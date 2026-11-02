@@ -32,9 +32,10 @@ service cloud.firestore {
           allow read: if isMember(cid);
           allow write: if isMember(cid) && request.auth.uid == uid;
         }
-        // The photo you chose to see at the top: only you
+        // The photo each of you picks: both can see it, only the owner changes it
         match /extra/{doc} {
-          allow read, write: if isMember(cid) && request.auth.uid == uid;
+          allow read: if isMember(cid);
+          allow write: if isMember(cid) && request.auth.uid == uid;
         }
       }
 

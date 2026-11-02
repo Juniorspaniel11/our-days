@@ -485,8 +485,8 @@ function watchPerson(u,isMe){
       if(ch.doc.metadata.hasPendingWrites)return;p.days[k]=ch.doc.data();if(isMe)sent["day:"+k]=js(p.days[k])});
     softRender();
   },e=>console.warn(e)));
-  if(isMe)list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
-    if(S.people[u]){S.people[u].photo=ph;S.people[u].photoLoaded=true}sent.photo=js({photo:ph||null});softRender()},()=>{if(S.people[u])S.people[u].photoLoaded=true}));
+  list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
+    if(S.people[u]){S.people[u].photo=ph;S.people[u].photoLoaded=true}if(isMe)sent.photo=js({photo:ph||null});softRender()},()=>{if(S.people[u])S.people[u].photoLoaded=true}));
 }
 function start(profile){
   CID=profile.cid;S.viewAs=ME;S.code=CID;
@@ -1051,7 +1051,7 @@ function viewUs(){
       h("button",{type:"button",class:"ghost",style:"align-self:flex-start",onclick:async function(){try{await navigator.clipboard.writeText(S.code||CID);this.textContent="Copied"}catch(e){this.textContent="Press and hold the code to copy"}}},"Copy code")));
   }else{
   const pc=h("section",{class:"panel pcard"});
-  pc.appendChild(h("div",{class:"pchead"},h("div",{class:"mini"},o.photoOfMe?h("img",{src:o.photoOfMe,alt:""}):o.name[0]),h("div",{style:"min-width:0;flex:1"},h("h2",null,o.name+"'s day"),h("div",{class:"meta"},(on.key===mn.key?"Today in "+o.city:longDate(on.key)+" in "+o.city))),o.example?h("span",{class:"tag ex"},"Example data"):null));
+  pc.appendChild(h("div",{class:"pchead"},h("div",{class:"mini"},o.photo?h("img",{src:o.photo,alt:""}):o.name[0]),h("div",{style:"min-width:0;flex:1"},h("h2",null,o.name+"'s day"),h("div",{class:"meta"},(on.key===mn.key?"Today in "+o.city:longDate(on.key)+" in "+o.city))),o.example?h("span",{class:"tag ex"},"Example data"):null));
   const oev=itemsFor(oid,on.key).filter(x=>!x.skip&&!x.done),ocur=oev.find(x=>on.min>=x.s&&on.min<x.e),onext=oev.find(x=>x.s>on.min);
   pc.appendChild(h("div",{class:"now solid",style:"background:"+catColor(ocur||onext)},h("span",{class:"lbl"},ocur?"Right now":onext?"Up next":"Free"),h("b",null,ocur?ocur.title:onext?onext.title:"Nothing scheduled"),
     h("span",null,ocur?"Until "+fmt(ocur.e)+" there":onext?fmt(onext.s)+" there, "+fmt(onext.s+(mn.off-on.off))+" your time":"Nothing else scheduled today")));
@@ -1084,7 +1084,7 @@ function settingsSheet(){
       cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);cv.getContext("2d").drawImage(bmp,0,0,cv.width,cv.height);
       p.photo=cv.toDataURL("image/jpeg",0.82)}catch(e){const r=new FileReader();r.onload=()=>{p.photo=r.result;persist();render();settingsSheet()};r.readAsDataURL(f);return}
     persist();render();settingsSheet()}});
-  body.append(h("div",{class:"lbl"},"Photo at the top"),
+  body.append(h("div",{class:"lbl"},"Photo at the top"),h("p",{class:"hint"},o.placeholder?"Your partner also sees this photo on their Us tab.":o.name+" also sees this photo next to your day on the Us tab."),
     h("div",{class:"row"},h("span",{class:"ghost",style:"position:relative;overflow:hidden;display:inline-flex"},p.photo?"Change photo":"Add a photo",file),
       p.photo?h("button",{type:"button",class:"quiet",onclick:()=>{p.photo=null;persist();render();settingsSheet()}},"Remove"):null));
   const cur=S.theme||"system";
