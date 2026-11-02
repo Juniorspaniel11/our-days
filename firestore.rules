@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMember(cid) {
+      return signedIn() && request.auth.uid in get(/databases/$(database)/documents/couples/$(cid)).data.members;
+    }
+
+    // Each person's own profile: name, city, time zone, which space they belong to
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // The shared space for the two of you
+    match /couples/{cid} {
+      allow read: if isMember(cid);
+      // Creating a space: you must be its only member
+      allow create: if signedIn() && request.resource.data.members == [request.auth.uid];
+      // Joining with the code: only adds yourself, and only while there is one member
+      allow update: if signedIn()
+        && !(request.auth.uid in resource.data.members)
+        && resource.data.members.size() == 1
+        && request.resource.data.members == resource.data.members.concat([request.auth.uid])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members']);
+
+      // Each person's plan: both can read, only the owner can change it
+      match /people/{uid} {
+        allow read: if isMember(cid);
+        allow write: if isMember(cid) && request.auth.uid == uid;
+        match /days/{day} {
+          allow read: if isMember(cid);
+          allow write: if isMember(cid) && request.auth.uid == uid;
+        }
+        // The photo you chose to see at the top: only you
+        match /extra/{doc} {
+          allow read, write: if isMember(cid) && request.auth.uid == uid;
+        }
+      }
+
+      // Visit countdown, prayer, plans: both can read and change
+      match /shared/{doc} {
+        allow read, write: if isMember(cid);
+      }
+    }
+  }
+}
