@@ -321,16 +321,24 @@ html,body{margin:0}
 .gate .opt{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
 .code{font-family:var(--mono);font-size:26px;letter-spacing:.12em;background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:10px 14px;text-align:center;user-select:all;-webkit-user-select:all}
 .invite{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
-.tz{cursor:pointer;font:inherit;color:inherit}
+.tz{cursor:pointer;font-family:inherit;color:inherit}
 .tz.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .tz:disabled{cursor:default}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
 .robar button{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:14px}
-body.ro main :is(input,select,textarea,.x,.primary,.ghost,.edit,.link,.pill,.cd,.cdrow){pointer-events:none}
+body.ro main :is(input,select,textarea,.x,.primary,.ghost,.edit,.link,.pill,.cd,.cdrow,.scale button){pointer-events:none}
 body.ro main :is(.addtask,form,.habit .ghost,.proj .row,.what .row){display:none!important}
 body.ro main .sechead :is(.primary,.link){display:none!important}
 body.ro main .robar button{pointer-events:auto}
+.ckrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}
+.ckl{width:64px;font-weight:600;flex:none}
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.scale button{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;min-width:38px}
+.scale button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:600}
+.callrow{display:flex;gap:8px;flex-wrap:wrap}
+.callrow a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:8px 16px}
+.callrow a.c1{background:#3f7d4e;color:#fff}.callrow a.c2{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 </style>
 </head>
 
@@ -449,7 +457,7 @@ const extraRef=u=>DB.doc("couples/"+CID+"/people/"+u+"/extra/photo");
 const sharedRef=()=>DB.doc("couples/"+CID+"/shared/main");
 let syncT=null;
 function persist(){saveLocal();if(!ME||!CID)return;clearTimeout(syncT);syncT=setTimeout(flush,400)}
-function hasContent(d){return d&&((d.tasks&&d.tasks.length)||(d.done&&d.done.length)||(d.skip&&d.skip.length)||(d.habits&&d.habits.length))}
+function hasContent(d){return d&&((d.tasks&&d.tasks.length)||(d.done&&d.done.length)||(d.skip&&d.skip.length)||(d.habits&&d.habits.length)||(d.checkin&&Object.keys(d.checkin).length))}
 function flush(){
   if(!DB||!ME||!CID)return;const p=S.people[ME];if(!p||!p.loaded)return;
   const cutoff=addDays(tzNow(p.tz).key,-120);
@@ -484,7 +492,8 @@ function watchPerson(u,isMe){
     const cur=S.people[u]||{};
     if(!sn.exists){if(isMe&&cur)cur.loaded=true;return}
     const d=sn.data();
-    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,photoLoaded:cur.photoLoaded,partner:cur.partner,loaded:true};
+    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,loaded:true};
+    if(isMe)setTimeout(quickAdd,0);
     if(isMe)sent.person=js(d);
     link();softRender();
   },e=>console.warn(e)));
@@ -493,10 +502,19 @@ function watchPerson(u,isMe){
     const p=S.people[u];if(!p)return;
     qs.docChanges().forEach(ch=>{const k=ch.doc.id;if(ch.type==="removed"){delete p.days[k];return}
       if(ch.doc.metadata.hasPendingWrites)return;p.days[k]=ch.doc.data();if(isMe)sent["day:"+k]=js(p.days[k])});
+    if(isMe){p.daysLoaded=true;quickAdd()}
     softRender();
   },e=>console.warn(e)));
   list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
     if(S.people[u]){S.people[u].photo=ph;S.people[u].photoLoaded=true}if(isMe)sent.photo=js({photo:ph||null});softRender()},()=>{if(S.people[u])S.people[u].photoLoaded=true}));
+}
+/* Siri and Shortcuts: opening the app with ?add=Some task adds it to today */
+let pendingAdd=null;try{pendingAdd=new URLSearchParams(location.search).get("add")}catch(e){}
+function quickAdd(){
+  const p=S.people[ME];if(!pendingAdd||!p||!p.loaded||!p.daysLoaded)return;
+  const t=pendingAdd.trim();pendingAdd=null;
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  if(!t)return;addTask(ME,tzNow(p.tz).key,t);render();toast("Added to today",t);
 }
 function start(profile){
   CID=profile.cid;S.viewAs=ME;S.code=CID;
@@ -929,11 +947,29 @@ function habitsList(pid,k,editable){
 function panel(title,content,right){return h("section",{class:"panel"},h("div",{class:"sechead"},h("h2",null,title),right||null),content)}
 
 /* ---------- views ---------- */
+const MOODS=["Rough","Low","Okay","Good","Great"];
+function checkinSummary(c){if(!c||!Object.keys(c).length)return "";const out=[];
+  if(c.sleep!=null)out.push("slept "+c.sleep+" h");if(c.energy)out.push("energy "+c.energy+"/5");if(c.mood)out.push("mood "+MOODS[c.mood-1].toLowerCase());return out.join(" · ")}
+function sleepAvg(pid){const p=P(pid),t=tzNow(p.tz).key;let n=0,sum=0;for(let i=0;i<7;i++){const d=p.days[addDays(t,-i)];if(d&&d.checkin&&d.checkin.sleep!=null){n++;sum+=+d.checkin.sleep}}return n?{avg:Math.round(sum/n*10)/10,n}:null}
+function checkinCard(pid,k){
+  const d=day(pid,k);d.checkin=d.checkin||{};const c=d.checkin;
+  const set=(f,v)=>{c[f]=c[f]===v?null:v;if(c[f]==null)delete c[f];persist();render()};
+  const scale=(f,labels)=>h("div",{class:"scale",role:"group","aria-label":f},labels.map((l,i)=>h("button",{type:"button","aria-pressed":String(c[f]===i+1),onclick:()=>set(f,i+1)},l)));
+  const sl=h("select",{class:"inp",style:"width:auto","aria-label":"Hours of sleep",onchange:()=>{if(sl.value==="")delete c.sleep;else c.sleep=+sl.value;persist();render()}},
+    [h("option",{value:""},"Hours")].concat(Array.from({length:21},(_,i)=>3+i*0.5).map(v=>h("option",{value:String(v)},String(v)))));
+  sl.value=c.sleep!=null?String(c.sleep):"";
+  const av=sleepAvg(pid);
+  return h("section",{class:"panel"},h("div",{class:"sechead"},h("h2",null,"Check in"),h("span",{class:"hint"},av?"Sleep this week: "+av.avg+" h average":"5 seconds, once a day")),
+    h("div",{class:"ckrow"},h("span",{class:"ckl"},"Sleep"),sl,h("span",{class:"hint"},"hours last night")),
+    h("div",{class:"ckrow"},h("span",{class:"ckl"},"Energy"),scale("energy",["1","2","3","4","5"])),
+    h("div",{class:"ckrow"},h("span",{class:"ckl"},"Mood"),scale("mood",MOODS)));
+}
 function viewToday(){
   const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   return [
     countdownStrip(pid),
     dayCard(pid,n.key,"Today"),
+    checkinCard(pid,n.key),
     panel("Every day",habitsList(pid,n.key,true),h("button",{type:"button",class:"link",onclick:()=>{ui.habitEdit=!ui.habitEdit;render()}},ui.habitEdit?"Done":"Edit"))
   ];
 }
@@ -1065,6 +1101,11 @@ function viewUs(){
   const oev=itemsFor(oid,on.key).filter(x=>!x.skip&&!x.done),ocur=oev.find(x=>on.min>=x.s&&on.min<x.e),onext=oev.find(x=>x.s>on.min);
   pc.appendChild(h("div",{class:"now solid",style:"background:"+catColor(ocur||onext)},h("span",{class:"lbl"},ocur?"Right now":onext?"Up next":"Free"),h("b",null,ocur?ocur.title:onext?onext.title:"Nothing scheduled"),
     h("span",null,ocur?"Until "+fmt(ocur.e)+" there":onext?fmt(onext.s)+" there, "+fmt(onext.s+(mn.off-on.off))+" your time":"Nothing else scheduled today")));
+  const tel=(o.phone||"").replace(/[^0-9+]/g,"");
+  pc.appendChild(tel?h("div",{class:"callrow"},h("a",{class:"c1",href:"tel:"+tel},"Call "+o.name),h("a",{class:"c2",href:"facetime:"+tel},"FaceTime"),h("a",{class:"c2",href:"facetime-audio:"+tel},"FaceTime audio"))
+    :h("p",{class:"hint"},o.name+" can add a phone number in Settings to get Call and FaceTime buttons here."));
+  const oc=checkinSummary(day(oid,on.key).checkin);
+  pc.appendChild(h("div",{class:"lbl"},"Check in"));pc.appendChild(h("p",{class:oc?"":"empty",style:"margin:0"},oc?oc.charAt(0).toUpperCase()+oc.slice(1):"No check in yet today"));
   pc.appendChild(h("div",{class:"lbl"},"Tasks"));pc.appendChild(tasksBlock(oid,on.key,false));
   pc.appendChild(h("div",{class:"lbl"},"Schedule"));pc.appendChild(schedule(oid,on.key,{editable:false,viewer:pid}));
   pc.appendChild(h("div",{class:"lbl"},"Every day"));pc.appendChild(habitsList(oid,on.key,false));
@@ -1111,11 +1152,13 @@ function settingsSheet(){
   });
   body.appendChild(h("p",{class:"hint"},"Your choices are saved now. Notifications switch on in the next update."));
   const nm=h("input",{type:"text",class:"inp",value:p.name}),ct=h("input",{type:"text",class:"inp",value:p.city}),tzi=h("input",{type:"text",class:"inp",value:p.tz});
+  const ph=h("input",{type:"tel",class:"inp",value:p.phone||"",placeholder:"e.g. +1 940 555 0123",autocomplete:"tel"});
   body.append(h("div",{class:"lbl"},"Profile"),
     h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Name"),nm),h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"City"),ct)),
     h("div",{class:"field"},h("label",null,"Time zone"),tzi),
-    h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{p.name=nm.value.trim()||p.name;p.city=ct.value.trim()||p.city;
-      const t=tzi.value.trim();try{new Intl.DateTimeFormat("en-US",{timeZone:t});p.tz=t}catch(e){}persist();DB.doc("users/"+ME).set({name:p.name,city:p.city,tz:p.tz,cid:CID});render();settingsSheet()}},"Save profile"),
+    h("div",{class:"field"},h("label",null,"Phone number (for "+o.name+"'s Call and FaceTime buttons)"),ph),
+    h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{p.name=nm.value.trim()||p.name;p.city=ct.value.trim()||p.city;p.phone=ph.value.trim();
+      const t=tzi.value.trim();try{new Intl.DateTimeFormat("en-US",{timeZone:t});p.tz=t}catch(e){}persist();DB.doc("users/"+ME).set({name:p.name,city:p.city,tz:p.tz,cid:CID},{merge:true});render();settingsSheet()}},"Save profile"),
       h("button",{type:"button",class:"quiet",onclick:()=>{tzi.value=Intl.DateTimeFormat().resolvedOptions().timeZone}},"Use this device's time zone")));
   body.append(h("div",{class:"lbl"},"Shared space code"),h("div",{class:"code",style:"font-size:18px"},S.code||CID||""),
     h("p",{class:"hint"},"Your partner joins with this code."),
