@@ -972,7 +972,6 @@ function viewToday(){
   return [
     countdownStrip(pid),
     dayCard(pid,n.key,"Today"),
-    checkinCard(pid,n.key),
     panel("Every day",habitsList(pid,n.key,true),h("button",{type:"button",class:"link",onclick:()=>{ui.habitEdit=!ui.habitEdit;render()}},ui.habitEdit?"Done":"Edit"))
   ];
 }
@@ -1107,8 +1106,6 @@ function viewUs(){
   const tel=(o.phone||"").replace(/[^0-9+]/g,"");
   pc.appendChild(tel?h("div",{class:"callrow"},h("a",{class:"c1",href:"tel:"+tel},"Call "+o.name),h("a",{class:"c2",href:"facetime:"+tel},"FaceTime"),h("a",{class:"c2",href:"facetime-audio:"+tel},"FaceTime audio"))
     :h("p",{class:"hint"},o.name+" can add a phone number in Settings to get Call and FaceTime buttons here."));
-  const oc=checkinSummary(day(oid,on.key).checkin);
-  pc.appendChild(h("div",{class:"lbl"},"Check in"));pc.appendChild(h("p",{class:oc?"":"empty",style:"margin:0"},oc?oc.charAt(0).toUpperCase()+oc.slice(1):"No check in yet today"));
   pc.appendChild(h("div",{class:"lbl"},"Tasks"));pc.appendChild(tasksBlock(oid,on.key,false));
   pc.appendChild(h("div",{class:"lbl"},"Schedule"));pc.appendChild(schedule(oid,on.key,{editable:false,viewer:pid}));
   pc.appendChild(h("div",{class:"lbl"},"Every day"));pc.appendChild(habitsList(oid,on.key,false));
