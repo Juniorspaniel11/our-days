@@ -339,6 +339,7 @@ body.ro main .robar button{pointer-events:auto}
 .callrow{display:flex;gap:8px;flex-wrap:wrap}
 .callrow a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:8px 16px}
 .callrow a.c1{background:#3f7d4e;color:#fff}.callrow a.c2{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.pushbox{display:flex;flex-direction:column;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:6px}
 </style>
 </head>
 
@@ -462,7 +463,7 @@ function flush(){
   if(!DB||!ME||!CID)return;const p=S.people[ME];if(!p||!p.loaded)return;
   const cutoff=addDays(tzNow(p.tz).key,-120);
   if(p.focus)Object.keys(p.focus).forEach(k=>{if(k<cutoff)delete p.focus[k]});
-  const {days,partner,photo,loaded,...doc}=p;
+  const {days,partner,photo,loaded,photoLoaded,daysLoaded,cal,...doc}=p;
   put("person",personRef(ME),doc);
   if(p.photoLoaded)put("photo",extraRef(ME),{photo:photo||null});
   for(const k in days){if(sent["day:"+k]===undefined&&!hasContent(days[k]))continue;put("day:"+k,dayRef(ME,k),days[k])}
@@ -492,7 +493,7 @@ function watchPerson(u,isMe){
     const cur=S.people[u]||{};
     if(!sn.exists){if(isMe&&cur)cur.loaded=true;return}
     const d=sn.data();
-    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,loaded:true};
+    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
     if(isMe)setTimeout(quickAdd,0);
     if(isMe)sent.person=js(d);
     link();softRender();
@@ -505,6 +506,7 @@ function watchPerson(u,isMe){
     if(isMe){p.daysLoaded=true;quickAdd()}
     softRender();
   },e=>console.warn(e)));
+  list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/calendar").onSnapshot(sn=>{const p=S.people[u];if(!p)return;p.cal=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
     if(S.people[u]){S.people[u].photo=ph;S.people[u].photoLoaded=true}if(isMe)sent.photo=js({photo:ph||null});softRender()},()=>{if(S.people[u])S.people[u].photoLoaded=true}));
 }
@@ -604,7 +606,8 @@ function itemsFor(pid,k){
   const p=P(pid),dow=parseKey(k).getDay(),d=day(pid,k);
   const r=p.routine.filter(x=>(x.days||[]).includes(dow)).map(x=>({...x,kind:"rep"}));
   const e=p.events.filter(x=>x.date===k).map(x=>({...x,kind:"one"}));
-  return r.concat(e).map(x=>{const s=toMin(x.start);return {...x,s,e:toMin(x.end)??s+60,done:d.done.includes(x.id),skip:d.skip.includes(x.id)}}).sort((a,b)=>a.s-b.s);
+  const c=((p.cal&&p.cal.events)||[]).filter(x=>x.date===k).map(x=>({...x,kind:"cal"}));
+  return r.concat(e,c).map(x=>{const s=x.allDay?-1:toMin(x.start);return {...x,s,e:x.allDay?-1:(toMin(x.end)??s+60),done:d.done.includes(x.id),skip:d.skip.includes(x.id)}}).sort((a,b)=>a.s-b.s);
 }
 function carry(pid){
   const p=P(pid),t=tzNow(p.tz).key;if(p.lastCarry===t)return;p.lastCarry=t;
@@ -823,11 +826,11 @@ function schedule(pid,k,opts){
   if(!items.length)tl.appendChild(h("div",{class:"ev"},h("div",{class:"empty"},"Nothing scheduled.")));
   items.forEach(x=>{
     const cls="ev"+(isToday&&!x.done&&!x.skip&&n.min>=x.s&&n.min<x.e?" cur":"")+(x.kind==="rep"?" rep":"")+(isToday&&n.min>=x.e&&!x.done&&!x.skip?" past":"")+(x.done?" done":"")+(x.skip?" skip":"");
-    const times=h("div",{class:"t"},fmt(x.s),h("br"),fmt(x.e));
-    const rep=x.kind==="rep"?"Every "+x.days.slice().sort((a,b)=>((a+6)%7)-((b+6)%7)).map(d=>SH[d]).join(", "):"One time";
+    const times=x.allDay?h("div",{class:"t"},"All day"):h("div",{class:"t"},fmt(x.s),h("br"),fmt(x.e));
+    const rep=x.kind==="cal"?"From your calendar"+(x.location?" · "+x.location:""):x.kind==="rep"?"Every "+x.days.slice().sort((a,b)=>((a+6)%7)-((b+6)%7)).map(d=>SH[d]).join(", "):"One time";
     const smalls=[];
     if(x.skip)smalls.push("Cancelled for this day");else{if(x.done)smalls.push("Done");if(x.note)smalls.push(x.note);smalls.push(rep)}
-    if(diff)smalls.unshift(fmt(x.s+diff)+" your time");
+    if(diff&&!x.allDay)smalls.unshift(fmt(x.s+diff)+" your time");
     const isCur=isToday&&!x.done&&!x.skip&&n.min>=x.s&&n.min<x.e,isNext=isToday&&!x.done&&!x.skip&&x.s>n.min&&x.s-n.min<=60;
     const cc=catColor(x);
     const what=h("div",{class:"what"},h("b",null,isCur?h("span",{class:"nowtag"},"Now"):isNext?h("span",{class:"nowtag next"},"In "+(x.s-n.min)+" min"):null,x.title),
@@ -836,7 +839,7 @@ function schedule(pid,k,opts){
       const acts=h("div",{class:"row"});
       if(x.agenda){const a=(p.agenda[x.id]||[]).filter(i=>!i.d).length;acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>agendaSheet(pid,x)},"Agenda ("+a+")"))}
       if(x.skip)acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>toggleIn(pid,k,"skip",x.id)},"Restore"));
-      else acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>itemSheet(pid,k,x)},"Edit"));
+      else if(x.kind!=="cal")acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>itemSheet(pid,k,x)},"Edit"));
       what.appendChild(acts);
       const cb=h("input",{type:"checkbox",checked:x.done,disabled:x.skip,"aria-label":"Mark done",onchange:()=>toggleIn(pid,k,"done",x.id)});
       tl.appendChild(h("div",{class:cls,style:"--cc:"+cc},h("div",{class:"evrow"},cb,times,what)));
@@ -1126,6 +1129,31 @@ function viewUs(){
 }
 
 /* ---------- settings ---------- */
+const VAPID_PUBLIC="BMUJsWU9rc_xiWa16ujIUeNcvlDAot-lPoFYKX3hVAjALmPRWXrAgNU8OvTkbmKEdpuBKVUbeOGlO63qk_Gqv24";
+function b64ToBytes(b){const p="=".repeat((4-b.length%4)%4),s=atob((b+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from([...s].map(c=>c.charCodeAt(0)))}
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const standalone=()=>window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+function pushBox(){
+  const box=h("div",{class:"pushbox"}),msg=h("span",{class:"msg"});
+  const supported="serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+  const state=supported?Notification.permission:"unsupported";
+  if(isIOS&&!standalone()){box.append(h("b",null,"Notifications on this iPhone"),h("p",{class:"hint"},"Open Our Days from its home screen icon (not Safari) and come back here to switch them on."));return box}
+  if(!supported){box.append(h("b",null,"Notifications"),h("p",{class:"hint"},"This browser can't receive notifications. On iPhone, use the home screen app."));return box}
+  const on=state==="granted"&&localStorage.getItem("od-push")==="1";
+  box.append(h("b",null,on?"Notifications are on for this device":"Notifications on this device"),
+    h("p",{class:"hint"},state==="denied"?"Notifications are blocked. Allow them in your phone or browser settings for Our Days, then come back.":on?"Each phone or laptop you use has its own switch.":"Switch them on once on each phone or laptop you use."),
+    h("div",{class:"row"},
+      state==="denied"?null:h("button",{type:"button",class:on?"ghost":"primary",onclick:async()=>{msg.textContent="Asking…";
+        try{const perm=await Notification.requestPermission();if(perm!=="granted"){msg.textContent="Not allowed. You can change this in Settings later.";return}
+          const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
+          if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToBytes(VAPID_PUBLIC)});
+          const j=sub.toJSON(),id="d"+Math.abs([...j.endpoint].reduce((a,c)=>(a*31+c.charCodeAt(0))|0,7)).toString(36);
+          await DB.doc("users/"+ME).set({push:{[id]:{endpoint:j.endpoint,keys:j.keys}}},{merge:true});
+          try{localStorage.setItem("od-push","1")}catch(e){}msg.textContent="On. Try a test.";settingsSheet()}
+        catch(e){console.warn(e);msg.textContent="Couldn't switch on. Try again."}}},on?"Refresh this device":"Turn on notifications"),
+      on?h("button",{type:"button",class:"ghost",onclick:async()=>{try{await DB.doc("users/"+ME).set({testPushAt:Date.now()},{merge:true});msg.textContent="Test requested. It arrives within about 5 minutes."}catch(e){msg.textContent="Couldn't request a test."}}},"Send me a test"):null,msg));
+  return box;
+}
 function settingsSheet(){
   const pid=ME,p=P(pid),o=P(partnerOf(pid)),nf=p.settings.notif;
   const body=h("div",{class:"body"});
@@ -1144,13 +1172,19 @@ function settingsSheet(){
   const sp=h("input",{type:"checkbox",checked:p.settings.shareProjects,onchange:()=>{p.settings.shareProjects=sp.checked;persist()}});
   body.append(h("div",{class:"lbl"},"Sharing"),h("label",{class:"check"},sp,"Let "+o.name+" see my projects"),h("p",{class:"hint"},o.name+" always sees your schedule, tasks and habits. Only you can change them."));
   body.appendChild(h("div",{class:"lbl"},"Notifications"));
-  const rows=[["morning","Morning plan","morningAt","Your day, top 3 and closest countdown"],["evening","Plan tomorrow","eveningAt","Pick tomorrow's top 3"],["countdown","Countdown alerts",null,"30, 7 and 1 day before, plus checkpoints"],["meeting","Before meetings",null,"10 minutes before, with the agenda"],["prayer","Prayer reminder","prayerAt","Gentle nudge if you haven't prayed yet"]];
+  const rows=[["morning","Morning plan","morningAt","Your day, top 3 and closest countdown"],["evening","Plan tomorrow","eveningAt","Pick tomorrow's top 3"],["countdown","Countdown alerts",null,"30, 14, 7, 3 and 1 day before, plus checkpoints"],["meeting","Before meetings",null,"10 minutes before, with the agenda"],["prayer","Prayer reminder","prayerAt","Gentle nudge if you haven't prayed yet"]];
   rows.forEach(([k,label,tk,desc])=>{
     const cb=h("input",{type:"checkbox",checked:nf[k],onchange:()=>{nf[k]=cb.checked;persist()}});
     const ti=tk?h("input",{type:"time",class:"inp",value:nf[tk],"aria-label":label+" time",onchange:()=>{nf[tk]=ti.value;persist()}}):null;
     body.appendChild(h("div",{class:"setrow"},h("label",{class:"check",style:"flex:1"},cb,h("span",null,label,h("br"),h("small",{style:"color:var(--muted);font-size:14px"},desc))),ti));
   });
-  body.appendChild(h("p",{class:"hint"},"Your choices are saved now. Notifications switch on in the next update."));
+  body.appendChild(pushBox());
+  const calIn=h("textarea",{class:"inp",rows:"3",placeholder:"Paste your private calendar link here. One per line if you have more than one.","aria-label":"Calendar links"});calIn.value=p.settings.cal||"";
+  const calMsg=h("span",{class:"msg"});const cs=p.cal;
+  body.append(h("div",{class:"lbl"},"Calendars"),
+    h("p",{class:"hint"},"Google Calendar: on a computer open calendar.google.com → Settings → your calendar → Integrate calendar → copy \"Secret address in iCal format\". UNT Outlook: Settings → Calendar → Shared calendars → Publish a calendar → copy the ICS link."),
+    calIn,h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{p.settings.cal=calIn.value.trim();persist();calMsg.textContent="Saved. Events show up within a few minutes."}},"Save calendars"),calMsg),
+    cs&&cs.fetchedAt?h("p",{class:"hint"},"Last synced "+new Date(cs.fetchedAt).toLocaleString("en-US",{weekday:"short",hour:"numeric",minute:"2-digit"})+" · "+((cs.events||[]).length)+" events in the next 3 weeks"+((cs.errors||[]).length?" · Couldn't load: "+cs.errors.join(", "):"")):"");
   const nm=h("input",{type:"text",class:"inp",value:p.name}),ct=h("input",{type:"text",class:"inp",value:p.city}),tzi=h("input",{type:"text",class:"inp",value:p.tz});
   const ph=h("input",{type:"tel",class:"inp",value:p.phone||"",placeholder:"e.g. +1 940 555 0123",autocomplete:"tel"});
   body.append(h("div",{class:"lbl"},"Profile"),

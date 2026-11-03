@@ -1,0 +1,10 @@
+{
+  "name": "our-days-server",
+  "private": true,
+  "description": "Background job for Our Days: calendar sync and notifications",
+  "dependencies": {
+    "firebase-admin": "12.7.0",
+    "node-ical": "0.20.1",
+    "web-push": "3.6.7"
+  }
+}
