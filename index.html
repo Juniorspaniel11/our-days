@@ -321,6 +321,16 @@ html,body{margin:0}
 .gate .opt{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
 .code{font-family:var(--mono);font-size:26px;letter-spacing:.12em;background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:10px 14px;text-align:center;user-select:all;-webkit-user-select:all}
 .invite{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.tz{cursor:pointer;font:inherit;color:inherit}
+.tz.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tz:disabled{cursor:default}
+.robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
+.robar span{min-width:0}
+.robar button{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:14px}
+body.ro main :is(input,select,textarea,.x,.primary,.ghost,.edit,.link,.pill,.cd,.cdrow){pointer-events:none}
+body.ro main :is(.addtask,form,.habit .ghost,.proj .row,.what .row){display:none!important}
+body.ro main .sechead :is(.primary,.link){display:none!important}
+body.ro main .robar button{pointer-events:auto}
 </style>
 </head>
 
@@ -920,7 +930,7 @@ function panel(title,content,right){return h("section",{class:"panel"},h("div",{
 
 /* ---------- views ---------- */
 function viewToday(){
-  const pid=me(),p=P(pid),n=tzNow(p.tz);carry(pid);
+  const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   return [
     countdownStrip(pid),
     dayCard(pid,n.key,"Today"),
@@ -1076,7 +1086,7 @@ function viewUs(){
 
 /* ---------- settings ---------- */
 function settingsSheet(){
-  const pid=me(),p=P(pid),o=P(partnerOf(pid)),nf=p.settings.notif;
+  const pid=ME,p=P(pid),o=P(partnerOf(pid)),nf=p.settings.notif;
   const body=h("div",{class:"body"});
   const file=h("input",{type:"file",accept:"image/*",style:"position:absolute;inset:0;opacity:0;cursor:pointer","aria-label":"Choose a photo",onchange:async()=>{
     const f=file.files&&file.files[0];if(!f)return;
@@ -1153,12 +1163,20 @@ function render(){
   av.setAttribute("aria-label",p.photo?o.name+"'s photo, change in settings":"Add "+o.name+"'s photo");
   el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
   const greet=n.min<300?"Still up":n.min<720?"Good morning":n.min<1020?"Good afternoon":n.min<1320?"Good evening":"Good night";
-  el("title").textContent={today:greet+", "+p.name,week:"Plan the week",projects:"Your projects",us:p.name+" & "+o.name}[S.tab];
+  const RO=pid!==ME;document.body.classList.toggle("ro",RO);
+  el("title").textContent=RO?{today:p.name+"'s day",week:p.name+"'s week",projects:p.name+"'s projects",us:p.name+" & "+o.name}[S.tab]
+    :{today:greet+", "+p.name,week:"Plan the week",projects:"Your projects",us:p.name+" & "+o.name}[S.tab];
   const sl=el("subline");sl.innerHTML="";
-  sl.append(h("span",{class:"tz"},h("i",null,p.name[0]),h("b",null,fmt(n.min)),h("span",null,p.city)),
-    h("span",{class:"tz them"},h("i",null,o.name[0]),h("b",null,fmt(tzNow(o.tz).min)),h("span",null,o.city)));
+  const pidP=partnerOf(ME);
+  [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
+    sl.appendChild(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
+      "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
+      onclick:()=>{if(ph||S.viewAs===id)return;S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
+      h("i",null,(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")))});
   const th=S.theme||"system";if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
   const main=el("main");main.innerHTML="";
+  if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
+    h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
   const v={today:viewToday,week:viewWeek,projects:viewProjects,us:viewUs}[S.tab]();
   v.forEach(x=>main.appendChild(x));
   renderTimer();
