@@ -492,6 +492,16 @@ body.tab-us #avatar{display:none}
 .ju .hbar{width:100%;height:6px;border-radius:99px;background:color-mix(in srgb,#8b6ad1 18%,transparent);overflow:hidden;margin-top:4px}.ju .hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8b6ad1,#e2557c)}
 .ju .hmiles{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
 body.tab-us #title,body.tab-us #subline{display:none}
+.hstat{width:100%;min-width:0;display:flex;flex-direction:column;gap:6px}
+.hstat .hst{white-space:normal;overflow:visible}.hstat .hsp{width:100%}.hstat .hsp-pres{margin-left:auto}
+.hstat .hsp{align-self:stretch;border-radius:16px;padding:6px 10px 6px 6px}
+.hsp{box-sizing:border-box;overflow:hidden;display:flex;align-items:center;gap:7px;font-size:13.5px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 3px;min-width:0;max-width:100%;color:var(--ink);text-align:left;align-self:flex-start}
+button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,transparent)}
+.hsp i{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-style:normal;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none}
+.hsp i.on{box-shadow:0 0 0 2px #2fbf71}
+.hsp .hse{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;flex:none}
+.hsp .hst{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.hsp .hsedit{color:#8b6ad1;flex:none}.hsp-pres{flex:none;color:var(--muted);font-weight:600;font-size:12px}.hsp-pres.on{color:#1f9d55}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -1497,7 +1507,7 @@ const kwEmoji=t=>{t=(t||"").toLowerCase();const R=[[/pray|bible|church|devot|wor
 const CD_EMOJI={visit:"✈️",presentation:"🎤",conference:"🧳",deadline:"⏳",project:"📌",other:"📅"};
 
 /* ---------- Spicy: romantic and flirty extras, only when you both switch it on ---------- */
-const SPICY_TOPIC={id:"spicy",name:"Spicy",c:"#d0393f",icon:"heart",tag:"spicy",qs:L(`Which outfit of mine drives you crazy?|Where would you love a surprise kiss from me?|What's the most attractive thing I do without realizing?|Describe our perfect slow evening together.|What's a romantic date idea you've never told me about?|Which of my features do you find most irresistible?|What's the best kiss we've had, and why?|Which song puts you in the mood for romance?|What compliment from me makes you blush?|What would you whisper to me if I were next to you right now?|What's your favorite way to be held?|Lips, neck, or forehead kisses?|What flirty message do you want me to send you more often?|Where would you love to be alone with me for a whole day?|What makes you feel most desired by me?|What do you miss most about being close to me?|What's the first thing you want to do when I pick you up at the airport?|What's one thing about my voice that gets you?|What's your favorite way for me to flirt with you?|What do you daydream about when you miss me?|What's the most memorable hug we've shared?|How do you feel when I hold your hand in public?|What would a perfect honeymoon evening look like to you?|Do you prefer chasing or being chased?|What do you love about the way I look at you?|What's the boldest romantic thing you'd do for me?|What small touch from me would make your whole day?|Which scent on me do you love most?|What's your idea of the perfect cuddle?|What do you wish I'd do more when we're together?|How long could you go without kissing me when we finally meet?|What's the most romantic thing I've ever said to you?|Which photo of me do you look at the most?|What would make our next reunion unforgettable?|What's a flirty nickname you'd secretly love?`)};
+const SPICY_TOPIC={id:"spicy",name:"Flirty",c:"#d0393f",icon:"heart",tag:"spicy",qs:L(`Which outfit of mine drives you crazy?|Where would you love a surprise kiss from me?|What's the most attractive thing I do without realizing?|Describe our perfect slow evening together.|What's a romantic date idea you've never told me about?|Which of my features do you find most irresistible?|What's the best kiss we've had, and why?|Which song puts you in the mood for romance?|What compliment from me makes you blush?|What would you whisper to me if I were next to you right now?|What's your favorite way to be held?|Lips, neck, or forehead kisses?|What flirty message do you want me to send you more often?|Where would you love to be alone with me for a whole day?|What makes you feel most desired by me?|What do you miss most about being close to me?|What's the first thing you want to do when I pick you up at the airport?|What's one thing about my voice that gets you?|What's your favorite way for me to flirt with you?|What do you daydream about when you miss me?|What's the most memorable hug we've shared?|How do you feel when I hold your hand in public?|What would a perfect honeymoon evening look like to you?|Do you prefer chasing or being chased?|What do you love about the way I look at you?|What's the boldest romantic thing you'd do for me?|What small touch from me would make your whole day?|Which scent on me do you love most?|What's your idea of the perfect cuddle?|What do you wish I'd do more when we're together?|How long could you go without kissing me when we finally meet?|What's the most romantic thing I've ever said to you?|Which photo of me do you look at the most?|What would make our next reunion unforgettable?|What's a flirty nickname you'd secretly love?`)};
 const SPICY_GAMES={
   likely:singles(`blush first 😳|send a flirty text first 😏|start a cuddle 🫂|steal a kiss in public 💋|sing a love song to the other 🎶|plan a romantic surprise 🌹|stare at the other a little too long 👀|fall asleep during cuddles 😴|wear the other's hoodie 🧥|write a love poem 📜|ask for one more kiss 😘|get butterflies at the airport 🦋`),
   wyr:pairs(`forehead kisses 😚 / back hugs 🫂|slow dance in the kitchen 💃 / stargaze on a blanket ✨|get a love letter 💌 / a love song 🎶|a candlelit dinner 🕯️ / breakfast in bed 🥐|cuddle all day 🛌 / adventure all day 🧗|flirty texts all day 📱 / one long romantic call ☎️|a kiss in the rain 🌧️ / a kiss under fireworks 🎆|a surprise kiss 💋 / a surprise hug 🤗|a weekend cabin 🛖 / a beach bungalow 🏝️|be serenaded 🎸 / be swept off your feet 💫`),
@@ -1505,9 +1515,12 @@ const SPICY_GAMES={
   nhie:singles(`sent a flirty text to the wrong chat 🙈|dreamed about you 💭|practiced a kiss in the mirror 🪞|blushed reading your message 😳|replayed your voice note just to hear you 🎧|kept something that smells like you 👕|smiled at my phone in public because of you 📱|picked an outfit just to impress you 👗|imagined our first kiss before it happened 💋|stayed up late just to keep talking to you 🌙`),
   agree:singles(`Kissing beats hugging. 💋|Flirting should never stop after marriage. 😏|Romance is better planned than spontaneous. 📅|Physical touch matters even in long distance. 🫂|Holding hands in public is a must. 🤝|A good cuddle fixes almost everything. 🧸|Every couple needs a song. 🎶|Dressing up for each other still matters. 👗|Saying I love you every day never gets old. ❤️|The best part of a visit is the first hug. 🤗`)
 };
-TOPICS.push(SPICY_TOPIC);TOPIC_EMOJI.spicy="🌶️";
-const spicyOn=()=>{const s=US.main.spicy||{};return !!(PARTNER&&s[ME]&&s[PARTNER])};
-const gItems=g=>spicyOn()&&SPICY_GAMES[g.id]?g.items.concat(SPICY_GAMES[g.id]):g.items;
+TOPICS.push(SPICY_TOPIC);TOPIC_EMOJI.spicy="💋";
+const spicyOn=()=>!!((US.main.spicy||{})[ME]);
+const gItems=g=>g.items;
+const FLIRTY_GAME={id:"flirty",name:"Flirty picks",e:"💋",c:"#d0393f",icon:"heart",intro:"Pick the one you'd love most.",items:SPICY_GAMES.wyr.concat(SPICY_GAMES.tot),
+  q:()=>"Which would you love?",lab:x=>x[0].t+" or "+x[1].t,opts:x=>x.map(o=>o.t),optPics:x=>x.map(o=>o.e)};
+const visibleGames=()=>spicyOn()?GAMES.concat([FLIRTY_GAME]):GAMES;
 
 /* ---------- Love points: earned from things you already do together ---------- */
 function lovePoints(){
@@ -1808,7 +1821,7 @@ function presenceOf(u){const p=P(u)&&P(u).presence;if(!p||!p.at)return {on:false
 const EV_EXTRA=[["call","Video call","📹"],["movie","Watch a movie together","🎬"],["cook","Cook the same meal","🍳"],["bible","Read the Bible together","📖"],["music","Share songs","🎶"],["walk","Walk and talk on the phone","🚶"],["study","Study together on video","💻"]];
 function evActs(){const a=[];
   a.push(["dq","Question of the day","❓"],["photo","Photo of the day","📸"]);
-  GAMES.forEach(g=>a.push(["game:"+g.id,g.name,g.e]));
+  visibleGames().forEach(g=>a.push(["game:"+g.id,g.name,g.e]));
   enabledTopics().forEach(t=>a.push(["topic:"+t.id,"Ask: "+t.name,TOPIC_EMOJI[t.id]]));
   a.push(["prayer","Pray together","🙏"],["paint","Paint together","🎨"],["read","Read and discuss a chapter","📚"],["home","Build our dream home","🏡"],["letter","Write each other a letter","💌"],["plans","Plan the next visit","🗺️"],["checkin","Monthly check-in","🗓️"]);
   EV_EXTRA.forEach(([k,l,e])=>a.push(["x:"+k,l,e]));return a}
@@ -1979,7 +1992,7 @@ function somedayPlans(){
   out.push(h("form",{class:"row",onsubmit:e=>{e.preventDefault();if(!pi.value.trim())return;S.shared.plans.push({id:uid(),t:pi.value.trim(),d:false,by:ME});persist();refreshSheet()}},h("div",{style:"flex:1 1 200px"},pi),h("button",{type:"submit",class:"btn"},"Add")));
   return out}
 
-const gameById=id=>GAMES.find(g=>g.id===id);
+const gameById=id=>id==="flirty"?FLIRTY_GAME:GAMES.find(g=>g.id===id);
 
 /* ---------- Us data: couples/{cid}/us/main plus moments, letters, jar, nudges ---------- */
 const usRef=()=>DB.doc("couples/"+CID+"/us/main");
@@ -2011,7 +2024,7 @@ const HEART='<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4
 const ANS=()=>US.main.answers||{};
 const bothAnswered=id=>{const a=ANS()[id];return !!(a&&a[ME]&&a[PARTNER])};
 function enabledTopics(){const pr=US.main.prefs||{};return TOPICS.filter(t=>t.tag==="spicy"?spicyOn():!t.tag||pr[t.tag]!==false)}
-function dailyQ(k){const pool=[];enabledTopics().forEach(t=>t.qs.forEach((q,i)=>pool.push({tid:t.id,i,q})));return pool[hashN(k+"q",pool.length)]}
+function dailyQ(k){const pool=[];enabledTopics().filter(t=>t.tag!=="spicy").forEach(t=>t.qs.forEach((q,i)=>pool.push({tid:t.id,i,q})));return pool[hashN(k+"q",pool.length)]}
 const dailyPrompt=k=>PHOTOPROMPTS[hashN(k+"p",PHOTOPROMPTS.length)];
 const GM=gid=>((US.main.games||{})[gid])||{};
 const gameRound=(gid,k)=>(GM(gid).rounds||{})[k]||0;
@@ -2171,7 +2184,7 @@ function gameSheet(g){juSheet(g.name,()=>{
     h("div",{class:"totres"},set.map((s,n)=>{const it=gItems(g)[s],op=g.opts(it);const pp=g.optPics(it),pe=pp?pp[mine[n]]+(mine[n]===theirs[n]?"":" "+pp[theirs[n]]):g.pic(it);
       return h("div",{class:"rrow"+(mine[n]===theirs[n]?" m":"")},emo(pe.split(" ")[0],34,false),h("div",null,h("b",null,lab(it)),h("span",null,"You: "+op[mine[n]]+" · "+nm(o)+": "+op[theirs[n]])))})),
     h("button",{type:"button",class:"btn",style:"background:"+g.c,onclick:()=>saveUs({games:{[g.id]:{rounds:{[k]:r+1}}}})},"Play 5 more"),
-    h("p",{class:"hint"},gItems(g).length+" in this game"+(spicyOn()&&SPICY_GAMES[g.id]?", spicy ones included":"")+". New rounds every day.")]})}
+    h("p",{class:"hint"},gItems(g).length+" in this game. New rounds every day.")]})}
 
 function doodleSheet(){let col="#e2557c",size=6;juSheet("Doodle for "+nm(PARTNER),()=>{
   const c=h("canvas",{width:"640",height:"640","aria-label":"Drawing area"}),ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,640,640);ctx.lineCap="round";ctx.lineJoin="round";
@@ -2186,10 +2199,11 @@ function doodleSheet(){let col="#e2557c",size=6;juSheet("Doodle for "+nm(PARTNER
     h("button",{type:"button",class:"btn gh",onclick:()=>{ctx.fillStyle="#fff";ctx.fillRect(0,0,640,640);any=false}},"Clear"))]});sheetFn=null}
 
 function topicsSettingsSheet(){juSheet("Topics",()=>{const pr=US.main.prefs||{};return [
-  h("p",{class:"hint"},"Choose which kinds of questions show up. You both see the same set."),
+  h("p",{class:"hint"},"Choose which kinds of questions show up. These four apply to you both."),
   ...TOPICTOGGLES.map(([k,n,d])=>{const on=pr[k]!==false;return h("div",{class:"tog"},h("div",null,h("b",null,n),h("small",null,d)),h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(on),"aria-label":n,onclick:()=>saveUs({prefs:{[k]:!on}})}))}),
-  (()=>{const sp=US.main.spicy||{},mine=!!sp[ME],theirs=!!sp[PARTNER];return h("div",{class:"tog spicytog"},h("div",null,h("b",null,"Spicy 🌶️"),h("small",null,"Flirty, romantic questions and game rounds. They only show when you both switch this on. "+(theirs?nm(PARTNER)+" has it on.":nm(PARTNER)+" has it off."))),
-    h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(mine),"aria-label":"Spicy",onclick:()=>{saveUs({spicy:{[ME]:!mine}});if(!mine&&theirs){confetti(80);toast("Spicy is on 🌶️","New questions and game rounds unlocked")}}}))})()]})}
+  h("p",{class:"hint",style:"margin-top:10px"},"Just for you. "+nm(PARTNER)+" chooses separately."),
+  (()=>{const mine=spicyOn();return h("div",{class:"tog"},h("div",null,h("b",null,"Flirty 💋"),h("small",null,"Romantic, flirty questions and a Flirty picks game")),
+    h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(mine),"aria-label":"Flirty",onclick:()=>{saveUs({spicy:{[ME]:!mine}});if(!mine)toast("Flirty is on 💋","Find it under Ask each other and Play together")}}))})()]})}
 
 /* ---------- icons ---------- */
 const ICON={
@@ -2324,7 +2338,7 @@ function viewUs(){
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);
 
   out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Play together"),h("span",{class:"hint"},"5 rounds a day")),
-    sc(GAMES.map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
+    sc(visibleGames().map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
       return tile(g.c,g.e,g.name,h("small",{class:"sub"},a&&b?"See matches":a?"Waiting for "+nm(oo):b?"Your turn":"Play"),b&&!a,()=>gameSheet(g))}))));
 
   const A=ANS(),tops=enabledTopics();
@@ -2497,8 +2511,13 @@ function render(){
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
       onclick:()=>{if(ph||S.viewAs===id)return;if(S.tab==="us"&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
       h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")))});
+  let statusBar=null;
+  if(S.tab!=="us"&&P(pidP)&&!P(pidP).placeholder){const ms=statusOf(ME),ps=statusOf(pidP),pr=presenceOf(pidP);
+    statusBar=(h("div",{class:"hstat"},
+      h("button",{type:"button",class:"hsp mine",onclick:statusSheet,"aria-label":"Your status, tap to change"},h("i",null,(P(ME).name||"?")[0]),h("span",{class:"hse"},ms.e),h("span",{class:"hst"},ms.t),h("span",{class:"hsedit","aria-hidden":"true"},"✎")),
+      h("div",{class:"hsp"},h("i",{class:pr.on?"on":""},(P(pidP).name||"?")[0]),h("span",{class:"hse"},ps.e),h("span",{class:"hst"},ps.t),h("small",{class:"hsp-pres"+(pr.on?" on":"")},pr.on?"Online":(pr.text||"Offline").replace("Active ","")))))}
   const th=S.theme||"system";if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
-  const main=el("main");main.innerHTML="";
+  const main=el("main");main.innerHTML="";if(statusBar)main.appendChild(statusBar);
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
     h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
   const v={today:viewToday,week:viewWeek,projects:viewProjects,us:viewUs}[S.tab]();
@@ -2512,7 +2531,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-a";
+const APP_VERSION="2026-11-04-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
