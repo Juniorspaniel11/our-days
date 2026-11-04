@@ -412,6 +412,22 @@ body.ro main .robar button{pointer-events:auto}
 .ju .faces{display:flex;justify-content:space-between;gap:4px}
 .ju .face{flex:1;font-size:30px;line-height:1;padding:8px 0;border-radius:14px;border:2px solid transparent;background:var(--card);cursor:pointer;filter:grayscale(.7);opacity:.75}
 .ju .face.on{border-color:#3f8a4f;filter:none;opacity:1;background:color-mix(in srgb,#3f8a4f 12%,var(--card))}
+.ju .cstrip{display:grid;grid-template-columns:78px minmax(0,1fr) 78px;align-items:center;gap:6px}
+.ju .pcircle{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ju .pcircle>img,.ju .pcircle>span{width:74px;height:74px;border-radius:50%;object-fit:cover;border:3px solid var(--c);box-shadow:0 0 0 3px var(--card),var(--shadow);display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,var(--card));color:var(--c);font-family:var(--fun);font-weight:700;font-size:30px}
+.ju .pcircle small{font-size:12.5px;font-weight:700;color:var(--muted)}
+.ju .pfile{position:absolute;left:0;top:0;width:78px;height:78px;opacity:0;cursor:pointer}
+.ju .padd{position:absolute;right:0;top:50px;width:24px;height:24px;border-radius:50%;background:#5b3b8c;color:#fff;font-style:normal;font-weight:700;display:grid;place-items:center;border:2px solid var(--card);pointer-events:none}
+.ju .cmid{background:none;border:0;padding:0;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:0;min-width:0;text-align:center}
+.ju .cmid b{font-family:var(--fun);font-weight:700;font-size:24px;line-height:1.05}.ju .cmid>small{font-size:13px;font-weight:600;color:var(--muted)}
+.ju .cpath{width:100%;height:auto;display:block;margin:2px 0}
+.ju .cmeta{font-size:12.5px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.ju .cmeta .mono{font-family:var(--mono);color:var(--rose)}
+body.tab-us #avatar{display:none}
+.ju .pages{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.ju .pages::-webkit-scrollbar{display:none}
+.ju .pages{flex-wrap:wrap}
+.ju .pagebtn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--line);background:var(--bg);border-radius:16px;padding:6px 8px;cursor:pointer;color:var(--ink);min-width:72px}
+.ju .pagebtn small{font-size:12px;font-weight:600}.ju .pagebtn[aria-pressed="true"]{border-color:var(--rose);background:var(--rose-soft)}
+.ju .bfind{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:18px;padding:12px;background:var(--bg)}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -717,7 +733,7 @@ function watchPerson(u,isMe){
     const cur=S.people[u]||{};
     if(!sn.exists){if(isMe&&cur)cur.loaded=true;return}
     const d=sn.data();
-    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
+    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,avatar:cur.avatar,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
     if(isMe)setTimeout(quickAdd,0);
     if(isMe)sent.person=js(d);
     link();softRender();
@@ -731,6 +747,7 @@ function watchPerson(u,isMe){
     softRender();
   },e=>console.warn(e)));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/calendar").onSnapshot(sn=>{const p=S.people[u];if(!p)return;p.cal=sn.exists?sn.data():null;softRender()},()=>{}));
+  list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/avatar").onSnapshot(sn=>{if(S.people[u])S.people[u].avatar=sn.exists?sn.data().photo:null;softRender()},()=>{}));
   list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
     if(S.people[u]){S.people[u].photo=ph;S.people[u].photoLoaded=true}if(isMe)sent.photo=js({photo:ph||null});softRender()},()=>{if(S.people[u])S.people[u].photoLoaded=true}));
 }
@@ -1463,40 +1480,6 @@ function homeScene(big){
   sc.appendChild(h("div",{class:"hsign"},H.name||(nm(ME)&&P(PARTNER)?COUPLE().map(nm).join(" & ")+"'s home":"Our home")));
   return sc;
 }
-function homeSheet(){juSheet("Our dream home",()=>{
-  const H=HM(),pts=lovePoints()-homeSpent(),out=[homeScene(true)];
-  out.push(h("div",{class:"ptsbar"},h("span",null,emo("🌸",30,true)),h("div",null,h("b",null,pts.toLocaleString()+" love points"),h("small",null,"Spend them together. Either of you can add things.")),h("button",{type:"button",class:"lnk",onclick:()=>{const d=el("earnbox");d.hidden=!d.hidden}},"How to earn")));
-  out.push(h("div",{id:"earnbox",class:"earn",hidden:true},EARN.map(([e,l,v])=>h("div",null,emo(e,24,false),h("span",null,l),h("b",null,v)))));
-  const nmIn=h("input",{type:"text",class:"inp",value:H.name||"",placeholder:"Name your home, e.g. The Aboagye home"});
-  out.push(h("div",{class:"row"},h("div",{style:"flex:1 1 200px"},nmIn),h("button",{type:"button",class:"btn gh",onclick:()=>{saveHome({name:nmIn.value.trim()});nmIn.blur()}},"Save name")));
-  SHOP.forEach(c=>{
-    out.push(h("h2",{style:"font-size:19px;margin-top:6px"},c.name));
-    out.push(h("div",{class:"shop"},c.items.map(([id,n,e,p])=>{
-      const owned=(H.owned||[]).includes(id),cur=c.id==="home"?(H.home||"apt")===id:c.id==="ride"?H.ride===id:false,count=c.id==="pets"?(H.pets||[]).filter(x=>x.k===id).length:c.id==="garden"?(H.garden||[]).filter(x=>x.k===id).length:0;
-      const free=p===0||(c.one&&owned);
-      const lab=c.one?(cur?"In use":owned||p===0?"Use":p+" 🌸"):p+" 🌸";
-      return h("button",{type:"button",class:"shopitem tap"+(cur?" cur":""),onclick:e2=>{
-        if(c.one){if(cur)return;if(!free){if(pts<p){toast("Not enough love points","You need "+(p-pts)+" more. Answer a question or play a game together.");return}}
-          const o={[c.id==="home"?"home":"ride"]:id,log:homeLog((free?"switched to ":"got ")+(free?"the ":"a ")+n.toLowerCase()+" "+e)};if(!free&&p>0)o.owned=(H.owned||[]).concat([id]);saveHome(o);if(!free)confetti(90);return}
-        if(pts<p){toast("Not enough love points","You need "+(p-pts)+" more. Answer a question or play a game together.");return}
-        const key=c.id==="pets"?"pets":"garden",arr=(H[key]||[]).concat([{id:uid(),k:id,name:c.id==="pets"?n:""}]);
-        if(c.id==="garden"&&arr.length>8){toast("The garden is full","Remove something first");return}
-        if(c.id==="pets"&&arr.length>6){toast("That's a lot of pets","Six is the limit");return}
-        saveHome({[key]:arr,log:homeLog((c.id==="pets"?"adopted a ":"planted a ")+n.toLowerCase()+" "+e)});hearts(e2.currentTarget,8);confetti(60)}},
-        emo(e,44,false),h("b",null,n),h("small",null,count?"You have "+count+" · "+lab:lab))})));
-    if(c.id==="pets"&&(H.pets||[]).length)out.push(h("div",{class:"named"},(H.pets||[]).map(x=>{const i=h("input",{type:"text",class:"inp",value:x.name||"","aria-label":"Pet name"});
-      return h("div",{class:"row"},emo(SHOPITEM[x.k].e,30,false),h("div",{style:"flex:1"},i),h("button",{type:"button",class:"ghost",onclick:()=>{saveHome({pets:H.pets.map(y=>y.id===x.id?{...y,name:i.value.trim()||y.name}:y)});i.blur()}},"Save"),
-        h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveHome({pets:H.pets.filter(y=>y.id!==x.id)})},"×"))})));
-    if(c.id==="garden"&&(H.garden||[]).length)out.push(h("p",{class:"hint"},"Tap × to remove: ",...(H.garden||[]).map(x=>h("button",{type:"button",class:"chipx",onclick:()=>saveHome({garden:H.garden.filter(y=>y.id!==x.id)})},SHOPITEM[x.k].e+" ×"))));
-  });
-  out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Our family"),h("p",{class:"hint"},"Children are a blessing, not a purchase, so they're free. Add them with the names you dream of."));
-  (H.kids||[]).forEach(k=>{const i=h("input",{type:"text",class:"inp",value:k.name||"","aria-label":"Child's name"});
-    out.push(h("div",{class:"row"},emo(k.e,30,false),h("div",{style:"flex:1"},i),h("button",{type:"button",class:"ghost",onclick:()=>{saveHome({kids:H.kids.map(y=>y.id===k.id?{...y,name:i.value.trim()}:y)});i.blur()}},"Save"),
-      h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveHome({kids:H.kids.filter(y=>y.id!==k.id)})},"×")))});
-  if((H.kids||[]).length<6)out.push(h("div",{class:"chips"},KID_EMOJI.map(e=>h("button",{type:"button",onclick:ev=>{saveHome({kids:(H.kids||[]).concat([{id:uid(),e,name:""}]),log:homeLog("added a little one "+e)});hearts(ev.currentTarget,10)}},e+" Add"))));
-  const lg=(H.log||[]).slice(-5).reverse();
-  if(lg.length)out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Lately"),h("div",{class:"loglist"},lg.map(x=>h("p",{class:"hint"},(x.by===ME?"You ":nm(x.by)+" ")+x.text+" · "+ago(x.at)))));
-  return out})}
 
 
 /* ---------- The road to the next visit: you move toward each other day by day ---------- */
@@ -1582,7 +1565,7 @@ const VSUG={travel:["Book flights ✈️","Airport pickup plan 🚗","Check in o
   do:["Church together ⛪","Date night 💃","Photo walk 📸","Cook a meal together 🍳","Movie night 🎬","Pray together 🙏"],eat:["Our favorite restaurant 🍝","Try somewhere new 🍜","Breakfast spot 🥞","Dessert run 🍦"]};
 const VP=id=>((US.visits||{})[id]||{}).items||[];
 function visitPlanSheet(v){v=v||nextVisit();let vc="do";if(!v){juSheet("Visit plan",()=>[h("div",{class:"bigemo"},emo("🧳",72,true)),h("p",{class:"hint",style:"text-align:center"},"Add your next visit first, then plan it here together."),h("button",{type:"button",class:"btn",onclick:()=>addCountdownSheet(ME)},"Add a visit countdown")]);return}
-  juSheet(v.title||"Visit plan",()=>{
+  juSheet("Plans",()=>{
   const items=VP(v.id),left=daysBetween(tzNow(P(ME).tz).key,v.date),dn=items.filter(x=>x.d).length;
   const save=arr=>saveDoc("visits",{[v.id]:{items:arr}});
   const ti=h("input",{type:"text",class:"inp",placeholder:"Add something to the plan","aria-label":"Plan item"});
@@ -1596,6 +1579,7 @@ function visitPlanSheet(v){v=v||nextVisit();let vc="do";if(!v){juSheet("Visit pl
     const sug=VSUG[k].filter(s=>!list.some(x=>x.t===s));
     if(sug.length)out.push(h("div",{class:"chips sug"},sug.map(s=>h("button",{type:"button",onclick:()=>save(VP(v.id).concat([{id:uid(),t:s,c:k,d:false,by:ME}]))},"+ "+s))));
   });
+  out.push(...somedayPlans());
   return out})}
 
 /* ---------- Read together ---------- */
@@ -1624,7 +1608,7 @@ function coverEl(b,w){const box=h("div",{class:"cover",style:"width:"+w+"px;heig
   const show=id=>{if(!id)return;const i=h("img",{src:"https://covers.openlibrary.org/b/id/"+id+"-M.jpg",alt:"",loading:"lazy"});i.onerror=()=>i.remove();box.appendChild(i)};
   if(b.cover!==undefined&&b.cover!==null)show(b.cover);else coverFor(b.title,b.author).then(show);return box}
 function addBook(b,start){const list=SHELF();if(list.some(x=>x.title.toLowerCase()===b.title.toLowerCase())){toast("Already on your shelf",b.title);return}
-  const nb={id:uid(),title:b.title,author:b.author||"",cover:b.cover??null,status:start?"reading":"want",ch:{},chapters:0,by:ME,at:Date.now()};
+  const nb={id:uid(),title:b.title,author:b.author||"",key:b.key||"",cover:b.cover??null,status:start?"reading":"want",ch:{},chapters:0,by:ME,at:Date.now()};
   const o={list:list.concat([nb])};if(start&&!BK().current)o.current=nb.id;saveDoc("books",o);toast(start?"Reading together 📖":"Added to your shelf",b.title);if(start)confetti(60)}
 function readSheet(){juSheet("Read together",()=>{
   const list=SHELF(),cur=list.find(x=>x.id===BK().current&&x.status==="reading")||list.find(x=>x.status==="reading"),out=[];
@@ -1633,6 +1617,7 @@ function readSheet(){juSheet("Read together",()=>{
     const chIn=h("input",{type:"number",class:"inp",min:"0",value:cur.chapters||"",placeholder:"?",style:"width:80px","aria-label":"Number of chapters"});
     const discussed=[];for(let c=1;c<=Math.max(mine,theirs);c++)discussed.push(c);
     out.push(h("div",{class:"bookcur"},coverEl(cur,92),h("div",{class:"tx"},h("span",{class:"k"},"Reading together"),h("b",null,cur.title),h("small",null,cur.author),
+      h("a",{class:"lnk",style:"font-size:14px;margin-top:2px",href:cur.key?"https://openlibrary.org"+cur.key:"https://openlibrary.org/search?q="+encodeURIComponent(cur.title+" "+cur.author),target:"_blank",rel:"noopener"},"Find a copy to read or borrow ↗"),
       h("div",{class:"bprog"},[[ME,mine],[PARTNER,theirs]].map(([u,n])=>h("div",null,h("i",{class:u===ME?"me":"them"},nm(u)[0]),h("span",null,n?"Chapter "+n+(cur.chapters?" of "+cur.chapters:""):"Not started")))))),
       h("div",{class:"row"},h("span",{class:"hint"},"I'm on chapter"),h("button",{type:"button",class:"ghost",onclick:()=>setCh(mine-1)},"−"),h("b",{style:"min-width:28px;text-align:center"},String(mine)),h("button",{type:"button",class:"ghost",onclick:()=>{setCh(mine+1);if(theirs===mine+1)toast("Same chapter as "+nm(PARTNER),"Discuss it together below")}},"+")),
       mine===theirs&&mine>0?h("p",{class:"hint"},"You're on the same page 🤝"):null,
@@ -1647,12 +1632,15 @@ function readSheet(){juSheet("Read together",()=>{
   if(want.length)out.push(h("h2",{style:"font-size:19px"},"Up next"),h("div",{class:"shelf"},want.map(b=>h("div",{class:"shelfitem"},coverEl(b,70),h("small",null,b.title),
     h("button",{type:"button",class:"ghost",onclick:()=>saveDoc("books",{list:SHELF().map(x=>x.id===b.id?{...x,status:"reading"}:x.id===(cur&&cur.id)?{...x,status:"want"}:x),current:b.id})},"Start")))));
   if(done.length)out.push(h("h2",{style:"font-size:19px"},"Finished together 🎉"),h("div",{class:"shelf"},done.map(b=>h("div",{class:"shelfitem"},coverEl(b,70),h("small",null,b.title)))));
-  const q=h("input",{type:"search",class:"inp",placeholder:"Search any book by title or author","aria-label":"Search books"}),res=h("div",{class:"shelf"});
-  const go=async()=>{const v=q.value.trim();if(!v)return;res.innerHTML="";res.appendChild(h("p",{class:"hint"},"Searching…"));const r=await olSearch(v);res.innerHTML="";
-    if(!r){res.appendChild(h("p",{class:"hint"},"Search isn't reachable right now. Try again in a bit."));return}
-    if(!r.length){res.appendChild(h("p",{class:"hint"},"No books found."));return}
-    r.forEach(b=>res.appendChild(h("div",{class:"shelfitem"},coverEl(b,70),h("small",null,b.title),h("small",{class:"au"},b.author),h("button",{type:"button",class:"ghost",onclick:()=>addBook(b,!cur)},cur?"Add":"Read this"))))};
-  out.push(h("h2",{style:"font-size:19px"},"Find a book"),h("form",{class:"row",onsubmit:e=>{e.preventDefault();q.blur();go()}},h("div",{style:"flex:1 1 200px"},q),h("button",{type:"submit",class:"btn"},"Search")),res);
+  if(!DR.bs)out.push(h("button",{type:"button",class:"btn gh",onclick:()=>{DR.bs=true;refreshSheet()}},"🔍 Find a book"));
+  else{const q=h("input",{type:"search",class:"inp",placeholder:"Search by title or author","aria-label":"Search books",value:DR.bq||""}),res=h("div",{class:"shelf"});
+    const showRes=r=>{res.innerHTML="";if(r==null)return;if(r==="wait"){res.appendChild(h("p",{class:"hint"},"Searching…"));return}if(r==="err"){res.appendChild(h("p",{class:"hint"},"Search isn't reachable right now. Try again in a bit."));return}
+      if(!r.length){res.appendChild(h("p",{class:"hint"},"No books found."));return}
+      r.forEach(b=>res.appendChild(h("div",{class:"shelfitem"},coverEl(b,70),h("small",null,b.title),h("small",{class:"au"},b.author),h("button",{type:"button",class:"ghost",onclick:()=>addBook(b,!cur)},cur?"Add":"Read this"))))};
+    showRes(DR.bres);
+    const go=async()=>{const v=q.value.trim();if(!v)return;DR.bq=v;showRes("wait");const r=await olSearch(v);DR.bres=r||"err";showRes(DR.bres)};
+    out.push(h("div",{class:"bfind"},h("div",{class:"sechd"},h("h2",{style:"font-size:19px"},"🔍 Find a book"),h("button",{type:"button",class:"btn gh",style:"padding:6px 14px",onclick:()=>{DR.bs=false;DR.bres=null;DR.bq="";refreshSheet()}},"Close")),
+      h("form",{class:"row",onsubmit:e=>{e.preventDefault();q.blur();go()}},h("div",{style:"flex:1 1 200px"},q),h("button",{type:"submit",class:"btn"},"Search")),res))}
   out.push(h("h2",{style:"font-size:19px"},"Good ones for couples"),h("div",{class:"lib"},LIBRARY.filter(([t])=>!list.some(x=>x.title===t)).map(([t,a,d])=>h("div",{class:"libitem"},coverEl({title:t,author:a},62),h("div",{class:"tx"},h("b",null,t),h("small",null,a),h("small",{class:"d"},d)),h("button",{type:"button",class:"ghost",onclick:()=>addBook({title:t,author:a},!cur)},cur?"Add":"Read")))));
   return out})}
 
@@ -1687,45 +1675,167 @@ function growSection(){
   const ck=checkinState(monthKey()),pp=PP().filter(x=>!x.answered).length,mon=monthName(monthKey()).split(" ")[0];
   const T=(c,e,name,sub,hot,fn,anim)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,!!anim),h("b",null,name),h("small",{class:"sub"},sub));
   return h("section",{class:"ju"},h("h2",null,"Do together"),h("div",{class:"tgrid"},
-    T("#1f7f78",hm.e,"Our dream home","🌸 "+(lovePoints()-homeSpent()).toLocaleString(),false,homeSheet),
+    T("#1f7f78",hm.e,"Our dream home",((H.pets||[]).length+(H.kids||[]).length+(H.garden||[]).length+(H.ride?1:0))?[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("")||"Keep building":"Start building",false,homeSheet),
     T("#c0398a","🎨","Paint together","One canvas",false,paintSheet),
     T("#5b3b8c","🙏","Prayer points",pp?pp+" praying for":"Add one",false,prayerPointsSheet),
-    T("#2d6fb8","🧳","Visit plan",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" done":"Start planning"):"Add a visit",false,()=>visitPlanSheet()),
+    T("#2d6fb8","🗺️","Plans",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" for the visit":"Plan the visit"):(S.shared.plans.length?S.shared.plans.filter(x=>!x.d).length+" ideas":"Add ideas"),false,plansSheet),
     T("#b9661c","📚","Read together",cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet),
     T("#3f8a4f","🗓️","Check-in",ck.mine&&ck.theirs?mon+" done ✓":ck.mine?"Waiting for "+nm(PARTNER):ck.theirs?nm(PARTNER)+" is done":mon,!!(ck.theirs&&!ck.mine),()=>checkinSheet())));
 }
 
-/* ---------- Paint together: one shared canvas ---------- */
+
+/* ---------- Top of Us: your picture, a path, her picture ---------- */
+const avatarRef=u=>DB.doc("couples/"+CID+"/people/"+u+"/extra/avatar");
+async function pickAvatar(file){const img=await shrink(file,360);if(!img){toast("Couldn't read that photo","Try a different one");return}
+  if(S.people[ME])S.people[ME].avatar=img;avatarRef(ME).set({photo:img}).catch(syncErr);render();toast("Picture updated",nm(PARTNER)+" sees it on the Us tab too")}
+function personCircle(u){
+  const x=P(u),ph=x&&x.avatar,c=u===ME?"#5b3b8c":"#e2557c";
+  const box=h("div",{class:"pcircle",style:"--c:"+c},ph?h("img",{src:ph,alt:nm(u)}):h("span",null,(nm(u)[0]||"?")),h("small",null,u===ME?"You":nm(u)));
+  if(u===ME){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};box.appendChild(f);
+    if(!ph)box.appendChild(h("i",{class:"padd"},"+"))}
+  return box}
+function coupleStrip(){
+  const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
+  if(v){const J=US.main.journey||{};let from=J[v.id];if(!from){from=today;if(DB)saveUs({journey:{[v.id]:today}})}
+    const total=Math.max(1,daysBetween(from,v.date));left=Math.max(0,daysBetween(today,v.date));p=Math.min(1,Math.max(0,1-left/total))}
+  const PB=[[6,30],[60,4],[140,4],[194,30]],[l]=bzSplit(p/2,PB),[,r]=bzSplit(1-p/2,PB),m=bzPt(.5,PB),met=v&&left===0;
+  const svg=`<svg viewBox="0 0 200 40" class="cpath" aria-hidden="true"><path d="${bzD(PB)}" fill="none" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="1 7"/>
+    <path d="${bzD(l)}" fill="none" stroke="#5b3b8c" stroke-width="3.5" stroke-linecap="round"/><path d="${bzD(r)}" fill="none" stroke="#e2557c" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="${m[0]}" y="${m[1]+5}" text-anchor="middle" font-size="${met?16:12}" opacity="${met?1:.55}">💞</text></svg>`;
+  const mid=h("button",{type:"button",class:"cmid",onclick:datesSheet,"aria-label":"Your next visit"});
+  if(v){mid.append(h("b",null,met?"Together today":left+(left===1?" day":" days")),h("small",null,met?"💞":"until "+shortDate(v.date)))}else mid.append(h("b",{style:"font-size:16px"},"Add a visit"),h("small",null,"Tap to set the date"));
+  const pathBox=h("div");pathBox.innerHTML=svg;mid.appendChild(pathBox.firstChild);
+  const mi=h("span",null,"");Promise.all([ME,PARTNER].map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b)mi.textContent=miles(a,b).toLocaleString()+" miles apart"});
+  if(v&&!met)mid.appendChild(h("small",{class:"cmeta"},h("span",{class:"mono",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},"")));
+  mid.appendChild(h("small",{class:"cmeta"},mi));
+  return h("section",{class:"ju"},h("div",{class:"cstrip"},personCircle(ME),mid,personCircle(PARTNER)));
+}
+
+/* ---------- Our dream home: build freely, change your mind any time ---------- */
+function homeSheet(){juSheet("Our dream home",()=>{
+  const H=HM(),out=[homeScene(true),h("p",{class:"hint",style:"text-align:center"},"Build it together. Tap to add, tap again or use × to take it away.")];
+  const nmIn=h("input",{type:"text",class:"inp",value:H.name||"",placeholder:"Name your home, e.g. The Aboagye home"});
+  out.push(h("div",{class:"row"},h("div",{style:"flex:1 1 200px"},nmIn),h("button",{type:"button",class:"btn gh",onclick:()=>{saveHome({name:nmIn.value.trim()});nmIn.blur()}},"Save name")));
+  SHOP.forEach(c=>{
+    out.push(h("h2",{style:"font-size:19px;margin-top:6px"},c.name));
+    out.push(h("div",{class:"shop"},c.items.map(([id,n,e])=>{
+      const key=c.id==="pets"?"pets":"garden",cur=c.id==="home"?(H.home||"apt")===id:c.id==="ride"?H.ride===id:false,count=c.one?0:(H[key]||[]).filter(x=>x.k===id).length;
+      const lab=c.id==="home"?(cur?"Our home":"Choose"):c.id==="ride"?(cur?"Tap to remove":"Choose"):(count?count+" added · tap for more":"Add");
+      return h("button",{type:"button",class:"shopitem tap"+(cur||count?" cur":""),onclick:e2=>{
+        if(c.id==="home"){if(!cur)saveHome({home:id,log:homeLog("moved us into a "+n.toLowerCase()+" "+e)});return}
+        if(c.id==="ride"){saveHome(cur?{ride:null}:{ride:id,log:homeLog("picked a "+n.toLowerCase()+" "+e)});return}
+        const arr=(H[key]||[]).concat([{id:uid(),k:id,name:c.id==="pets"?n:""}]);
+        if(c.id==="garden"&&arr.length>8){toast("The garden is full","Take something out first");return}
+        if(c.id==="pets"&&arr.length>6){toast("That's a lot of pets","Six is the limit");return}
+        saveHome({[key]:arr,log:homeLog((c.id==="pets"?"adopted a ":"planted a ")+n.toLowerCase()+" "+e)});hearts(e2.currentTarget,8)}},
+        emo(e,44,false),h("b",null,n),h("small",null,lab))})));
+    if(c.id==="pets"&&(H.pets||[]).length)out.push(h("div",{class:"named"},(H.pets||[]).map(x=>{const i=h("input",{type:"text",class:"inp",value:x.name||"","aria-label":"Pet name"});
+      return h("div",{class:"row"},emo(SHOPITEM[x.k].e,30,false),h("div",{style:"flex:1"},i),h("button",{type:"button",class:"ghost",onclick:()=>{saveHome({pets:H.pets.map(y=>y.id===x.id?{...y,name:i.value.trim()||y.name}:y)});i.blur()}},"Save"),
+        h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveHome({pets:H.pets.filter(y=>y.id!==x.id)})},"×"))})));
+    if(c.id==="garden"&&(H.garden||[]).length)out.push(h("p",{class:"hint"},"In the garden, tap to take out: ",...(H.garden||[]).map(x=>h("button",{type:"button",class:"chipx",onclick:()=>saveHome({garden:H.garden.filter(y=>y.id!==x.id)})},SHOPITEM[x.k].e+" ×"))));
+  });
+  out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Our family"),h("p",{class:"hint"},"Add your little ones with the names you dream of."));
+  (H.kids||[]).forEach(k=>{const i=h("input",{type:"text",class:"inp",value:k.name||"","aria-label":"Child's name",placeholder:"Name"});
+    out.push(h("div",{class:"row"},emo(k.e,30,false),h("div",{style:"flex:1"},i),h("button",{type:"button",class:"ghost",onclick:()=>{saveHome({kids:H.kids.map(y=>y.id===k.id?{...y,name:i.value.trim()}:y)});i.blur()}},"Save"),
+      h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveHome({kids:H.kids.filter(y=>y.id!==k.id)})},"×")))});
+  if((H.kids||[]).length<6)out.push(h("div",{class:"chips"},KID_EMOJI.map(e=>h("button",{type:"button",onclick:ev=>{saveHome({kids:(H.kids||[]).concat([{id:uid(),e,name:""}]),log:homeLog("added a little one "+e)});hearts(ev.currentTarget,10)}},e+" Add"))));
+  const lg=(H.log||[]).slice(-5).reverse();
+  if(lg.length)out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Lately"),h("div",{class:"loglist"},lg.map(x=>h("p",{class:"hint"},(x.by===ME?"You ":nm(x.by)+" ")+x.text+" · "+ago(x.at)))));
+  return out})}
+
+/* ---------- Paint together: colouring pages plus free drawing ---------- */
+const PW=600;
+const OUT=(ctx,f)=>{ctx.save();ctx.strokeStyle="#2a1a22";ctx.lineWidth=5;ctx.lineCap="round";ctx.lineJoin="round";f(ctx);ctx.restore()};
+const circ=(c,x,y,r)=>{c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke()};
+const rect=(c,x,y,w,hh)=>{c.strokeRect(x,y,w,hh)};
+const poly=(c,pts,close=true)=>{c.beginPath();c.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)c.lineTo(pts[i],pts[i+1]);if(close)c.closePath();c.stroke()};
+const heartP=(c,x,y,s)=>{c.save();c.translate(x,y);c.scale(s,s);c.beginPath();c.moveTo(0,40);c.bezierCurveTo(-55,5,-50,-38,-18,-40);c.bezierCurveTo(-6,-41,0,-30,0,-22);c.bezierCurveTo(0,-30,6,-41,18,-40);c.bezierCurveTo(50,-38,55,5,0,40);c.closePath();c.restore();c.stroke()};
+const PAGES=[
+ {id:"sunny",name:"Sunny day",e:"☀️",draw:c=>OUT(c,c=>{circ(c,120,120,58);for(let i=0;i<12;i++){const a=i*Math.PI/6;c.beginPath();c.moveTo(120+Math.cos(a)*74,120+Math.sin(a)*74);c.lineTo(120+Math.cos(a)*104,120+Math.sin(a)*104);c.stroke()}
+   c.beginPath();c.moveTo(380,140);c.arc(410,130,30,Math.PI*.9,Math.PI*1.95);c.arc(460,118,36,Math.PI*1.1,Math.PI*1.95);c.arc(505,140,26,Math.PI*1.3,Math.PI*.4);c.lineTo(390,166);c.arc(390,148,18,Math.PI*.5,Math.PI*1.5);c.stroke();
+   c.beginPath();c.moveTo(0,430);c.quadraticCurveTo(150,340,320,410);c.quadraticCurveTo(470,470,600,390);c.stroke();
+   rect(c,330,330,150,110);poly(c,[315,332,405,262,495,332]);rect(c,390,380,34,60);rect(c,348,350,30,28);rect(c,436,350,30,28);
+   rect(c,95,360,22,95);circ(c,106,330,52);
+   [[60,520],[180,540],[300,515],[440,540],[540,510]].forEach(([x,y])=>{for(let k=0;k<5;k++){const a=k*Math.PI*2/5;circ(c,x+Math.cos(a)*14,y+Math.sin(a)*14,10)}circ(c,x,y,7)})})},
+ {id:"flower",name:"Flower",e:"🌸",draw:c=>OUT(c,c=>{for(let i=0;i<8;i++){c.save();c.translate(300,220);c.rotate(i*Math.PI/4);c.beginPath();c.ellipse(0,-95,38,62,0,0,Math.PI*2);c.stroke();c.restore()}
+   circ(c,300,220,46);c.beginPath();c.moveTo(300,266);c.quadraticCurveTo(290,380,300,470);c.stroke();
+   c.beginPath();c.moveTo(296,390);c.quadraticCurveTo(220,350,200,400);c.quadraticCurveTo(250,420,296,390);c.stroke();c.beginPath();c.moveTo(302,420);c.quadraticCurveTo(380,380,400,430);c.quadraticCurveTo(350,450,302,420);c.stroke();
+   poly(c,[220,470,380,470,358,580,242,580]);rect(c,208,452,184,22);
+   [[90,90],[520,110],[80,520],[520,520]].forEach(([x,y])=>heartP(c,x,y,.7))})},
+ {id:"hearts",name:"Hearts",e:"💞",draw:c=>OUT(c,c=>{heartP(c,300,300,5);heartP(c,300,300,3.2);heartP(c,300,300,1.5);
+   [[80,80,.9],[520,80,.9],[80,520,.9],[520,520,.9],[300,60,.6],[300,555,.6],[45,300,.6],[555,300,.6]].forEach(([x,y,s])=>heartP(c,x,y,s))})},
+ {id:"home",name:"Our home",e:"🏡",draw:c=>OUT(c,c=>{poly(c,[90,290,300,120,510,290]);rect(c,120,290,360,240);rect(c,380,150,40,80);
+   rect(c,265,400,70,130);circ(c,320,468,5);rect(c,155,330,80,70);c.beginPath();c.moveTo(195,330);c.lineTo(195,400);c.moveTo(155,365);c.lineTo(235,365);c.stroke();
+   rect(c,365,330,80,70);c.beginPath();c.moveTo(405,330);c.lineTo(405,400);c.moveTo(365,365);c.lineTo(445,365);c.stroke();
+   poly(c,[265,530,335,530,380,600,220,600]);heartP(c,300,245,.55);
+   for(let x=10;x<120;x+=26){rect(c,x,470,16,60)}for(let x=490;x<600;x+=26){rect(c,x,470,16,60)}
+   circ(c,520,80,40);c.beginPath();c.moveTo(390,140);c.quadraticCurveTo(370,110,395,95);c.quadraticCurveTo(420,80,400,55);c.stroke()})},
+ {id:"mandala",name:"Mandala",e:"🌀",draw:c=>OUT(c,c=>{[40,90,140,190,240,285].forEach(r=>circ(c,300,300,r));for(let i=0;i<16;i++){const a=i*Math.PI/8;c.beginPath();c.moveTo(300+Math.cos(a)*40,300+Math.sin(a)*40);c.lineTo(300+Math.cos(a)*285,300+Math.sin(a)*285);c.stroke()}
+   for(let i=0;i<8;i++){const a=i*Math.PI/4+Math.PI/8;circ(c,300+Math.cos(a)*165,300+Math.sin(a)*165,22)}})},
+ {id:"blank",name:"Blank",e:"⬜",draw:()=>{}}
+];
+function flood(ctx,x,y,hex){
+  const img=ctx.getImageData(0,0,PW,PW),d=img.data,i0=(y*PW+x)*4,t=[d[i0],d[i0+1],d[i0+2]],f=[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
+  if(Math.abs(t[0]-f[0])+Math.abs(t[1]-f[1])+Math.abs(t[2]-f[2])<10)return;
+  const same=i=>Math.abs(d[i]-t[0])+Math.abs(d[i+1]-t[1])+Math.abs(d[i+2]-t[2])<110;
+  const st=[[x,y]],seen=new Uint8Array(PW*PW);
+  while(st.length){let [cx,cy]=st.pop();let i=cy*PW+cx;while(cx>=0&&!seen[i]&&same(i*4)){cx--;i--}cx++;i++;let up=false,dn=false;
+    while(cx<PW&&!seen[i]&&same(i*4)){seen[i]=1;const j=i*4;d[j]=f[0];d[j+1]=f[1];d[j+2]=f[2];d[j+3]=255;
+      if(cy>0){const k=i-PW;if(!seen[k]&&same(k*4)){if(!up){st.push([cx,cy-1]);up=true}}else up=false}
+      if(cy<PW-1){const k=i+PW;if(!seen[k]&&same(k*4)){if(!dn){st.push([cx,cy+1]);dn=true}}else dn=false}cx++;i++}}
+  ctx.putImageData(img,0,0)}
 const paintRef=()=>DB.doc("couples/"+CID+"/us/paint");
 let sheetCleanup=null;
 function paintSheet(){
-  let col="#e2557c",size=8,strokes=[],cur=null;
-  const c=h("canvas",{width:"1000",height:"1000","aria-label":"Shared drawing area"}),ctx=c.getContext("2d");
-  const draw=s=>{const p=s.p;if(!p||p.length<2)return;ctx.strokeStyle=s.c;ctx.fillStyle=s.c;ctx.lineWidth=s.w;ctx.lineCap="round";ctx.lineJoin="round";
-    if(p.length===2){ctx.beginPath();ctx.arc(p[0],p[1],s.w/2,0,7);ctx.fill();return}
-    ctx.beginPath();ctx.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)ctx.lineTo(p[i],p[i+1]);ctx.stroke()};
-  const redraw=()=>{ctx.fillStyle="#fffdf8";ctx.fillRect(0,0,1000,1000);strokes.forEach(draw);if(cur)draw(cur)};
-  const pos=e=>{const r=c.getBoundingClientRect();return [Math.round((e.clientX-r.left)*1000/r.width),Math.round((e.clientY-r.top)*1000/r.height)]};
-  c.addEventListener("pointerdown",e=>{c.setPointerCapture(e.pointerId);cur={id:uid(),by:ME,c:col,w:size,p:pos(e)};redraw()});
-  c.addEventListener("pointermove",e=>{if(!cur)return;const [x,y]=pos(e),p=cur.p;if(Math.abs(x-p[p.length-2])+Math.abs(y-p[p.length-1])<6)return;p.push(x,y);if(p.length>1200)finish();else{ctx.strokeStyle=cur.c;ctx.lineWidth=cur.w;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(p[p.length-4],p[p.length-3]);ctx.lineTo(x,y);ctx.stroke()}});
-  const finish=()=>{if(!cur)return;const s=cur;cur=null;strokes.push(s);if(strokes.length>700){toast("The canvas is full","Save it to your memories and start fresh");return}
-    paintRef().set({strokes:firebase.firestore.FieldValue.arrayUnion(s),at:Date.now(),by:ME},{merge:true}).catch(syncErr)};
-  ["pointerup","pointercancel"].forEach(t=>c.addEventListener(t,finish));
-  const COLS=["#2a1a22","#e2557c","#ff9f43","#f2b84b","#3f8a4f","#1f7f78","#2d6fb8","#5b3b8c","#8b5a36","#ffffff"];
-  const sw=h("div",{class:"swatches"},COLS.map(x=>h("button",{type:"button",style:"background:"+x+(x==="#ffffff"?";box-shadow:inset 0 0 0 1px var(--line)":""),"aria-label":x==="#ffffff"?"Eraser (white)":"Color","aria-pressed":String(x===col),onclick:e=>{col=x;sw.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}})));
-  const sz=h("div",{class:"chips"},[[4,"Fine"],[8,"Medium"],[18,"Thick"],[40,"Marker"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===size),onclick:e=>{size=v;sz.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
-  const who=h("p",{class:"hint"},"Draw anything. "+nm(PARTNER)+" sees each line as soon as you lift your finger.");
-  const undo=()=>{const mine=strokes.filter(s=>s.by===ME);const last=mine[mine.length-1];if(!last)return;strokes=strokes.filter(s=>s!==last);redraw();paintRef().set({strokes:firebase.firestore.FieldValue.arrayRemove(last)},{merge:true}).catch(syncErr)};
-  const fresh=confirmBtn("Start fresh",()=>{paintRef().set({strokes:[],at:Date.now(),by:ME}).catch(syncErr);strokes=[];redraw()});
-  const box=h("div",{class:"ju","data-nofocus":"1"},who,h("div",{class:"canvaswrap paintwrap"},c),sw,sz,
-    h("div",{class:"row"},h("button",{type:"button",class:"btn gh",onclick:undo},"Undo my last line"),
-      h("button",{type:"button",class:"btn",onclick:e=>{if(!strokes.length){toast("Nothing to save yet","Draw something first");return}redraw();
-        addTo("moments",{from:ME,at:Date.now(),kind:"paint",note:"Our painting",img:c.toDataURL("image/jpeg",.8)});saveUs({counts:{moments:INC(1)}});hearts(e.currentTarget,10);toast("Saved to memories","It hangs in the frame in your room")}},"Save to memories"),fresh));
-  openSheet("Paint together",box);redraw();
-  const un=paintRef().onSnapshot(sn=>{const d=sn.exists?sn.data():{};strokes=(d.strokes||[]).slice();redraw();
+  let col="#f2b84b",size=10,tool="fill",page="sunny",acts=[],applied=0,cur=null;
+  const c=h("canvas",{width:String(PW),height:String(PW),"aria-label":"Shared painting"}),ctx=c.getContext("2d",{willReadFrequently:true});
+  const pg=()=>PAGES.find(x=>x.id===page)||PAGES[0];
+  const drawStroke=s=>{const p=s.p;ctx.strokeStyle=s.c;ctx.fillStyle=s.c;ctx.lineWidth=s.w;ctx.lineCap="round";ctx.lineJoin="round";
+    if(p.length===2){ctx.beginPath();ctx.arc(p[0],p[1],s.w/2,0,7);ctx.fill();return}ctx.beginPath();ctx.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)ctx.lineTo(p[i],p[i+1]);ctx.stroke()};
+  const apply=a=>{if(a.t==="f")flood(ctx,a.x,a.y,a.c);else drawStroke(a)};
+  const full=()=>{ctx.fillStyle="#ffffff";ctx.fillRect(0,0,PW,PW);pg().draw(ctx);acts.forEach(apply);applied=acts.length;pg().draw(ctx)};
+  const pos=e=>{const r=c.getBoundingClientRect();return [Math.max(0,Math.min(PW-1,Math.round((e.clientX-r.left)*PW/r.width))),Math.max(0,Math.min(PW-1,Math.round((e.clientY-r.top)*PW/r.height)))]};
+  const push=a=>{acts.push(a);applied=acts.length;paintRef().set({actions:firebase.firestore.FieldValue.arrayUnion(a),page,at:Date.now(),by:ME},{merge:true}).catch(syncErr);if(acts.length>600)toast("The canvas is full","Save it to your memories and start fresh")};
+  c.addEventListener("pointerdown",e=>{const [x,y]=pos(e);if(tool==="fill"){const a={t:"f",id:uid(),by:ME,x,y,c:col};flood(ctx,x,y,col);pg().draw(ctx);push(a);return}
+    c.setPointerCapture(e.pointerId);cur={t:"s",id:uid(),by:ME,c:col,w:size,p:[x,y]};drawStroke(cur)});
+  c.addEventListener("pointermove",e=>{if(!cur)return;const [x,y]=pos(e),p=cur.p;if(Math.abs(x-p[p.length-2])+Math.abs(y-p[p.length-1])<4)return;p.push(x,y);
+    ctx.strokeStyle=cur.c;ctx.lineWidth=cur.w;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(p[p.length-4],p[p.length-3]);ctx.lineTo(x,y);ctx.stroke();if(p.length>1000)end()});
+  const end=()=>{if(!cur)return;const s=cur;cur=null;pg().draw(ctx);push(s)};
+  ["pointerup","pointercancel"].forEach(t=>c.addEventListener(t,end));
+  const COLS=["#e2557c","#ff8fab","#ff9f43","#f2b84b","#ffe66d","#8bd17c","#3f8a4f","#5fd0c4","#2d6fb8","#9ec9ff","#5b3b8c","#c89bff","#8b5a36","#2a1a22","#ffffff"];
+  const sw=h("div",{class:"swatches"},COLS.map(x=>h("button",{type:"button",style:"background:"+x+(x==="#ffffff"?";box-shadow:inset 0 0 0 1px var(--line)":""),"aria-label":x==="#ffffff"?"White":"Colour","aria-pressed":String(x===col),onclick:e=>{col=x;sw.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}})));
+  const tools=h("div",{class:"chips"},[["fill","🪣 Fill"],["brush","🖌️ Brush"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===tool),onclick:e=>{tool=v;tools.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)));szRow.hidden=v!=="brush"}},l)));
+  const szRow=h("div",{class:"chips",hidden:true},[[5,"Fine"],[10,"Medium"],[22,"Thick"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===size),onclick:e=>{size=v;szRow.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
+  const pages=h("div",{class:"pages"},PAGES.map(x=>h("button",{type:"button",class:"pagebtn","aria-pressed":String(x.id===page),onclick:()=>{if(x.id===page)return;if(acts.length&&!confirm2(x))return;page=x.id;acts=[];paintRef().set({page,actions:[],at:Date.now(),by:ME}).catch(syncErr);markPages();full()}},emo(x.e,30,false),h("small",null,x.name))));
+  let armed=null;const confirm2=x=>{if(armed===x.id){armed=null;return true}armed=x.id;toast("Tap "+x.name+" again","Switching pages starts a fresh canvas. Save this one to memories first if you like it.");return false};
+  const markPages=()=>pages.querySelectorAll(".pagebtn").forEach((b,i)=>b.setAttribute("aria-pressed",String(PAGES[i].id===page)));
+  const who=h("p",{class:"hint"},"Pick a picture, then tap an area to fill it with colour. "+nm(PARTNER)+" sees every colour you add.");
+  const undo=()=>{const mine=acts.filter(a=>a.by===ME),last=mine[mine.length-1];if(!last)return;acts=acts.filter(a=>a!==last);full();paintRef().set({actions:firebase.firestore.FieldValue.arrayRemove(last)},{merge:true}).catch(syncErr)};
+  const box=h("div",{class:"ju","data-nofocus":"1"},who,pages,h("div",{class:"canvaswrap paintwrap"},c),tools,sw,szRow,
+    h("div",{class:"row"},h("button",{type:"button",class:"btn gh",onclick:undo},"Undo mine"),
+      h("button",{type:"button",class:"btn",onclick:e=>{if(!acts.length){toast("Nothing to save yet","Add some colour first");return}
+        addTo("moments",{from:ME,at:Date.now(),kind:"paint",note:"Our painting: "+pg().name,img:c.toDataURL("image/jpeg",.85)});saveUs({counts:{moments:INC(1)}});hearts(e.currentTarget,10);toast("Saved to memories","It hangs in the frame in your room")}},"Save to memories"),
+      confirmBtn("Start fresh",()=>{acts=[];paintRef().set({page,actions:[],at:Date.now(),by:ME}).catch(syncErr);full()})));
+  openSheet("Paint together",box);full();
+  const un=paintRef().onSnapshot(sn=>{const d=sn.exists?sn.data():{},na=d.actions||[],np=d.page||"sunny";
+    const prefix=na.length>=applied&&np===page&&acts.slice(0,applied).every((a,i)=>na[i]&&na[i].id===a.id);
+    if(np!==page){page=np;markPages()}acts=na.slice();
+    if(prefix&&acts.length>applied){for(let i=applied;i<acts.length;i++)apply(acts[i]);applied=acts.length;pg().draw(ctx)}else if(!prefix||acts.length!==applied)full();
     if(d.by&&d.by!==ME&&d.at&&Date.now()-d.at<60000)who.textContent=nm(d.by)+" is painting with you right now 🎨"},e=>console.warn(e));
   sheetCleanup=un;
 }
+
+/* ---------- Plans: next visit checklist plus someday plans ---------- */
+function plansSheet(){const v=nextVisit();if(v){visitPlanSheet(v);return}
+  juSheet("Plans",()=>[h("div",{class:"bigemo"},emo("🗺️",64,true)),h("button",{type:"button",class:"btn gh",onclick:()=>addCountdownSheet(ME)},"Add a visit to plan it"),...somedayPlans()])}
+function somedayPlans(){
+  const out=[h("h2",{style:"font-size:19px;margin-top:6px"},"🌟 Plans for us"),h("p",{class:"hint"},"Date ideas, trips, things to do together one day.")];
+  S.shared.plans.forEach(x=>{const cb=h("input",{type:"checkbox",checked:x.d,"aria-label":"Done",onchange:()=>{x.d=cb.checked;persist();refreshSheet()}});
+    out.push(h("div",{class:"vpitem"+(x.d?" ok":"")},cb,h("span",{class:"tx"},x.t,h("small",null,"Added by "+(x.by===ME?"you":nm(x.by)))),h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>{S.shared.plans=S.shared.plans.filter(y=>y.id!==x.id);persist();refreshSheet()}},"×")))});
+  const pi=h("input",{type:"text",class:"inp",placeholder:"e.g. Dinner on the Strip"});
+  out.push(h("form",{class:"row",onsubmit:e=>{e.preventDefault();if(!pi.value.trim())return;S.shared.plans.push({id:uid(),t:pi.value.trim(),d:false,by:ME});persist();refreshSheet()}},h("div",{style:"flex:1 1 200px"},pi),h("button",{type:"submit",class:"btn"},"Add")));
+  return out}
+
 const gameById=id=>GAMES.find(g=>g.id===id);
 
 /* ---------- Us data: couples/{cid}/us/main plus moments, letters, jar, nudges ---------- */
@@ -1807,7 +1917,7 @@ function windowSheet(){juSheet(nm(PARTNER)+" right now",()=>{
   return [h("div",{class:"jcities"},cards),dist,
     h("div",{class:"now solid",style:"background:"+catColor(cur||nx)},h("span",{class:"lbl"},cur?"Right now":nx?"Up next":"Free"),h("b",null,cur?cur.title:nx?nx.title:"Nothing scheduled"),
       h("span",null,cur?"Until "+fmt(cur.e)+" there":nx?fmt(nx.s)+" there, "+fmt(nx.s+(mn.off-on.off))+" your time":"Nothing else scheduled today")),
-    tasks.length?h("p",{class:"hint"},dn+" of "+tasks.length+" tasks done today"):null,callLine(),
+    tasks.length?h("p",{class:"hint"},dn+" of "+tasks.length+" tasks done today"):null,
     tel?h("div",{class:"callrow"},h("a",{class:"c1",href:"tel:"+tel},"Call"),h("a",{class:"c2",href:"facetime:"+tel},"FaceTime"),h("a",{class:"c2",href:"facetime-audio:"+tel},"FaceTime audio"))
       :h("p",{class:"hint"},nm(oid)+" can add a phone number in Settings to get Call and FaceTime buttons here."),
     h("button",{type:"button",class:"btn gh",onclick:()=>{closeSheet();S.tab="today";S.viewAs=oid;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"See "+nm(oid)+"'s whole day")]})}
@@ -2041,11 +2151,10 @@ function viewUs(){
   const o=P(partnerOf(ME)),out=[];
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
+  out.push(coupleStrip());
   out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
-    h("button",{type:"button",class:"jpill tap",onclick:datesSheet},svgEl(ICON.plane("#e2557c")),v?h("span",{class:"mono",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},""):"Add a visit"),
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
-  const jc=journeyCard();if(jc)out.push(jc);
   const room=h("div",{class:"room"});room.innerHTML=roomSVG();room.appendChild(h("span",{class:"roomcap"},"Tap anything in your room"));
   room.querySelectorAll("[data-obj]").forEach(g=>{const go=()=>OBJ[g.dataset.obj]();g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
   const top=h("div",{class:"ju"},room);
@@ -2059,7 +2168,7 @@ function viewUs(){
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
   const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
-  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),callLine(),
+  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
     checkinDue()?h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))):null,
     h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},TE(dailyPrompt(k)).t)),emo(TE(dailyPrompt(k)).e||"📸",56,true)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
@@ -2083,7 +2192,6 @@ function viewUs(){
       return tile(t.c,TOPIC_EMOJI[t.id],t.name,wt?h("small",{class:"sub"},wt+" for you"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"}))),wt>0,()=>topicSheet(t))})),
     h("p",{class:"hint"},tops.reduce((a,t)=>a+t.qs.length,0)+" questions in "+tops.length+" topics.")));
 
-  out.push(usPlans());
   setTimeout(usTick,0);
   return out;
 }
@@ -2126,6 +2234,9 @@ function settingsSheet(){
       cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);cv.getContext("2d").drawImage(bmp,0,0,cv.width,cv.height);
       p.photo=cv.toDataURL("image/jpeg",0.82)}catch(e){const r=new FileReader();r.onload=()=>{p.photo=r.result;persist();render();settingsSheet()};r.readAsDataURL(f);return}
     persist();render();settingsSheet()}});
+  const af=h("input",{type:"file",accept:"image/*",style:"position:absolute;inset:0;opacity:0;cursor:pointer","aria-label":"Choose your picture",onchange:async()=>{const f=af.files&&af.files[0];if(f){await pickAvatar(f);settingsSheet()}}});
+  body.append(h("div",{class:"lbl"},"Your picture"),h("p",{class:"hint"},"A picture of you. It sits on your side at the top of the Us tab, across from "+o.name+"."),
+    h("div",{class:"row"},p.avatar?h("img",{src:p.avatar,alt:"",style:"width:56px;height:56px;border-radius:50%;object-fit:cover"}):null,h("span",{class:"ghost",style:"position:relative;overflow:hidden;display:inline-flex"},p.avatar?"Change picture":"Add your picture",af)));
   body.append(h("div",{class:"lbl"},"Photo at the top"),h("p",{class:"hint"},o.placeholder?"Your partner also sees this photo on their Us tab.":o.name+" also sees this photo next to your day on the Us tab."),
     h("div",{class:"row"},h("span",{class:"ghost",style:"position:relative;overflow:hidden;display:inline-flex"},p.photo?"Change photo":"Add a photo",file),
       p.photo?h("button",{type:"button",class:"quiet",onclick:()=>{p.photo=null;persist();render();settingsSheet()}},"Remove"):null));
@@ -2204,7 +2315,7 @@ function render(){
   av.setAttribute("aria-label",p.photo?o.name+"'s photo, change in settings":"Add "+o.name+"'s photo");
   el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
   const greet=n.min<300?"Still up":n.min<720?"Good morning":n.min<1020?"Good afternoon":n.min<1320?"Good evening":"Good night";
-  const RO=pid!==ME;document.body.classList.toggle("ro",RO);
+  const RO=pid!==ME;document.body.classList.toggle("ro",RO);document.body.classList.toggle("tab-us",S.tab==="us");
   el("title").textContent=RO?{today:p.name+"'s day",week:p.name+"'s week",projects:p.name+"'s projects",us:p.name+" & "+o.name}[S.tab]
     :{today:greet+", "+p.name,week:"Plan the week",projects:"Your projects",us:p.name+" & "+o.name}[S.tab];
   const sl=el("subline");sl.innerHTML="";
