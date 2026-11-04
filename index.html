@@ -178,6 +178,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .task{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)}
 .task .tx{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);padding:6px 0;outline:none;font-size:17px;resize:none;overflow:hidden;line-height:1.4;font-family:inherit;field-sizing:content}
 .task.done .tx{text-decoration:line-through;color:var(--muted)}
+.tfoc{display:flex;align-items:center;gap:6px;flex:none}.tmin{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
+.fbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}.fbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .carried{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:999px;padding:1px 9px;white-space:nowrap}
 .addtask{display:flex;gap:8px;margin-top:10px}
 .addtask .inp{flex:1}
@@ -1252,11 +1254,14 @@ function tasksBlock(pid,k,editable){
     return h("ul",{class:"ro-list"},l.map(i=>h("li",{class:i.d?"ok":""},h("span",{class:"st"},i.d?"✓":"○"),h("span",null,i.t))))}
   d.tasks.forEach(it=>{
     const row=h("div",{class:"task"+(it.d?" done":"")});
-    const cb=h("input",{type:"checkbox",checked:it.d,"aria-label":"Done",onchange:()=>{it.d=cb.checked;row.classList.toggle("done",cb.checked);persist()}});
+    const cb=h("input",{type:"checkbox",checked:it.d,"aria-label":"Done",onchange:()=>{it.d=cb.checked;row.classList.toggle("done",cb.checked);persist();if(S.timer&&S.timer.id==="t:"+it.id)stopTimer();else if(cb.checked)render()}});
     const tx=h("textarea",{class:"tx",rows:"1",value:it.t,"aria-label":"Task",oninput:()=>{it.t=tx.value;persist();fit()}});
     const fit=()=>{tx.style.height="auto";tx.style.height=tx.scrollHeight+"px"};requestAnimationFrame(fit);
     const x=h("button",{type:"button",class:"x","aria-label":"Remove task",onclick:()=>{d.tasks=d.tasks.filter(y=>y.id!==it.id);persist();render()}},"×");
-    row.append(...[cb,tx,it.c?h("span",{class:"carried",title:"Moved from an earlier day"},"carried"):null,x].filter(Boolean));
+    const isToday=pid===me()&&k===tzNow(P(pid).tz).key,fid="t:"+it.id,run=S.timer&&S.timer.id===fid,fm=((P(pid).focus[k]||{})[fid])||0;
+    const fb=isToday&&(!it.d||fm)?h("span",{class:"tfoc"},fm?h("span",{class:"tmin",title:"Focus time today"},fm>=60?Math.floor(fm/60)+"h "+pad(fm%60)+"m":fm+"m"):null,
+      !it.d?h("button",{type:"button",class:"fbtn"+(run?" on":""),"aria-label":run?"Stop focus":"Start focus on this task",onclick:()=>{if(run)stopTimer();else{startTimer("task",fid,it.t||"Task");render()}}},run?"■ Stop":"▶ Focus"):null):null;
+    row.append(...[cb,tx,it.c?h("span",{class:"carried",title:"Moved from an earlier day"},"carried"):null,fb,x].filter(Boolean));
     box.appendChild(row);
   });
   const inp=h("input",{type:"text",class:"inp",placeholder:d.tasks.length?"Add another task":"Add a task, e.g. Draft Methods section"});
@@ -1347,9 +1352,10 @@ function viewProjects(){
   const pid=me(),p=P(pid),n=tzNow(p.tz),mon=addDays(n.key,-((n.dow+6)%7));
   const tot={};for(let i=0;i<7;i++){const f=p.focus[addDays(mon,i)]||{};p.projects.forEach(x=>{if(f[x.id])tot[x.id]=(tot[x.id]||0)+f[x.id]})}
   const hm=m=>m>=60?Math.floor(m/60)+"h "+pad(m%60)+"m":m+"m";
+  let tt=0;for(let i=0;i<7;i++){const f=p.focus[addDays(mon,i)]||{};Object.keys(f).forEach(id=>{if(id.startsWith("t:"))tt+=f[id]})}
   const ids=Object.keys(tot);
-  const sum=h("div",{class:"fsum"},ids.length?ids.map(id=>{const x=p.projects.find(y=>y.id===id);return h("div",{class:"frow"},h("span",null,x?x.title:"Project"),h("span",null,hm(tot[id])))})
-    :h("p",{class:"empty"},"No focus time yet this week. Tap Start focus on a project."));
+  const sum=h("div",{class:"fsum"},ids.length||tt?ids.map(id=>{const x=p.projects.find(y=>y.id===id);return h("div",{class:"frow"},h("span",null,x?x.title:"Project"),h("span",null,hm(tot[id])))}).concat(tt?[h("div",{class:"frow"},h("span",null,"Daily tasks"),h("span",null,hm(tt)))]:[])
+    :h("p",{class:"empty"},"No focus time yet this week. Tap Start focus on a project or Focus on a task."));
   const list=h("div",{class:"projs"});
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
@@ -2560,7 +2566,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-g";
+const APP_VERSION="2026-11-04-h";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
