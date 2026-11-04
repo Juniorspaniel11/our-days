@@ -1835,7 +1835,7 @@ function presenceOf(u){if(u===ME)return {on:!document.hidden,text:"Online now"};
 /* ---------- Our evening: plan what you'll do together ---------- */
 const EV_EXTRA=[["call","Video call","📹"],["movie","Watch a movie together","🎬"],["cook","Cook the same meal","🍳"],["bible","Read the Bible together","📖"],["music","Share songs","🎶"],["walk","Walk and talk on the phone","🚶"],["study","Study together on video","💻"]];
 function evActs(){const a=[];
-  a.push(["dq","Question of the day","❓"],["photo","Photo of the day","📸"]);
+  a.push(["dq","Question of the day","❓"]);
   visibleGames().forEach(g=>a.push(["game:"+g.id,g.name,g.e]));
   enabledTopics().forEach(t=>a.push(["topic:"+t.id,"Ask: "+t.name,TOPIC_EMOJI[t.id]]));
   a.push(["prayer","Pray together","🙏"],["paint","Paint together","🎨"],["read","Read and discuss a chapter","📚"],["home","Build our dream home","🏡"],["letter","Write each other a letter","💌"],["plans","Plan the next visit","🗺️"],["checkin","Monthly check-in","🗓️"]);
@@ -2144,9 +2144,9 @@ function jarSheet(){juSheet("Love notes jar",()=>{
       h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"btn"},"Add note")),
     h("p",{class:"hint"},US.jar.filter(j=>j.from===ME).length+" from you · "+theirs.length+" from "+nm(PARTNER))]})}
 
-function memoriesSheet(){juSheet("Memories",()=>[h("p",{class:"hint"},"Photos, doodles and moments you've shared. The newest hangs in your frame."),
-  US.moments.length?h("div",{class:"memgrid"},US.moments.map(m=>h("div",{class:"mem"},m.img?h("img",{src:m.img,alt:"",loading:"lazy"}):h("div",{class:"ph"}),h("small",null,(m.note||"A moment")+" · "+nm(m.from)+" · "+ago(m.at))))):h("p",{class:"hint"},"Nothing yet. Share today's photo to start."),
-  h("button",{type:"button",class:"btn",onclick:photoSheet},"Share today's photo")])}
+function memoriesSheet(){juSheet("Memories",()=>[h("p",{class:"hint"},"Doodles, paintings and moments you've shared. The newest hangs in your frame."),
+  US.moments.length?h("div",{class:"memgrid"},US.moments.map(m=>h("div",{class:"mem"},m.img?h("img",{src:m.img,alt:"",loading:"lazy"}):h("div",{class:"ph"}),h("small",null,(m.note||"A moment")+" · "+nm(m.from)+" · "+ago(m.at))))):h("p",{class:"hint"},"Nothing yet. Send a doodle or save a painting to start."),
+  h("button",{type:"button",class:"btn",onclick:doodleSheet},"Send a doodle")])}
 
 function answerSheet(id,question,title,onBack){juSheet(title,()=>{
   const o=PARTNER,a=ANS()[id]||{},mine=a[ME],theirs=a[o],te=TOPIC_EMOJI[id.startsWith("d:")?(dailyQ(id.slice(2))||{}).tid:id.split(":")[0]],out=[te?h("div",{class:"bigemo"},emo(te,72,true)):null,h("p",{class:"q",style:"text-align:center"},question)];
@@ -2344,7 +2344,6 @@ function viewUs(){
   out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
     checkinDue()?h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))):null,
     h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
-    h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},TE(dailyPrompt(k)).t)),emo(TE(dailyPrompt(k)).e||"📸",56,true)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
 
   out.push(growSection());
@@ -2547,7 +2546,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-d";
+const APP_VERSION="2026-11-04-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
