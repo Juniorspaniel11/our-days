@@ -180,6 +180,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .task.done .tx{text-decoration:line-through;color:var(--muted)}
 .tfoc{display:flex;align-items:center;gap:6px;flex:none}.tmin{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
 .fbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}.fbtn.big{align-self:flex-start;margin:4px 0 6px;padding:7px 14px;font-size:14px}.fbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ev.todo .tx{width:100%;border:0;background:transparent;color:var(--ink);padding:0;outline:none;font:inherit;font-weight:600;resize:none;overflow:hidden;line-height:1.4;field-sizing:content}.ev.todo.done .tx{text-decoration:line-through;color:var(--muted)}
 .carried{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:999px;padding:1px 9px;white-space:nowrap}
 .addtask{display:flex;gap:8px;margin-top:10px}
 .addtask .inp{flex:1}
@@ -994,6 +995,11 @@ function logFocus(pid,targetType,targetId,mins){
   const d=day(pid,k);p.habits.forEach(x=>{if(x.goal&&f[x.id]>=x.goal&&!d.habits.includes(x.id))d.habits.push(x.id)});
   persist();
 }
+function focusMins(pid,fid,k){const f=P(pid).focus||{};return k?((f[k]||{})[fid]||0):Object.values(f).reduce((a,x)=>a+((x||{})[fid]||0),0)}
+const hmShort=m=>m>=60?Math.floor(m/60)+"h "+pad(m%60)+"m":m+"m";
+function focusBtn(fid,label,mins){const run=S.timer&&S.timer.id===fid;
+  return h("span",{class:"tfoc"},h("button",{type:"button",class:"fbtn"+(run?" on":""),"aria-label":run?"End focus":"Start focus on "+label,onclick:()=>{if(run)stopTimer();else{startTimer("task",fid,label);render()}}},run?"■ End focus":"▶ Focus"),
+    mins?h("span",{class:"tmin",title:"Focus time today"},hmShort(mins)+" focused"):null)}
 function startTimer(type,id,label){
   if(S.timer)stopTimer();
   S.timer={pid:me(),type,id,label,start:Date.now()};persist();renderTimer();
@@ -1174,7 +1180,8 @@ function schedule(pid,k,opts){
   const n=tzNow(p.tz),isToday=k===n.key,items=itemsFor(pid,k);
   const diff=viewer?tzNow(P(viewer).tz).off-n.off:0;
   const tl=h("div",{class:"timeline"});
-  if(!items.length)tl.appendChild(h("div",{class:"ev"},h("div",{class:"empty"},"Nothing scheduled.")));
+  const todos=editable?day(pid,k).tasks.filter(x=>x.t):[];
+  if(!items.length&&!todos.length)tl.appendChild(h("div",{class:"ev"},h("div",{class:"empty"},editable?"Nothing on your list yet. Tap + Add.":"Nothing scheduled.")));
   items.forEach(x=>{
     const cls="ev"+(isToday&&!x.done&&!x.skip&&n.min>=x.s&&n.min<x.e?" cur":"")+(x.kind==="rep"?" rep":"")+(isToday&&n.min>=x.e&&!x.done&&!x.skip?" past":"")+(x.done?" done":"")+(x.skip?" skip":"");
     const times=x.allDay?h("div",{class:"t"},"All day"):h("div",{class:"t"},fmt(x.s),h("br"),fmt(x.e));
@@ -1191,11 +1198,23 @@ function schedule(pid,k,opts){
       if(x.agenda){const a=(p.agenda[x.id]||[]).filter(i=>!i.d).length;acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>agendaSheet(pid,x)},"Agenda ("+a+")"))}
       if(x.skip)acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>toggleIn(pid,k,"skip",x.id)},"Restore"));
       else if(x.kind!=="cal")acts.appendChild(h("button",{type:"button",class:"link",onclick:()=>itemSheet(pid,k,x)},"Edit"));
+      if(isToday&&pid===me()&&!x.skip&&(!x.done||focusMins(pid,"e:"+x.id,k)))acts.prepend(x.done?h("span",{class:"tmin"},hmShort(focusMins(pid,"e:"+x.id,k))+" focused"):focusBtn("e:"+x.id,x.title,focusMins(pid,"e:"+x.id,k)));
       what.appendChild(acts);
       const cb=h("input",{type:"checkbox",checked:x.done,disabled:x.skip,"aria-label":"Mark done",onchange:()=>toggleIn(pid,k,"done",x.id)});
       tl.appendChild(h("div",{class:cls,style:"--cc:"+cc},h("div",{class:"evrow"},cb,times,what)));
     }else tl.appendChild(h("div",{class:cls,style:"--cc:"+cc},h("div",{class:"evrow ro"},times,what)));
   });
+  const d=day(pid,k);
+  todos.forEach(it=>{const fid="t:"+it.id,fm=focusMins(pid,fid);
+    const row=h("div",{class:"ev todo"+(it.d?" done":""),style:"--cc:var(--accent)"});
+    const cb=h("input",{type:"checkbox",checked:it.d,"aria-label":"Done",onchange:()=>{it.d=cb.checked;persist();if(S.timer&&S.timer.id===fid)stopTimer();else render()}});
+    const tx=h("textarea",{class:"tx",rows:"1",value:it.t,"aria-label":"To do",oninput:()=>{it.t=tx.value;persist();fit()}});
+    const fit=()=>{tx.style.height="auto";tx.style.height=tx.scrollHeight+"px"};requestAnimationFrame(fit);
+    const acts=h("div",{class:"row"},
+      isToday&&pid===me()?(it.d?(fm?h("span",{class:"tmin"},hmShort(fm)+" focused"):null):focusBtn(fid,it.t,fm)):null,
+      it.c?h("span",{class:"carried",title:"Moved from an earlier day"},"carried over"):null,
+      h("button",{type:"button",class:"link",onclick:()=>{d.tasks=d.tasks.filter(y=>y.id!==it.id);if(S.timer&&S.timer.id===fid)stopTimer();persist();render()}},"Remove"));
+    row.appendChild(h("div",{class:"evrow"},cb,h("div",{class:"t"},"Anytime"),h("div",{class:"what"},tx,acts)));tl.appendChild(row)});
   return tl;
 }
 
@@ -1203,7 +1222,7 @@ function dowPicker(sel){return h("div",{class:"dows"},[1,2,3,4,5,6,0].map(n=>h("
 
 function itemSheet(pid,k,x){
   const p=P(pid),isNew=!x;x=x||{kind:"one",title:"",note:"",start:"",end:"",date:k,days:[parseKey(k).getDay()]};
-  const ti=h("input",{type:"text",class:"inp",value:x.title,placeholder:"What, e.g. Seminar in Room 120"});
+  const ti=h("input",{type:"text",class:"inp",value:x.title,placeholder:"What, e.g. Draft Methods section or Seminar"});
   const no=h("input",{type:"text",class:"inp",value:x.note||"",placeholder:"Note (optional)"});
   const st=h("input",{type:"time",class:"inp",value:x.start}),en=h("input",{type:"time",class:"inp",value:x.end||""});
   const dt=h("input",{type:"date",class:"inp",value:x.date||k});
@@ -1214,7 +1233,9 @@ function itemSheet(pid,k,x){
   const catpick=h("div",{class:"catpick",role:"radiogroup","aria-label":"Category"},Object.keys(CAT).map(k=>h("label",null,h("input",{type:"radio",name:"cat",value:k,checked:k===curCat}),h("span",{style:"background:"+CAT[k][1]},CAT[k][0]))));
   const dateField=h("div",{class:"field"},h("label",null,"Date"),dt),dowField=h("div",{class:"field"},h("label",null,"Repeats every"),dows);
   const sync=()=>{dateField.hidden=repeat.checked;dowField.hidden=!repeat.checked};repeat.onchange=sync;sync();
-  const form=h("form",{class:"body",onsubmit:e=>{e.preventDefault();if(!ti.value.trim()||!st.value)return;
+  const form=h("form",{class:"body",onsubmit:e=>{e.preventDefault();if(!ti.value.trim())return;
+    if(!st.value&&!repeat.checked){p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);addTask(pid,dt.value||k,ti.value.trim());closeSheet();render();return}
+    if(!st.value){st.focus();return}
     const ck=catpick.querySelector("input:checked");
     const base={title:ti.value.trim(),note:no.value.trim(),start:st.value,end:en.value,agenda:ag.checked,cat:ck?ck.value:"personal"};
     p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);
@@ -1225,7 +1246,7 @@ function itemSheet(pid,k,x){
     persist();closeSheet()}},
     h("div",{class:"field"},h("label",null,"What"),ti),no,
     h("div",{class:"field"},h("label",null,"Color"),catpick),
-    h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 120px"},h("label",null,"Start"),st),h("div",{class:"field",style:"flex:1 1 120px"},h("label",null,"End"),en)),
+    h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 120px"},h("label",null,"Start (empty for anytime)"),st),h("div",{class:"field",style:"flex:1 1 120px"},h("label",null,"End"),en)),
     h("label",{class:"check"},repeat,"Repeat every week"),dateField,dowField,
     h("label",{class:"check"},ag,"Keep a meeting agenda for this"),
     h("div",{class:"row"},h("button",{type:"submit",class:"primary"},isNew?"Add":"Save"),
@@ -1271,11 +1292,9 @@ function tasksBlock(pid,k,editable){
 function dayCard(pid,k,title){
   const open=day(pid,k).tasks.filter(x=>x.t&&!x.d).length;
   return h("section",{class:"panel"},
-    h("div",{class:"sechead"},h("h2",null,title),h("button",{type:"button",class:"primary",onclick:()=>itemSheet(pid,k,null)},"+ Event")),
-    schedule(pid,k,{editable:true}),
-    h("div",{class:"subhead"},h("b",null,"Tasks"),h("span",{class:"hint"},open?open+" open · unfinished ones carry over":"Unfinished ones carry over")),
-    pid===me()?(()=>{const run=S.timer&&S.timer.id==="t:free";return h("button",{type:"button",class:"fbtn big"+(run?" on":""),onclick:()=>{if(run)stopTimer();else{startTimer("task","t:free","Focus session");render()}}},run?"■ Stop focus session":"▶ Start a focus session")})():null,
-    tasksBlock(pid,k,true));
+    h("div",{class:"sechead"},h("h2",null,"To do "+(title==="Today"||title==="Tomorrow"?title.toLowerCase():"· "+title)),h("button",{type:"button",class:"primary",onclick:()=>itemSheet(pid,k,null)},"+ Add")),
+    h("p",{class:"hint",style:"margin:-4px 0 10px"},open?open+" still open · unfinished ones without a time carry over to tomorrow":"Give it a time to put it on your schedule, or leave the time empty for anytime"),
+    schedule(pid,k,{editable:true}));
 }
 function habitsList(pid,k,editable){
   const p=P(pid),d=day(pid,k),box=h("div");
@@ -1353,10 +1372,10 @@ function viewProjects(){
   const pid=me(),p=P(pid),n=tzNow(p.tz),mon=addDays(n.key,-((n.dow+6)%7));
   const tot={};for(let i=0;i<7;i++){const f=p.focus[addDays(mon,i)]||{};p.projects.forEach(x=>{if(f[x.id])tot[x.id]=(tot[x.id]||0)+f[x.id]})}
   const hm=m=>m>=60?Math.floor(m/60)+"h "+pad(m%60)+"m":m+"m";
-  let tt=0;for(let i=0;i<7;i++){const f=p.focus[addDays(mon,i)]||{};Object.keys(f).forEach(id=>{if(id.startsWith("t:"))tt+=f[id]})}
+  let tt=0;for(let i=0;i<7;i++){const f=p.focus[addDays(mon,i)]||{};Object.keys(f).forEach(id=>{if(id.startsWith("t:")||id.startsWith("e:"))tt+=f[id]})}
   const ids=Object.keys(tot);
-  const sum=h("div",{class:"fsum"},ids.length||tt?ids.map(id=>{const x=p.projects.find(y=>y.id===id);return h("div",{class:"frow"},h("span",null,x?x.title:"Project"),h("span",null,hm(tot[id])))}).concat(tt?[h("div",{class:"frow"},h("span",null,"Daily tasks"),h("span",null,hm(tt)))]:[])
-    :h("p",{class:"empty"},"No focus time yet this week. Tap Start focus on a project or Focus on a task."));
+  const sum=h("div",{class:"fsum"},ids.length||tt?ids.map(id=>{const x=p.projects.find(y=>y.id===id);return h("div",{class:"frow"},h("span",null,x?x.title:"Project"),h("span",null,hm(tot[id])))}).concat(tt?[h("div",{class:"frow"},h("span",null,"To do items"),h("span",null,hm(tt)))]:[])
+    :h("p",{class:"empty"},"No focus time yet this week. Tap Start focus on a project or ▶ Focus on anything in your to do list."));
   const list=h("div",{class:"projs"});
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
@@ -2567,7 +2586,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-i";
+const APP_VERSION="2026-11-04-j";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
