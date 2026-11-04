@@ -357,6 +357,30 @@ body.ro main .robar button{pointer-events:auto}
 .ju .semo{position:absolute;right:12px;top:12px}
 .ju .tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:340px){.ju .tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ju .make{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ju .mk{border-radius:24px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;cursor:pointer;text-align:left;color:var(--ink);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 24%,var(--card)),var(--card) 85%);box-shadow:var(--shadow)}
+.ju .mk b{font-family:var(--fun);font-weight:600;font-size:18px;margin-top:6px}.ju .mk small{font-size:13.5px;font-weight:700;color:var(--c)}
+.ju .mkpic{display:flex;align-items:flex-end;gap:2px;min-height:64px}.ju .mkpic .fam{font-size:22px;line-height:1}
+.ju .hscene{position:relative;width:100%;aspect-ratio:1/1;border-radius:26px;overflow:hidden;background:linear-gradient(180deg,var(--s1),var(--s2) 45%,var(--s3) 62%);box-shadow:var(--shadow)}
+.ju .hscene .hills{position:absolute;left:-10%;right:-10%;bottom:0;height:46%;background:radial-gradient(120% 70% at 30% 0,#8fcf7a 0 60%,transparent 61%),radial-gradient(120% 80% at 80% 10%,#79bf68 0 60%,transparent 61%),linear-gradient(#6fb55e,#5a9e4c)}
+.ju .hscene.night .hills{filter:brightness(.55) saturate(.8)}
+.ju .hitem{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px}
+.ju .hitem small{font-size:11px;font-weight:700;color:#3a2430;background:rgba(255,255,255,.85);border-radius:99px;padding:0 6px;white-space:nowrap}
+.ju .hsign{position:absolute;right:12px;top:12px;background:#f6e7c8;color:#4a2f1d;font-family:var(--fun);font-weight:600;font-size:15px;padding:6px 12px;border-radius:10px;border:3px solid #8b5a36;max-width:60%}
+.ju .ptsbar{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,#e2557c 12%,var(--card));border-radius:18px;padding:10px 12px}
+.ju .ptsbar>div{flex:1;min-width:0}.ju .ptsbar b{display:block;font-family:var(--fun);font-weight:600;font-size:19px}.ju .ptsbar small{color:var(--muted);font-size:13.5px}
+.ju .earn{display:flex;flex-direction:column;gap:6px;background:var(--bg);border-radius:16px;padding:10px 12px}
+.ju .earn>div{display:flex;align-items:center;gap:10px;font-size:14.5px}.ju .earn span{flex:1}.ju .earn b{color:#e2557c}
+.ju .shop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ju .shopitem{border-radius:18px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg);border:1.5px solid var(--line);cursor:pointer;color:var(--ink);text-align:center}
+.ju .shopitem b{font-size:14px;line-height:1.2}.ju .shopitem small{font-size:12.5px;font-weight:700;color:var(--muted)}
+.ju .shopitem.cur{border-color:#3f8a4f;background:color-mix(in srgb,#3f8a4f 12%,var(--card))}.ju .shopitem.cur small{color:#3f8a4f}
+.ju .named{display:flex;flex-direction:column;gap:6px}
+.ju .chipx{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:2px 10px;margin:2px;cursor:pointer;font-size:15px}
+.ju .loglist{display:flex;flex-direction:column;gap:4px}
+.ju .paintwrap{background:#fffdf8}
+.ju .spicytog{background:color-mix(in srgb,#d0393f 8%,transparent);border-radius:14px;padding:10px;border-top:0;margin-top:6px}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -850,9 +874,9 @@ function skyFor(m){
 }
 /* ---------- sheet & toast ---------- */
 let sheetFn=null;
-function openSheet(title,body){sheetFn=null;el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);el("sheet").hidden=false;
+function openSheet(title,body){sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);el("sheet").hidden=false;
   setTimeout(()=>{const f=b.querySelector("input[type=text],textarea");if(f&&!f.value&&!b.querySelector("[data-nofocus]"))f.focus()},50)}
-function closeSheet(){el("sheet").hidden=true;sheetFn=null;render()}
+function closeSheet(){el("sheet").hidden=true;sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}render()}
 el("sheetClose").onclick=closeSheet;el("sheetBd").onclick=closeSheet;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!el("sheet").hidden)closeSheet()});
 let toastT=null;
@@ -1356,6 +1380,123 @@ function emo(e,size,anim){
 const kwEmoji=t=>{t=(t||"").toLowerCase();const R=[[/pray|bible|church|devot|worship/,"🙏"],[/work ?out|gym|run|exercise|lift/,"💪"],[/read|book/,"📚"],[/data|analysis|stat|plot/,"📊"],[/manuscript|paper|writ|draft|thesis|dissert/,"📝"],[/niw|visa|green card|immigr|eb2/,"🗂️"],[/intern|job|career|apply/,"💼"],[/present|talk|slides|defen/,"🎤"],[/conference|poster/,"🧳"],[/water|hydrat/,"💧"],[/sleep|bed/,"😴"],[/visit|trip|flight|travel/,"✈️"],[/lab|cell|experiment|culture/,"🧪"],[/finance|money|budget|sav/,"💰"],[/journal/,"📓"],[/meditat|rest/,"🧘"],[/cook|meal/,"🍳"],[/walk/,"🚶"],[/call|fiona|joel/,"💞"]];
   for(const [r,e] of R)if(r.test(t))return e;return ""};
 const CD_EMOJI={visit:"✈️",presentation:"🎤",conference:"🧳",deadline:"⏳",project:"📌",other:"📅"};
+
+/* ---------- Spicy: romantic and flirty extras, only when you both switch it on ---------- */
+const SPICY_TOPIC={id:"spicy",name:"Spicy",c:"#d0393f",icon:"heart",tag:"spicy",qs:L(`Which outfit of mine drives you crazy?|Where would you love a surprise kiss from me?|What's the most attractive thing I do without realizing?|Describe our perfect slow evening together.|What's a romantic date idea you've never told me about?|Which of my features do you find most irresistible?|What's the best kiss we've had, and why?|Which song puts you in the mood for romance?|What compliment from me makes you blush?|What would you whisper to me if I were next to you right now?|What's your favorite way to be held?|Lips, neck, or forehead kisses?|What flirty message do you want me to send you more often?|Where would you love to be alone with me for a whole day?|What makes you feel most desired by me?|What do you miss most about being close to me?|What's the first thing you want to do when I pick you up at the airport?|What's one thing about my voice that gets you?|What's your favorite way for me to flirt with you?|What do you daydream about when you miss me?|What's the most memorable hug we've shared?|How do you feel when I hold your hand in public?|What would a perfect honeymoon evening look like to you?|Do you prefer chasing or being chased?|What do you love about the way I look at you?|What's the boldest romantic thing you'd do for me?|What small touch from me would make your whole day?|Which scent on me do you love most?|What's your idea of the perfect cuddle?|What do you wish I'd do more when we're together?|How long could you go without kissing me when we finally meet?|What's the most romantic thing I've ever said to you?|Which photo of me do you look at the most?|What would make our next reunion unforgettable?|What's a flirty nickname you'd secretly love?`)};
+const SPICY_GAMES={
+  likely:singles(`blush first 😳|send a flirty text first 😏|start a cuddle 🫂|steal a kiss in public 💋|sing a love song to the other 🎶|plan a romantic surprise 🌹|stare at the other a little too long 👀|fall asleep during cuddles 😴|wear the other's hoodie 🧥|write a love poem 📜|ask for one more kiss 😘|get butterflies at the airport 🦋`),
+  wyr:pairs(`forehead kisses 😚 / back hugs 🫂|slow dance in the kitchen 💃 / stargaze on a blanket ✨|get a love letter 💌 / a love song 🎶|a candlelit dinner 🕯️ / breakfast in bed 🥐|cuddle all day 🛌 / adventure all day 🧗|flirty texts all day 📱 / one long romantic call ☎️|a kiss in the rain 🌧️ / a kiss under fireworks 🎆|a surprise kiss 💋 / a surprise hug 🤗|a weekend cabin 🛖 / a beach bungalow 🏝️|be serenaded 🎸 / be swept off your feet 💫`),
+  tot:pairs(`Cuddles 🫂 / Kisses 💋|Holding hands 🤝 / Arm around me 💞|Candlelight 🕯️ / Moonlight 🌙|Slow dance 💃 / Bubble bath 🛁|Flirty text 😏 / Love note 💌|Red roses 🌹 / Wildflowers 💐|Cologne 🧴 / Fresh out the shower 🚿|Big spoon 🥄 / Little spoon 🧸|Morning kisses 🌅 / Goodnight kisses 🌙|Dress up 👗 / Cozy pajamas 🩳`),
+  nhie:singles(`sent a flirty text to the wrong chat 🙈|dreamed about you 💭|practiced a kiss in the mirror 🪞|blushed reading your message 😳|replayed your voice note just to hear you 🎧|kept something that smells like you 👕|smiled at my phone in public because of you 📱|picked an outfit just to impress you 👗|imagined our first kiss before it happened 💋|stayed up late just to keep talking to you 🌙`),
+  agree:singles(`Kissing beats hugging. 💋|Flirting should never stop after marriage. 😏|Romance is better planned than spontaneous. 📅|Physical touch matters even in long distance. 🫂|Holding hands in public is a must. 🤝|A good cuddle fixes almost everything. 🧸|Every couple needs a song. 🎶|Dressing up for each other still matters. 👗|Saying I love you every day never gets old. ❤️|The best part of a visit is the first hug. 🤗`)
+};
+TOPICS.push(SPICY_TOPIC);TOPIC_EMOJI.spicy="🌶️";
+const spicyOn=()=>{const s=US.main.spicy||{};return !!(PARTNER&&s[ME]&&s[PARTNER])};
+const gItems=g=>spicyOn()&&SPICY_GAMES[g.id]?g.items.concat(SPICY_GAMES[g.id]):g.items;
+
+/* ---------- Love points: earned from things you already do together ---------- */
+function lovePoints(){
+  const cn=US.main.counts||{},qs=Object.keys(ANS()).filter(bothAnswered).length,nights=Object.keys(S.shared.prayer.log||{}).length;
+  let rounds=0;Object.values(US.main.games||{}).forEach(G=>Object.entries(G||{}).forEach(([k,d])=>{if(k!=="rounds"&&d&&COUPLE().every(u=>(d[u]||[]).length===5))rounds++}));
+  return 100+qs*10+nights*10+rounds*5+(cn.moments||0)*5+US.letters.length*10+US.jar.length*3+(cn.hearts||0);
+}
+const EARN=[["💬","Question answered together","+10"],["🕯️","Night of prayer","+10"],["🎲","Game round you both finished","+5"],["📸","Photo, doodle or painting","+5"],["💌","Love letter","+10"],["🫙","Jar note","+3"],["💖","Heart sent","+1"]];
+
+/* ---------- Our dream home ---------- */
+const SHOP=[
+  {id:"home",name:"Home",one:true,items:[["apt","Apartment","🏢",0],["cottage","Cottage","🏡",150],["house","Family house","🏠",400],["farm","Farmhouse","🛖",600],["castle","Castle","🏰",1500]]},
+  {id:"pets",name:"Pets",items:[["dog","Dog","🐶",120],["cat","Cat","🐱",120],["bunny","Bunny","🐰",100],["parrot","Parrot","🦜",100],["turtle","Turtle","🐢",80],["fish","Goldfish","🐠",40]]},
+  {id:"ride",name:"Rides",one:true,items:[["bike","Bicycles","🚲",40],["scooter","Scooter","🛵",100],["car","Car","🚗",250],["suv","SUV","🚙",350],["van","Family van","🚐",400],["sports","Sports car","🏎️",900]]},
+  {id:"garden",name:"Garden",items:[["tulips","Tulips","🌷",20],["sunflower","Sunflowers","🌻",20],["tree","Tree","🌳",30],["bench","Bench","🪑",30],["palm","Palm tree","🌴",50],["veg","Veggie patch","🥕",60],["tent","Tent","⛺",80],["fountain","Fountain","⛲",200]]}
+];
+const SHOPITEM={};SHOP.forEach(c=>c.items.forEach(([id,n,e,p])=>SHOPITEM[id]={id,n,e,p,cat:c.id}));
+const KID_EMOJI=["👶","👧","👦","🧒"];
+const homeRef=()=>DB.doc("couples/"+CID+"/us/home");
+const HM=()=>US.home||{};
+const saveHome=o=>{if(DB&&CID)homeRef().set(o,{merge:true}).catch(syncErr)};
+function homeSpent(){const H=HM();let s=0;(H.owned||[]).forEach(id=>{if(SHOPITEM[id])s+=SHOPITEM[id].p});(H.pets||[]).forEach(x=>s+=(SHOPITEM[x.k]||{p:0}).p);(H.garden||[]).forEach(x=>s+=(SHOPITEM[x.k]||{p:0}).p);return s}
+const homeLog=(text)=>{const lg=(HM().log||[]).slice(-29);lg.push({at:Date.now(),by:ME,text});return lg};
+function homeScene(big){
+  const H=HM(),t=tzNow(P(ME).tz),[s1,s2,s3,night]=roomSky(t.min),home=SHOPITEM[H.home||"apt"],ride=H.ride?SHOPITEM[H.ride]:null;
+  const sc=h("div",{class:"hscene"+(night?" night":""),style:`--s1:${s1};--s2:${s2};--s3:${s3}`});
+  sc.appendChild(h("div",{class:"hills"}));
+  const put=(e,size,x,y,anim,label)=>{const w=h("div",{class:"hitem",style:`left:${x}%;top:${y}%`},emo(e,size,anim),label?h("small",null,label):null);sc.appendChild(w)};
+  put(night?"🌙":"☀️",big?40:32,14,13,false);if(!night)put("☁️",big?44:34,34,9,false);else{put("✨",22,32,10,false);put("⭐",18,74,24,false)}
+  put(home.e,big?150:120,50,40,false);
+  const G=(H.garden||[]).slice(0,8),gp=[[12,46],[88,46],[24,58],[76,58],[8,70],[92,70],[40,64],[60,64]];
+  G.forEach((g,i)=>put(SHOPITEM[g.k].e,big?40:32,gp[i][0],gp[i][1],false));
+  if(ride)put(ride.e,big?70:56,18,80,false);
+  const kids=(H.kids||[]).slice(0,6);kids.forEach((k,i)=>put(k.e,big?40:32,62+i*7.5,62+(i%2)*4,true,big?k.name:null));
+  const pets=(H.pets||[]).slice(0,6);pets.forEach((p,i)=>put(SHOPITEM[p.k].e,big?48:38,44+i*11,84,true,big?p.name:null));
+  sc.appendChild(h("div",{class:"hsign"},H.name||(nm(ME)&&P(PARTNER)?COUPLE().map(nm).join(" & ")+"'s home":"Our home")));
+  return sc;
+}
+function homeSheet(){juSheet("Our dream home",()=>{
+  const H=HM(),pts=lovePoints()-homeSpent(),out=[homeScene(true)];
+  out.push(h("div",{class:"ptsbar"},h("span",null,emo("🌸",30,true)),h("div",null,h("b",null,pts.toLocaleString()+" love points"),h("small",null,"Spend them together. Either of you can add things.")),h("button",{type:"button",class:"lnk",onclick:()=>{const d=el("earnbox");d.hidden=!d.hidden}},"How to earn")));
+  out.push(h("div",{id:"earnbox",class:"earn",hidden:true},EARN.map(([e,l,v])=>h("div",null,emo(e,24,false),h("span",null,l),h("b",null,v)))));
+  const nmIn=h("input",{type:"text",class:"inp",value:H.name||"",placeholder:"Name your home, e.g. The Aboagye home"});
+  out.push(h("div",{class:"row"},h("div",{style:"flex:1 1 200px"},nmIn),h("button",{type:"button",class:"btn gh",onclick:()=>{saveHome({name:nmIn.value.trim()});nmIn.blur()}},"Save name")));
+  SHOP.forEach(c=>{
+    out.push(h("h2",{style:"font-size:19px;margin-top:6px"},c.name));
+    out.push(h("div",{class:"shop"},c.items.map(([id,n,e,p])=>{
+      const owned=(H.owned||[]).includes(id),cur=c.id==="home"?(H.home||"apt")===id:c.id==="ride"?H.ride===id:false,count=c.id==="pets"?(H.pets||[]).filter(x=>x.k===id).length:c.id==="garden"?(H.garden||[]).filter(x=>x.k===id).length:0;
+      const free=p===0||(c.one&&owned);
+      const lab=c.one?(cur?"In use":owned||p===0?"Use":p+" 🌸"):p+" 🌸";
+      return h("button",{type:"button",class:"shopitem tap"+(cur?" cur":""),onclick:e2=>{
+        if(c.one){if(cur)return;if(!free){if(pts<p){toast("Not enough love points","You need "+(p-pts)+" more. Answer a question or play a game together.");return}}
+          const o={[c.id==="home"?"home":"ride"]:id,log:homeLog((free?"switched to ":"got ")+(free?"the ":"a ")+n.toLowerCase()+" "+e)};if(!free&&p>0)o.owned=(H.owned||[]).concat([id]);saveHome(o);if(!free)confetti(90);return}
+        if(pts<p){toast("Not enough love points","You need "+(p-pts)+" more. Answer a question or play a game together.");return}
+        const key=c.id==="pets"?"pets":"garden",arr=(H[key]||[]).concat([{id:uid(),k:id,name:c.id==="pets"?n:""}]);
+        if(c.id==="garden"&&arr.length>8){toast("The garden is full","Remove something first");return}
+        if(c.id==="pets"&&arr.length>6){toast("That's a lot of pets","Six is the limit");return}
+        saveHome({[key]:arr,log:homeLog((c.id==="pets"?"adopted a ":"planted a ")+n.toLowerCase()+" "+e)});hearts(e2.currentTarget,8);confetti(60)}},
+        emo(e,44,false),h("b",null,n),h("small",null,count?"You have "+count+" · "+lab:lab))})));
+    if(c.id==="pets"&&(H.pets||[]).length)out.push(h("div",{class:"named"},(H.pets||[]).map(x=>{const i=h("input",{type:"text",class:"inp",value:x.name||"","aria-label":"Pet name"});
+      return h("div",{class:"row"},emo(SHOPITEM[x.k].e,30,false),h("div",{style:"flex:1"},i),h("button",{type:"button",class:"ghost",onclick:()=>{saveHome({pets:H.pets.map(y=>y.id===x.id?{...y,name:i.value.trim()||y.name}:y)});i.blur()}},"Save"),
+        h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveHome({pets:H.pets.filter(y=>y.id!==x.id)})},"×"))})));
+    if(c.id==="garden"&&(H.garden||[]).length)out.push(h("p",{class:"hint"},"Tap × to remove: ",...(H.garden||[]).map(x=>h("button",{type:"button",class:"chipx",onclick:()=>saveHome({garden:H.garden.filter(y=>y.id!==x.id)})},SHOPITEM[x.k].e+" ×"))));
+  });
+  out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Our family"),h("p",{class:"hint"},"Children are a blessing, not a purchase, so they're free. Add them with the names you dream of."));
+  (H.kids||[]).forEach(k=>{const i=h("input",{type:"text",class:"inp",value:k.name||"","aria-label":"Child's name"});
+    out.push(h("div",{class:"row"},emo(k.e,30,false),h("div",{style:"flex:1"},i),h("button",{type:"button",class:"ghost",onclick:()=>{saveHome({kids:H.kids.map(y=>y.id===k.id?{...y,name:i.value.trim()}:y)});i.blur()}},"Save"),
+      h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveHome({kids:H.kids.filter(y=>y.id!==k.id)})},"×")))});
+  if((H.kids||[]).length<6)out.push(h("div",{class:"chips"},KID_EMOJI.map(e=>h("button",{type:"button",onclick:ev=>{saveHome({kids:(H.kids||[]).concat([{id:uid(),e,name:""}]),log:homeLog("added a little one "+e)});hearts(ev.currentTarget,10)}},e+" Add"))));
+  const lg=(H.log||[]).slice(-5).reverse();
+  if(lg.length)out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Lately"),h("div",{class:"loglist"},lg.map(x=>h("p",{class:"hint"},(x.by===ME?"You ":nm(x.by)+" ")+x.text+" · "+ago(x.at)))));
+  return out})}
+
+/* ---------- Paint together: one shared canvas ---------- */
+const paintRef=()=>DB.doc("couples/"+CID+"/us/paint");
+let sheetCleanup=null;
+function paintSheet(){
+  let col="#e2557c",size=8,strokes=[],cur=null;
+  const c=h("canvas",{width:"1000",height:"1000","aria-label":"Shared drawing area"}),ctx=c.getContext("2d");
+  const draw=s=>{const p=s.p;if(!p||p.length<2)return;ctx.strokeStyle=s.c;ctx.fillStyle=s.c;ctx.lineWidth=s.w;ctx.lineCap="round";ctx.lineJoin="round";
+    if(p.length===2){ctx.beginPath();ctx.arc(p[0],p[1],s.w/2,0,7);ctx.fill();return}
+    ctx.beginPath();ctx.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)ctx.lineTo(p[i],p[i+1]);ctx.stroke()};
+  const redraw=()=>{ctx.fillStyle="#fffdf8";ctx.fillRect(0,0,1000,1000);strokes.forEach(draw);if(cur)draw(cur)};
+  const pos=e=>{const r=c.getBoundingClientRect();return [Math.round((e.clientX-r.left)*1000/r.width),Math.round((e.clientY-r.top)*1000/r.height)]};
+  c.addEventListener("pointerdown",e=>{c.setPointerCapture(e.pointerId);cur={id:uid(),by:ME,c:col,w:size,p:pos(e)};redraw()});
+  c.addEventListener("pointermove",e=>{if(!cur)return;const [x,y]=pos(e),p=cur.p;if(Math.abs(x-p[p.length-2])+Math.abs(y-p[p.length-1])<6)return;p.push(x,y);if(p.length>1200)finish();else{ctx.strokeStyle=cur.c;ctx.lineWidth=cur.w;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(p[p.length-4],p[p.length-3]);ctx.lineTo(x,y);ctx.stroke()}});
+  const finish=()=>{if(!cur)return;const s=cur;cur=null;strokes.push(s);if(strokes.length>700){toast("The canvas is full","Save it to your memories and start fresh");return}
+    paintRef().set({strokes:firebase.firestore.FieldValue.arrayUnion(s),at:Date.now(),by:ME},{merge:true}).catch(syncErr)};
+  ["pointerup","pointercancel"].forEach(t=>c.addEventListener(t,finish));
+  const COLS=["#2a1a22","#e2557c","#ff9f43","#f2b84b","#3f8a4f","#1f7f78","#2d6fb8","#5b3b8c","#8b5a36","#ffffff"];
+  const sw=h("div",{class:"swatches"},COLS.map(x=>h("button",{type:"button",style:"background:"+x+(x==="#ffffff"?";box-shadow:inset 0 0 0 1px var(--line)":""),"aria-label":x==="#ffffff"?"Eraser (white)":"Color","aria-pressed":String(x===col),onclick:e=>{col=x;sw.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}})));
+  const sz=h("div",{class:"chips"},[[4,"Fine"],[8,"Medium"],[18,"Thick"],[40,"Marker"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===size),onclick:e=>{size=v;sz.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
+  const who=h("p",{class:"hint"},"Draw anything. "+nm(PARTNER)+" sees each line as soon as you lift your finger.");
+  const undo=()=>{const mine=strokes.filter(s=>s.by===ME);const last=mine[mine.length-1];if(!last)return;strokes=strokes.filter(s=>s!==last);redraw();paintRef().set({strokes:firebase.firestore.FieldValue.arrayRemove(last)},{merge:true}).catch(syncErr)};
+  const fresh=confirmBtn("Start fresh",()=>{paintRef().set({strokes:[],at:Date.now(),by:ME}).catch(syncErr);strokes=[];redraw()});
+  const box=h("div",{class:"ju","data-nofocus":"1"},who,h("div",{class:"canvaswrap paintwrap"},c),sw,sz,
+    h("div",{class:"row"},h("button",{type:"button",class:"btn gh",onclick:undo},"Undo my last line"),
+      h("button",{type:"button",class:"btn",onclick:e=>{if(!strokes.length){toast("Nothing to save yet","Draw something first");return}redraw();
+        addTo("moments",{from:ME,at:Date.now(),kind:"paint",note:"Our painting",img:c.toDataURL("image/jpeg",.8)});saveUs({counts:{moments:INC(1)}});hearts(e.currentTarget,10);toast("Saved to memories","It hangs in the frame in your room")}},"Save to memories"),fresh));
+  openSheet("Paint together",box);redraw();
+  const un=paintRef().onSnapshot(sn=>{const d=sn.exists?sn.data():{};strokes=(d.strokes||[]).slice();redraw();
+    if(d.by&&d.by!==ME&&d.at&&Date.now()-d.at<60000)who.textContent=nm(d.by)+" is painting with you right now 🎨"},e=>console.warn(e));
+  sheetCleanup=un;
+}
 const gameById=id=>GAMES.find(g=>g.id===id);
 
 /* ---------- Us data: couples/{cid}/us/main plus moments, letters, jar, nudges ---------- */
@@ -1365,6 +1506,7 @@ function watchUs(){
   const col=n=>DB.collection("couples/"+CID+"/"+n);
   const list=(n,lim,key)=>unsubs.push(col(n).orderBy("at","desc").limit(lim).onSnapshot(q=>{US[key]=q.docs.map(d=>({id:d.id,...d.data()}));usRefresh()},e=>console.warn(e)));
   unsubs.push(usRef().onSnapshot(sn=>{US.main=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
+  unsubs.push(DB.doc("couples/"+CID+"/us/home").onSnapshot(sn=>{US.home=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
   list("moments",30,"moments");list("letters",200,"letters");list("jar",500,"jar");list("nudges",20,"nudges");
 }
 function usRefresh(){
@@ -1386,13 +1528,13 @@ const svgEl=s=>{const t=document.createElement("template");t.innerHTML=s.trim();
 const HEART='<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.4-9.3C1.2 8.2 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.9 1.4-1.8 3-2.9 5-2.9 3.6 0 5.8 3.7 4.4 7.2C19.5 16.4 12 21 12 21z"/></svg>';
 const ANS=()=>US.main.answers||{};
 const bothAnswered=id=>{const a=ANS()[id];return !!(a&&a[ME]&&a[PARTNER])};
-function enabledTopics(){const pr=US.main.prefs||{};return TOPICS.filter(t=>!t.tag||pr[t.tag]!==false)}
+function enabledTopics(){const pr=US.main.prefs||{};return TOPICS.filter(t=>t.tag==="spicy"?spicyOn():!t.tag||pr[t.tag]!==false)}
 function dailyQ(k){const pool=[];enabledTopics().forEach(t=>t.qs.forEach((q,i)=>pool.push({tid:t.id,i,q})));return pool[hashN(k+"q",pool.length)]}
 const dailyPrompt=k=>PHOTOPROMPTS[hashN(k+"p",PHOTOPROMPTS.length)];
 const GM=gid=>((US.main.games||{})[gid])||{};
 const gameRound=(gid,k)=>(GM(gid).rounds||{})[k]||0;
 const gkey=(k,r)=>r?k+"#"+r:k;
-function dailySet(gid,k){const n=gameById(gid).items.length,out=[],used=new Set();let s=hashN(gid+k,n);while(out.length<5){while(used.has(s))s=(s+1)%n;used.add(s);out.push(s);s=(s+13)%n}return out}
+function dailySet(gid,k){const n=gItems(gameById(gid)).length,out=[],used=new Set();let s=hashN(gid+k,n);while(out.length<5){while(used.has(s))s=(s+1)%n;used.add(s);out.push(s);s=(s+13)%n}return out}
 function togetherDays(){return US.main.since?daysBetween(US.main.since,tzNow(P(ME).tz).key):null}
 function nextVisit(){const k=tzNow(P(ME).tz).key;return S.shared.countdowns.filter(c=>c.kind==="visit"&&c.date&&daysBetween(k,c.date)>=0).sort((a,b)=>a.date.localeCompare(b.date))[0]||null}
 function visitLeft(v){const t=tzNow(P(ME).tz),tm=v.time?toMin(v.time):0;return Math.max(0,(daysBetween(t.key,v.date)*1440+tm-t.min)*60-new Date().getSeconds())}
@@ -1535,7 +1677,7 @@ function photoSheet(){let img=null;juSheet("Photo of the day",()=>{
 
 function gameSheet(g){juSheet(g.name,()=>{
   const k=usDay(),r=gameRound(g.id,k),key=gkey(k,r),set=dailySet(g.id,key),d=GM(g.id)[key]||{},o=PARTNER,mine=d[ME]||[],theirs=d[o],lab=g.lab||g.q;
-  if(mine.length<5){const i=mine.length,it=g.items[set[i]];
+  if(mine.length<5){const i=mine.length,it=gItems(g)[set[i]];
     const pics=g.optPics(it),big=g.pic?g.pic(it):null;
     return [h("p",{class:"hint"},"Round "+(i+1)+" of 5. "+g.intro),big?h("div",{class:"bigemo"},emo(big,96,true)):null,h("p",{class:"q",style:big?"text-align:center":""},g.q(it)),
       h("div",{class:"tot pics",style:"--c:"+g.c},g.opts(it).map((x,j)=>h("button",{type:"button",class:"tap",onclick:()=>{const nx=mine.concat([j]);saveUs({games:{[g.id]:{[key]:{[ME]:nx}}}});
@@ -1544,10 +1686,10 @@ function gameSheet(g){juSheet(g.name,()=>{
   if(!theirs||theirs.length<5)return [h("div",{class:"lockbox"},emo(g.e,40,true),h("div",null,h("b",null,"Done. Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"You'll see each other's picks once "+nm(o)+" plays.")))];
   const m=mine.filter((v,n)=>v===theirs[n]).length;
   return [h("p",{class:"q"},m+" of 5 match"),
-    h("div",{class:"totres"},set.map((s,n)=>{const it=g.items[s],op=g.opts(it);const pp=g.optPics(it),pe=pp?pp[mine[n]]+(mine[n]===theirs[n]?"":" "+pp[theirs[n]]):g.pic(it);
+    h("div",{class:"totres"},set.map((s,n)=>{const it=gItems(g)[s],op=g.opts(it);const pp=g.optPics(it),pe=pp?pp[mine[n]]+(mine[n]===theirs[n]?"":" "+pp[theirs[n]]):g.pic(it);
       return h("div",{class:"rrow"+(mine[n]===theirs[n]?" m":"")},emo(pe.split(" ")[0],34,false),h("div",null,h("b",null,lab(it)),h("span",null,"You: "+op[mine[n]]+" · "+nm(o)+": "+op[theirs[n]])))})),
     h("button",{type:"button",class:"btn",style:"background:"+g.c,onclick:()=>saveUs({games:{[g.id]:{rounds:{[k]:r+1}}}})},"Play 5 more"),
-    h("p",{class:"hint"},g.items.length+" in this game. New rounds every day.")]})}
+    h("p",{class:"hint"},gItems(g).length+" in this game"+(spicyOn()&&SPICY_GAMES[g.id]?", spicy ones included":"")+". New rounds every day.")]})}
 
 function doodleSheet(){let col="#e2557c",size=6;juSheet("Doodle for "+nm(PARTNER),()=>{
   const c=h("canvas",{width:"640",height:"640","aria-label":"Drawing area"}),ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,640,640);ctx.lineCap="round";ctx.lineJoin="round";
@@ -1563,7 +1705,9 @@ function doodleSheet(){let col="#e2557c",size=6;juSheet("Doodle for "+nm(PARTNER
 
 function topicsSettingsSheet(){juSheet("Topics",()=>{const pr=US.main.prefs||{};return [
   h("p",{class:"hint"},"Choose which kinds of questions show up. You both see the same set."),
-  ...TOPICTOGGLES.map(([k,n,d])=>{const on=pr[k]!==false;return h("div",{class:"tog"},h("div",null,h("b",null,n),h("small",null,d)),h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(on),"aria-label":n,onclick:()=>saveUs({prefs:{[k]:!on}})}))})]})}
+  ...TOPICTOGGLES.map(([k,n,d])=>{const on=pr[k]!==false;return h("div",{class:"tog"},h("div",null,h("b",null,n),h("small",null,d)),h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(on),"aria-label":n,onclick:()=>saveUs({prefs:{[k]:!on}})}))}),
+  (()=>{const sp=US.main.spicy||{},mine=!!sp[ME],theirs=!!sp[PARTNER];return h("div",{class:"tog spicytog"},h("div",null,h("b",null,"Spicy 🌶️"),h("small",null,"Flirty, romantic questions and game rounds. They only show when you both switch this on. "+(theirs?nm(PARTNER)+" has it on.":nm(PARTNER)+" has it off."))),
+    h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(mine),"aria-label":"Spicy",onclick:()=>{saveUs({spicy:{[ME]:!mine}});if(!mine&&theirs){confetti(80);toast("Spicy is on 🌶️","New questions and game rounds unlocked")}}}))})()]})}
 
 /* ---------- icons ---------- */
 const ICON={
@@ -1688,8 +1832,12 @@ function viewUs(){
   out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
     h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},TE(dailyPrompt(k)).t)),emo(TE(dailyPrompt(k)).e||"📸",56,true)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
-    h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},tg.items[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},tg.items[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
+    h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
 
+  const H=US.home||{},hm=SHOPITEM[H.home||"apt"],fam=[...(H.pets||[]).map(p=>SHOPITEM[p.k].e),...(H.kids||[]).map(k=>k.e)].slice(0,4).join("");
+  out.push(h("section",{class:"ju"},h("h2",null,"Make together"),h("div",{class:"make"},
+    h("button",{type:"button",class:"mk tap",style:"--c:#1f7f78",onclick:homeSheet},h("div",{class:"mkpic"},emo(hm.e,64,false),fam?h("span",{class:"fam"},fam):null),h("b",null,"Our dream home"),h("small",null,"🌸 "+(lovePoints()-homeSpent()).toLocaleString()+" love points")),
+    h("button",{type:"button",class:"mk tap",style:"--c:#c0398a",onclick:paintSheet},h("div",{class:"mkpic"},emo("🎨",64,true)),h("b",null,"Paint together"),h("small",null,"One canvas, both of you")))));
   out.push(usPrayer());
   const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);

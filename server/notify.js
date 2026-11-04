@@ -181,9 +181,11 @@ async function socialEvents(db, cid, members, people, now) {
   for (const n of await recent("nudges")) if (other(n.from)) out.push({ to: other(n.from), key: "nudge:" + n.id, at: n.at, title: name(n.from) + " is thinking of you", body: "Open Our Days to send a heart back." });
   for (const l of await recent("letters")) if (l.to) out.push({ to: l.to, key: "letter:" + l.id, at: l.at, title: "A letter from " + name(l.from), body: l.openWhen ? "Open when " + l.openWhen : "It's waiting in your letterbox." });
   for (const m of await recent("moments")) if (other(m.from)) out.push({ to: other(m.from), key: "moment:" + m.id, at: m.at,
-    title: m.kind === "doodle" ? name(m.from) + " sent you a doodle" : m.kind === "daily" ? name(m.from) + " shared today's photo" : name(m.from) + " shared a moment",
+    title: m.kind === "doodle" ? name(m.from) + " sent you a doodle" : m.kind === "paint" ? name(m.from) + " saved your painting" : m.kind === "daily" ? name(m.from) + " shared today's photo" : name(m.from) + " shared a moment",
     body: m.kind === "daily" ? "Share yours to see it." : "It's in the frame in your room." });
   for (const j of await recent("jar")) if (other(j.from)) out.push({ to: other(j.from), key: "jar:" + j.id, at: j.at, title: name(j.from) + " added a note to your jar", body: "Pull it out whenever you need it." });
+  const home = (await db.doc(`couples/${cid}/us/home`).get()).data() || {};
+  for (const x of home.log || []) if (x && x.at > lo && other(x.by)) out.push({ to: other(x.by), key: "home:" + x.at + ":" + x.by, at: x.at, title: "Your dream home", body: name(x.by) + " " + x.text });
   const us = (await db.doc(`couples/${cid}/us/main`).get()).data() || {};
   for (const [id, a] of Object.entries(us.answers || {})) for (const [u, v] of Object.entries(a || {})) {
     const o = other(u); if (!o || !v || !(v.at > lo)) continue;
