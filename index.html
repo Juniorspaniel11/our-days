@@ -1531,7 +1531,7 @@ const SPICY_GAMES={
   agree:singles(`Kissing beats hugging. 💋|Flirting should never stop after marriage. 😏|Romance is better planned than spontaneous. 📅|Physical touch matters even in long distance. 🫂|Holding hands in public is a must. 🤝|A good cuddle fixes almost everything. 🧸|Every couple needs a song. 🎶|Dressing up for each other still matters. 👗|Saying I love you every day never gets old. ❤️|The best part of a visit is the first hug. 🤗`)
 };
 TOPICS.push(SPICY_TOPIC);TOPIC_EMOJI.spicy="💋";
-const spicyOn=()=>!!((US.main.spicy||{})[ME]);
+const spicyOn=()=>(US.main.spicy||{})[ME]!==false;
 const gItems=g=>g.items;
 const FLIRTY_GAME={id:"flirty",name:"Flirty picks",e:"💋",c:"#d0393f",icon:"heart",intro:"Pick the one you'd love most.",items:SPICY_GAMES.wyr.concat(SPICY_GAMES.tot),
   q:()=>"Which would you love?",lab:x=>x[0].t+" or "+x[1].t,opts:x=>x.map(o=>o.t),optPics:x=>x.map(o=>o.e)};
@@ -2216,7 +2216,7 @@ function doodleSheet(){let col="#e2557c",size=6;juSheet("Doodle for "+nm(PARTNER
 function topicsSettingsSheet(){juSheet("Topics",()=>{const pr=US.main.prefs||{};return [
   h("p",{class:"hint"},"Choose which kinds of questions show up. These four apply to you both."),
   ...TOPICTOGGLES.map(([k,n,d])=>{const on=pr[k]!==false;return h("div",{class:"tog"},h("div",null,h("b",null,n),h("small",null,d)),h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(on),"aria-label":n,onclick:()=>saveUs({prefs:{[k]:!on}})}))}),
-  h("p",{class:"hint",style:"margin-top:10px"},"Just for you. "+nm(PARTNER)+" chooses separately."),
+  h("p",{class:"hint",style:"margin-top:10px"},"On for you by default. Turning it off only hides it for you, "+nm(PARTNER)+" chooses separately."),
   (()=>{const mine=spicyOn();return h("div",{class:"tog"},h("div",null,h("b",null,"Flirty 💋"),h("small",null,"Romantic, flirty questions and a Flirty picks game")),
     h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(mine),"aria-label":"Flirty",onclick:()=>{saveUs({spicy:{[ME]:!mine}});if(!mine)toast("Flirty is on 💋","Find it under Ask each other and Play together")}}))})()]})}
 
@@ -2546,7 +2546,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-e";
+const APP_VERSION="2026-11-04-f";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
