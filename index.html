@@ -669,6 +669,20 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:20px;padding:0 4px}
 #jufx{position:fixed;inset:0;z-index:70;pointer-events:none;width:100%;height:100%}
 .juheart{position:fixed;z-index:71;pointer-events:none;width:28px;height:28px}
+
+/* laptop and desktop: use the whole screen */
+@media (min-width:1000px){
+  .hin,main.wrap{max-width:min(1440px,100%)}
+  .gut{padding-left:32px;padding-right:32px}
+  main.wrap{display:block;column-count:2;column-gap:28px}
+  main.wrap>*{break-inside:avoid;margin:0 0 24px}
+  main.wrap>.ju:first-child{column-span:all}
+  .ju .hero{grid-template-columns:minmax(0,1fr) 220px minmax(0,1fr);padding:24px 20px 20px}
+  .ju .hstatus{max-width:320px;font-size:14px;padding:9px 12px}
+  .sheet{align-items:center}
+  .sheet .pn{max-width:760px;max-height:88vh;border-radius:26px}
+}
+@media (min-width:1500px){main.wrap{column-count:3}}
 </style>
 </head>
 
@@ -2546,7 +2560,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-f";
+const APP_VERSION="2026-11-04-g";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
