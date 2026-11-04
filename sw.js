@@ -1,5 +1,5 @@
 /* Network first so updates show up right away, cached copy when offline. Also shows notifications. */
-const CACHE = "ourdays-v10";
+const CACHE = "ourdays-v11";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); });
 self.addEventListener("activate", e => e.waitUntil((async () => {
@@ -9,7 +9,7 @@ self.addEventListener("activate", e => e.waitUntil((async () => {
 self.addEventListener("fetch", e => {
   const u = new URL(e.request.url);
   if (e.request.method !== "GET" || u.origin !== location.origin) return;
-  e.respondWith(fetch(e.request).then(r => {
+  e.respondWith(fetch(e.request, { cache: "no-cache" }).then(r => {
     if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)); }
     return r;
   }).catch(() => caches.match(e.request).then(r => r || caches.match("./index.html"))));

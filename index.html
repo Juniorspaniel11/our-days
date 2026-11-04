@@ -2419,6 +2419,12 @@ el("avatar").onclick=settingsSheet;
 setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("sheet").hidden)return;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;render()},30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
+/* ---------- updates: reload when a newer version is published ---------- */
+const APP_VERSION="2026-11-03-c";
+async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
+  if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
+setTimeout(checkUpdate,3000);setInterval(checkUpdate,15*60000);
 /* ---------- boot ---------- */
 (function boot(){
   if(!window.firebase||FIREBASE_CONFIG.apiKey.startsWith("PASTE")){gate("config");return}
