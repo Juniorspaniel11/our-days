@@ -443,6 +443,29 @@ body.tab-us #avatar{display:none}
 .ju .actgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .ju .act{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:10px 6px;cursor:pointer;color:var(--ink);text-align:center}
 .ju .act small{font-size:12.5px;font-weight:600;line-height:1.2}
+.ju .strow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ju .stcard{display:flex;flex-direction:column;gap:6px;border-radius:20px;padding:12px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);text-align:left;color:var(--ink);min-width:0}
+.ju button.stcard{cursor:pointer}
+.ju .pres{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.2}
+.ju .pres i{width:10px;height:10px;border-radius:50%;background:#a7a1b3;flex:none}
+.ju .pres.on{color:#1f9d55}.ju .pres.on i{background:#2fbf71;box-shadow:0 0 0 3px rgba(47,191,113,.25)}
+@media (prefers-reduced-motion:no-preference){.ju .pres.on i{animation:jupulse 2s infinite}}
+.ju .pres.me{color:#5b3b8c}
+.ju .stbody{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;line-height:1.25}.ju .stbody span{min-width:0;overflow-wrap:anywhere}
+.ju .stedit{font-size:12px;font-weight:600;color:#5b3b8c}
+.ju .evbanner{position:relative;display:flex;flex-direction:column;gap:12px;width:100%;border:0;border-radius:28px;padding:18px;color:#fff;text-align:left;overflow:hidden;box-shadow:0 14px 34px rgba(91,59,140,.35);
+  background:radial-gradient(circle at 18% 22%,rgba(255,255,255,.7) 0 1px,transparent 2px),radial-gradient(circle at 42% 12%,rgba(255,255,255,.6) 0 1px,transparent 2px),radial-gradient(circle at 70% 30%,rgba(255,255,255,.5) 0 1px,transparent 2px),radial-gradient(circle at 30% 60%,rgba(255,255,255,.4) 0 1px,transparent 2px),
+  linear-gradient(140deg,#24185a 0%,#5b3b8c 45%,#c0398a 78%,#f08a6a 100%)}
+.ju button.evbanner{cursor:pointer;flex-direction:row;align-items:center}
+.ju .evb-head{display:flex;align-items:center;gap:12px}
+.ju .evb-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ju .evk{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#ffd27a}
+.ju .evbanner b{font-family:var(--fun);font-weight:600;font-size:22px;line-height:1.2}
+.ju .evbanner small{font-size:14px;opacity:.9}
+.ju .evbtn{align-self:flex-start;margin-top:4px;background:#fff;color:#5b3b8c;font-weight:700;font-size:14.5px;border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
+.ju .evbanner .evrow{background:rgba(255,255,255,.14);color:#fff}
+.ju .evbanner .evgo{color:#fff}.ju .evbanner .evgo .arrow{color:rgba(255,255,255,.7)}.ju .evbanner .evrow.ok .evgo{color:rgba(255,255,255,.6)}
+.ju .evbanner .evrow input{accent-color:#ffd27a}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -748,7 +771,7 @@ function watchPerson(u,isMe){
     const cur=S.people[u]||{};
     if(!sn.exists){if(isMe&&cur)cur.loaded=true;return}
     const d=sn.data();
-    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,avatar:cur.avatar,presence:cur.presence,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
+    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,avatar:cur.avatar,presence:cur.presence,status:cur.status,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
     if(isMe)setTimeout(quickAdd,0);
     if(isMe)sent.person=js(d);
     link();softRender();
@@ -762,6 +785,7 @@ function watchPerson(u,isMe){
     softRender();
   },e=>console.warn(e)));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/calendar").onSnapshot(sn=>{const p=S.people[u];if(!p)return;p.cal=sn.exists?sn.data():null;softRender()},()=>{}));
+  list.push(statusRef(u).onSnapshot(sn=>{if(S.people[u])S.people[u].status=sn.exists?sn.data():null;softRender()},()=>{}));
   if(!isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/presence").onSnapshot(sn=>{if(S.people[u])S.people[u].presence=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/avatar").onSnapshot(sn=>{if(S.people[u])S.people[u].avatar=sn.exists?sn.data().photo:null;softRender()},()=>{}));
   list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
@@ -1814,13 +1838,42 @@ function eveningSheet(dk){dk=dk||myToday();const d0=DR["ev"+dk]||(DR["ev"+dk]=nu
 function eveningCard(){
   const k=myToday(),pl=evPlanFor(k);
   if(!pl){const nxt=Object.keys(EVE()).filter(x=>x>k).sort()[0];
-    return h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>eveningSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Our evening"),h("span",{class:"tx"},"Plan tonight together")),emo("🌙",56,true)),
-      h("div",{class:"foot"},h("span",{class:"hint"},nxt?"Next planned: "+parseKey(nxt).toLocaleDateString("en-US",{weekday:"long"}):"Pick a time and a few things to do"),h("span",{class:"go"},"Plan")))}
+    return h("section",{class:"ju"},h("button",{type:"button",class:"evbanner tap",onclick:()=>eveningSheet()},
+      h("div",{class:"evb-text"},h("span",{class:"evk"},"Tonight"),h("b",null,"What are we doing tonight?"),h("small",null,nxt?"Next planned: "+parseKey(nxt).toLocaleDateString("en-US",{weekday:"long"})+". Plan tonight too.":"Pick a time and a few things to do together"),
+        h("span",{class:"evbtn"},"Plan our evening")),h("div",{class:"evb-pic"},emo("🌙",64,true))))}
   const done=(pl.items||[]).filter(x=>x.d).length;
-  return h("div",{class:"pc evcard",style:"--c:#5b3b8c"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Tonight together · "+evTimeText(pl)),h("span",{class:"tx"},(pl.by===ME?"You":nm(pl.by))+" planned "+(pl.items||[]).length+" thing"+((pl.items||[]).length===1?"":"s"))),emo("🌙",48,true)),
+  return h("section",{class:"ju"},h("div",{class:"evbanner"},
+    h("div",{class:"evb-head"},h("div",{class:"evb-text"},h("span",{class:"evk"},"Tonight · "+evTimeText(pl)),h("b",null,"Our evening"),h("small",null,(pl.by===ME?"You":nm(pl.by))+" planned it · "+done+" of "+(pl.items||[]).length+" done")),h("div",{class:"evb-pic"},emo("🌙",52,true))),
     h("div",{class:"evlist"},(pl.items||[]).map((x,i)=>{const cb=h("input",{type:"checkbox",checked:!!x.d,"aria-label":"Done",onchange:()=>{saveDoc("evening",{[k]:{items:pl.items.map(y=>y.id===x.id?{...y,d:cb.checked}:y)}});if(cb.checked)confetti(30)}});
       return h("div",{class:"evrow"+(x.d?" ok":"")},cb,emo(x.e,28,false),h("button",{type:"button",class:"evgo",onclick:()=>openAct(x.k)},x.label,x.k.startsWith("x:")?null:h("span",{class:"arrow"}," ›")))})),
-    h("div",{class:"foot"},h("span",{class:"hint"},done+" of "+(pl.items||[]).length+" done"),h("button",{type:"button",class:"go",style:"background:none;cursor:pointer",onclick:()=>eveningSheet()},"Edit")));
+    h("button",{type:"button",class:"evbtn",onclick:()=>eveningSheet()},"Edit the plan")));
+}
+
+/* ---------- Status: online or last active, plus what you're doing ---------- */
+const STATUSES=[["Free to talk","📞"],["In the lab","🧪"],["Studying","📚"],["In class","🎓"],["In a meeting","👥"],["At church","⛪"],["Working out","💪"],["Driving","🚗"],["Eating","🍽️"],["Resting","🛋️"],["Sleeping","😴"],["Busy, text me","💬"],["Missing you","🥺"],["Thinking of you","💭"]];
+const statusRef=u=>DB.doc("couples/"+CID+"/people/"+u+"/extra/status");
+function statusOf(u){const s=P(u)&&P(u).status;if(s&&s.t&&Date.now()<(s.until||0))return {e:s.e,t:s.t,set:true};
+  const n=tzNow(P(u).tz),ev=itemsFor(u,n.key).filter(x=>!x.skip&&x.s!=null),cur=ev.find(x=>n.min>=x.s&&n.min<x.e);
+  if(cur)return {e:kwEmoji(cur.title)||"🗓️",t:cur.title+" until "+fmt(cur.e),set:false};
+  if(n.min<360||n.min>=1410)return {e:"🌙",t:"Probably asleep",set:false};
+  const nx=ev.find(x=>x.s>n.min);return {e:"✨",t:nx?"Free until "+fmt(nx.s):"Free for the rest of the day",set:false}}
+function statusSheet(){let hrs=4;juSheet("Your status",()=>{
+  const cur=P(ME).status,active=cur&&cur.t&&Date.now()<(cur.until||0);
+  const dur=h("div",{class:"chips"},[[1,"1 hour"],[4,"4 hours"],[12,"Until tonight"],[24,"All day"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===hrs),onclick:e=>{hrs=v;dur.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
+  const set=(t,e)=>{const s={t,e,at:Date.now(),until:Date.now()+hrs*3600000};P(ME).status=s;statusRef(ME).set(s).catch(syncErr);closeSheet();toast("Status set",e+" "+t)};
+  const ci=h("input",{type:"text",class:"inp",placeholder:"Or type your own, e.g. Presenting at 3"});
+  return [h("p",{class:"hint"},nm(PARTNER)+" sees this under your name. When you haven't set one, it shows what's on your schedule."),
+    h("div",{class:"actgrid"},STATUSES.map(([t,e])=>h("button",{type:"button",class:"act tap",onclick:()=>set(t,e)},emo(e,30,false),h("small",null,t)))),
+    h("form",{class:"row",onsubmit:ev=>{ev.preventDefault();if(ci.value.trim())set(ci.value.trim(),"✏️")}},h("div",{style:"flex:1 1 200px"},ci),h("button",{type:"submit",class:"ghost"},"Set")),
+    h("p",{class:"hint"},"Keep it for"),dur,
+    active?h("button",{type:"button",class:"btn gh",onclick:()=>{P(ME).status=null;statusRef(ME).set({t:"",until:0}).catch(syncErr);closeSheet()}},"Clear my status"):null]})}
+function statusRow(){
+  const pr=presenceOf(PARTNER),ps=statusOf(PARTNER),ms=statusOf(ME);
+  const card=(u,st,top,onclick)=>h(onclick?"button":"div",{type:onclick?"button":null,class:"stcard"+(onclick?" tap":""),onclick},
+    h("div",{class:"sttop"},top),h("div",{class:"stbody"},emo(st.e,26,false),h("span",null,st.t)),onclick?h("small",{class:"stedit"},st.set?"Tap to change":"Tap to set a status"):null);
+  return h("section",{class:"ju"},h("div",{class:"strow"},
+    card(PARTNER,ps,h("span",{class:"pres"+(pr.on?" on":"")},h("i"),pr.on?nm(PARTNER)+" is online":pr.text?nm(PARTNER)+" · "+pr.text.replace("Active","active"):nm(PARTNER)+" · offline")),
+    card(ME,ms,h("span",{class:"pres me"},"You"),statusSheet)));
 }
 
 /* ---------- Paint together: colouring pages plus free drawing ---------- */
@@ -2232,6 +2285,8 @@ function viewUs(){
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(coupleStrip());
+  out.push(statusRow());
+  out.push(eveningCard());
   out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
@@ -2248,7 +2303,7 @@ function viewUs(){
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
   const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
-  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),eveningCard(),
+  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
     checkinDue()?h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))):null,
     h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},TE(dailyPrompt(k)).t)),emo(TE(dailyPrompt(k)).e||"📸",56,true)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
@@ -2420,7 +2475,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-03-c";
+const APP_VERSION="2026-11-03-d";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
