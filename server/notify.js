@@ -186,6 +186,16 @@ async function socialEvents(db, cid, members, people, now) {
   for (const j of await recent("jar")) if (other(j.from)) out.push({ to: other(j.from), key: "jar:" + j.id, at: j.at, title: name(j.from) + " added a note to your jar", body: "Pull it out whenever you need it." });
   const home = (await db.doc(`couples/${cid}/us/home`).get()).data() || {};
   for (const x of home.log || []) if (x && x.at > lo && other(x.by)) out.push({ to: other(x.by), key: "home:" + x.at + ":" + x.by, at: x.at, title: "Your dream home", body: name(x.by) + " " + x.text });
+  const pr = (await db.doc(`couples/${cid}/us/prayer`).get()).data() || {};
+  for (const x of pr.items || []) {
+    if (x.at > lo && other(x.by)) out.push({ to: other(x.by), key: "pray:" + x.id, at: x.at, title: name(x.by) + " added a prayer request", body: x.text });
+    if (x.answered && x.answeredAt > lo && other(x.answeredBy)) out.push({ to: other(x.answeredBy), key: "prayans:" + x.id, at: x.answeredAt, title: "Prayer answered 🙌", body: x.text });
+  }
+  const ck = (await db.doc(`couples/${cid}/us/checkin`).get()).data() || {};
+  for (const [mk, m] of Object.entries(ck)) for (const [u, v] of Object.entries(m || {})) {
+    const o = other(u); if (!o || !v || !(v.at > lo)) continue;
+    out.push({ to: o, key: "ck:" + mk + ":" + u, at: v.at, title: m[o] ? "Check-in unlocked" : name(u) + " finished the monthly check-in", body: m[o] ? "See how you both saw the month." : "Do yours to see each other's answers." });
+  }
   const us = (await db.doc(`couples/${cid}/us/main`).get()).data() || {};
   for (const [id, a] of Object.entries(us.answers || {})) for (const [u, v] of Object.entries(a || {})) {
     const o = other(u); if (!o || !v || !(v.at > lo)) continue;
