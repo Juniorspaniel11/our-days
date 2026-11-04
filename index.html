@@ -466,6 +466,32 @@ body.tab-us #avatar{display:none}
 .ju .evbanner .evrow{background:rgba(255,255,255,.14);color:#fff}
 .ju .evbanner .evgo{color:#fff}.ju .evbanner .evgo .arrow{color:rgba(255,255,255,.7)}.ju .evbanner .evrow.ok .evgo{color:rgba(255,255,255,.6)}
 .ju .evbanner .evrow input{accent-color:#ffd27a}
+.ju .hero{display:grid;grid-template-columns:minmax(0,1fr) 128px minmax(0,1fr);gap:6px;align-items:start;border-radius:28px;padding:16px 10px 14px;background:linear-gradient(160deg,color-mix(in srgb,#8b6ad1 16%,var(--card)),var(--card) 45%,color-mix(in srgb,#e2557c 16%,var(--card)));border:1px solid var(--line);box-shadow:var(--shadow)}
+.ju .hside{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;min-width:0}
+.ju .hpic{position:relative;width:76px;height:76px;margin-bottom:4px}
+.ju .hpic>img,.ju .hpic>span{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--c);display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,var(--card));color:var(--c);font-family:var(--fun);font-weight:700;font-size:30px}
+.ju .hpic .pfile{left:0;top:0;width:76px;height:76px}.ju .hpic .padd{top:52px}.ju .hpic .odot{top:54px;right:2px}
+.ju .hname{font-family:var(--fun);font-weight:700;font-size:20px;line-height:1.1;overflow-wrap:anywhere}
+.ju .hloc{font-size:12.5px;color:var(--muted);font-weight:600}
+.ju .hpres{font-size:12px;font-weight:700;color:var(--muted)}.ju .hpres.on{color:#1f9d55}.ju .hpres.me{color:#8b6ad1;font-weight:600}
+.ju .hstatus{display:flex;align-items:center;gap:5px;margin-top:4px;border-radius:14px;padding:6px 7px;width:100%;background:var(--bg);border:1px solid var(--line);font-size:12.5px;font-weight:700;line-height:1.2;color:var(--ink);text-align:left;max-width:100%}
+.ju .hstatus span{min-width:0;overflow-wrap:break-word;word-break:normal}
+.ju .hstatus{flex-direction:column;justify-content:center;text-align:center;gap:3px;position:relative}.ju .hstatus .hedit{position:absolute;top:4px;right:6px;margin:0}.ju .hstatus .hedit{color:#8b6ad1;margin-left:auto;padding-left:2px}
+.ju .htime{font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--ink)}.ju button.hstatus{cursor:pointer;border-color:color-mix(in srgb,#8b6ad1 45%,transparent)}
+.ju .hmid{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);text-align:center}
+.ju .hheart{font-size:22px;line-height:1;margin-bottom:2px}
+@media (prefers-reduced-motion:no-preference){.ju .hheart.beat{animation:jubeat 1.6s ease-in-out infinite}.ju .ht b.tick{animation:jutick .45s cubic-bezier(.3,1.6,.5,1)}.ju .hbig{animation:juglowtxt 3s ease-in-out infinite alternate}}
+@keyframes jutick{from{transform:translateY(-6px) scale(1.15);opacity:.4}}
+@keyframes juglowtxt{to{filter:drop-shadow(0 0 10px rgba(226,85,124,.55))}}
+.ju .hbig{font-family:var(--fun);font-weight:700;font-size:54px;line-height:.95;background:linear-gradient(135deg,#8b6ad1,#e2557c 60%,#f2a65a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ju .hdlabel{font-family:var(--fun);font-weight:600;font-size:15px;color:var(--ink);margin-top:-2px}
+.ju .htiles{display:flex;gap:4px;margin:6px 0 2px}
+.ju .ht{display:flex;flex-direction:column;align-items:center;background:#24185a;color:#fff;border-radius:10px;padding:4px 5px 3px;min-width:36px}
+.ju .ht b{font-family:var(--mono);font-weight:500;font-size:17px;line-height:1.1;display:inline-block}.ju .ht small{font-size:9.5px;opacity:.75;text-transform:uppercase;letter-spacing:.06em}
+.ju .huntil{font-size:12.5px;font-weight:700;color:var(--muted)}
+.ju .hbar{width:100%;height:6px;border-radius:99px;background:color-mix(in srgb,#8b6ad1 18%,transparent);overflow:hidden;margin-top:4px}.ju .hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8b6ad1,#e2557c)}
+.ju .hmiles{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+body.tab-us #title,body.tab-us #subline{display:none}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -1735,22 +1761,6 @@ function personCircle(u){
   if(u===ME){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};box.appendChild(f);
     if(!ph)box.appendChild(h("i",{class:"padd"},"+"))}
   return box}
-function coupleStrip(){
-  const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
-  if(v){const J=US.main.journey||{};let from=J[v.id];if(!from){from=today;if(DB)saveUs({journey:{[v.id]:today}})}
-    const total=Math.max(1,daysBetween(from,v.date));left=Math.max(0,daysBetween(today,v.date));p=Math.min(1,Math.max(0,1-left/total))}
-  const PB=[[6,30],[60,4],[140,4],[194,30]],[l]=bzSplit(p/2,PB),[,r]=bzSplit(1-p/2,PB),m=bzPt(.5,PB),met=v&&left===0;
-  const svg=`<svg viewBox="0 0 200 40" class="cpath" aria-hidden="true"><path d="${bzD(PB)}" fill="none" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="1 7"/>
-    <path d="${bzD(l)}" fill="none" stroke="#5b3b8c" stroke-width="3.5" stroke-linecap="round"/><path d="${bzD(r)}" fill="none" stroke="#e2557c" stroke-width="3.5" stroke-linecap="round"/>
-    <text x="${m[0]}" y="${m[1]+5}" text-anchor="middle" font-size="${met?16:12}" opacity="${met?1:.55}">💞</text></svg>`;
-  const mid=h("button",{type:"button",class:"cmid",onclick:datesSheet,"aria-label":"Your next visit"});
-  if(v){mid.append(h("b",null,met?"Together today":left+(left===1?" day":" days")),h("small",null,met?"💞":"until "+shortDate(v.date)))}else mid.append(h("b",{style:"font-size:16px"},"Add a visit"),h("small",null,"Tap to set the date"));
-  const pathBox=h("div");pathBox.innerHTML=svg;mid.appendChild(pathBox.firstChild);
-  const mi=h("span",null,"");Promise.all([ME,PARTNER].map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b)mi.textContent=miles(a,b).toLocaleString()+" miles apart"});
-  if(v&&!met)mid.appendChild(h("small",{class:"cmeta"},h("span",{class:"mono",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},"")));
-  mid.appendChild(h("small",{class:"cmeta"},mi));
-  return h("section",{class:"ju"},h("div",{class:"cstrip"},personCircle(ME),mid,personCircle(PARTNER)));
-}
 
 /* ---------- Our dream home: build freely, change your mind any time ---------- */
 function homeSheet(){juSheet("Our dream home",()=>{
@@ -2285,7 +2295,6 @@ function viewUs(){
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(coupleStrip());
-  out.push(statusRow());
   out.push(eveningCard());
   out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
@@ -2330,8 +2339,36 @@ function viewUs(){
   setTimeout(usTick,0);
   return out;
 }
-function usTick(){const e=el("vpill");if(!e||!P(ME))return;let s=visitLeft({date:e.dataset.date,time:e.dataset.time});const d=Math.floor(s/86400);s-=d*86400;const hh=Math.floor(s/3600);s-=hh*3600;const mm=Math.floor(s/60);
-  e.textContent=d+"d "+pad(hh)+":"+pad(mm)+":"+pad(s-mm*60)}
+/* ---------- Us hero: you | countdown | partner ---------- */
+function heroSide(u){
+  const x=P(u),me=u===ME,c=me?"#8b6ad1":"#e2557c",ph=x&&x.avatar,pr=me?null:presenceOf(u),st=statusOf(u),n=tzNow(x.tz);
+  const pic=h("div",{class:"hpic",style:"--c:"+c},ph?h("img",{src:ph,alt:""}):h("span",null,(nm(u)[0]||"?")),
+    !me&&pr.on?h("i",{class:"odot","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
+  if(me){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};pic.appendChild(f)}
+  const stEl=h(me?"button":"div",{type:me?"button":null,class:"hstatus"+(me?" tap":""),onclick:me?statusSheet:null,"aria-label":me?"Set your status":null},emo(st.e,18,false),h("span",null,st.t),me?h("span",{class:"hedit","aria-hidden":"true"},"✎"):null);
+  return h("div",{class:"hside"},pic,h("b",{class:"hname"},nm(u)),h("small",{class:"hloc"},x.city||""),h("small",{class:"htime"},fmt(n.min)),
+    !me?h("small",{class:"hpres"+(pr.on?" on":"")},pr.on?"● Online now":pr.text||"Offline"):null,stEl);
+}
+function coupleStrip(){
+  const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
+  if(v){const J=US.main.journey||{};let from=J[v.id];if(!from){from=today;if(DB)saveUs({journey:{[v.id]:today}})}
+    const total=Math.max(1,daysBetween(from,v.date));left=Math.max(0,daysBetween(today,v.date));p=Math.min(1,Math.max(0,1-left/total))}
+  const met=v&&left===0;
+  const mid=h("button",{type:"button",class:"hmid",onclick:datesSheet,"aria-label":"Your next visit"});
+  if(!v){mid.append(h("div",{class:"hheart"},"💞"),h("b",{class:"hbig",style:"font-size:22px"},"Add a visit"),h("small",{class:"huntil"},"Tap to set the date"))}
+  else if(met){mid.append(h("div",{class:"hheart beat"},"💞"),h("b",{class:"hbig",style:"font-size:26px"},"Today!"),h("small",{class:"huntil"},"Together at last"))}
+  else{const tile=(id,l)=>h("div",{class:"ht"},h("b",{id},"00"),h("small",null,l));
+    mid.append(h("div",{class:"hheart beat"},"💞"),h("b",{class:"hbig",id:"hdays"},String(left)),h("small",{class:"hdlabel"},left===1?"day to go":"days to go"),
+      h("div",{class:"htiles",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},tile("hh","hrs"),tile("hm","min"),tile("hs","sec")),
+      h("small",{class:"huntil"},"until "+shortDate(v.date)),h("div",{class:"hbar"},h("i",{style:"width:"+Math.round(p*100)+"%"})));
+  }
+  const mi=h("small",{class:"hmiles"},"");Promise.all([ME,PARTNER].map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b)mi.textContent=miles(a,b).toLocaleString()+" miles apart"});
+  mid.appendChild(mi);
+  return h("section",{class:"ju"},h("div",{class:"hero"},heroSide(ME),mid,heroSide(PARTNER)));
+}
+function usTick(){const e=el("vpill");if(!e||!P(ME))return;let s=visitLeft({date:e.dataset.date,time:e.dataset.time});const d=Math.floor(s/86400);s-=d*86400;const hh=Math.floor(s/3600);s-=hh*3600;const mm=Math.floor(s/60),ss=s-mm*60;
+  const set=(id,v)=>{const x=el(id);if(x&&x.textContent!==v){x.textContent=v;if(!RM){x.classList.remove("tick");void x.offsetWidth;x.classList.add("tick")}}};
+  set("hh",pad(hh));set("hm",pad(mm));set("hs",pad(ss))}
 setInterval(usTick,1000);
 
 /* ---------- settings ---------- */
@@ -2475,7 +2512,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-03-d";
+const APP_VERSION="2026-11-04-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
