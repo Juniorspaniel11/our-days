@@ -179,7 +179,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .task .tx{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);padding:6px 0;outline:none;font-size:17px;resize:none;overflow:hidden;line-height:1.4;font-family:inherit;field-sizing:content}
 .task.done .tx{text-decoration:line-through;color:var(--muted)}
 .tfoc{display:flex;align-items:center;gap:6px;flex:none}.tmin{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
-.fbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}.fbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.fbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}.fbtn.big{align-self:flex-start;margin:4px 0 6px;padding:7px 14px;font-size:14px}.fbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .carried{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:999px;padding:1px 9px;white-space:nowrap}
 .addtask{display:flex;gap:8px;margin-top:10px}
 .addtask .inp{flex:1}
@@ -1258,7 +1258,7 @@ function tasksBlock(pid,k,editable){
     const tx=h("textarea",{class:"tx",rows:"1",value:it.t,"aria-label":"Task",oninput:()=>{it.t=tx.value;persist();fit()}});
     const fit=()=>{tx.style.height="auto";tx.style.height=tx.scrollHeight+"px"};requestAnimationFrame(fit);
     const x=h("button",{type:"button",class:"x","aria-label":"Remove task",onclick:()=>{d.tasks=d.tasks.filter(y=>y.id!==it.id);persist();render()}},"×");
-    const isToday=pid===me()&&k===tzNow(P(pid).tz).key,fid="t:"+it.id,run=S.timer&&S.timer.id===fid,fm=((P(pid).focus[k]||{})[fid])||0;
+    const isToday=pid===me(),fid="t:"+it.id,run=S.timer&&S.timer.id===fid,fm=Object.values(P(pid).focus||{}).reduce((a,f)=>a+((f||{})[fid]||0),0);
     const fb=isToday&&(!it.d||fm)?h("span",{class:"tfoc"},fm?h("span",{class:"tmin",title:"Focus time today"},fm>=60?Math.floor(fm/60)+"h "+pad(fm%60)+"m":fm+"m"):null,
       !it.d?h("button",{type:"button",class:"fbtn"+(run?" on":""),"aria-label":run?"Stop focus":"Start focus on this task",onclick:()=>{if(run)stopTimer();else{startTimer("task",fid,it.t||"Task");render()}}},run?"■ Stop":"▶ Focus"):null):null;
     row.append(...[cb,tx,it.c?h("span",{class:"carried",title:"Moved from an earlier day"},"carried"):null,fb,x].filter(Boolean));
@@ -1274,6 +1274,7 @@ function dayCard(pid,k,title){
     h("div",{class:"sechead"},h("h2",null,title),h("button",{type:"button",class:"primary",onclick:()=>itemSheet(pid,k,null)},"+ Event")),
     schedule(pid,k,{editable:true}),
     h("div",{class:"subhead"},h("b",null,"Tasks"),h("span",{class:"hint"},open?open+" open · unfinished ones carry over":"Unfinished ones carry over")),
+    pid===me()?(()=>{const run=S.timer&&S.timer.id==="t:free";return h("button",{type:"button",class:"fbtn big"+(run?" on":""),onclick:()=>{if(run)stopTimer();else{startTimer("task","t:free","Focus session");render()}}},run?"■ Stop focus session":"▶ Start a focus session")})():null,
     tasksBlock(pid,k,true));
 }
 function habitsList(pid,k,editable){
@@ -2566,7 +2567,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-h";
+const APP_VERSION="2026-11-04-i";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
