@@ -381,6 +381,11 @@ body.ro main .robar button{pointer-events:auto}
 .ju .loglist{display:flex;flex-direction:column;gap:4px}
 .ju .paintwrap{background:#fffdf8}
 .ju .spicytog{background:color-mix(in srgb,#d0393f 8%,transparent);border-radius:14px;padding:10px;border-top:0;margin-top:6px}
+.ju .journey{display:flex;flex-direction:column;gap:2px;border-radius:24px;padding:14px 14px 10px;background:linear-gradient(170deg,color-mix(in srgb,#f2b84b 16%,var(--card)),var(--card) 70%);border:1px solid var(--line);box-shadow:var(--shadow);text-align:left;color:var(--ink);cursor:pointer;width:100%}
+.ju .jhead b{display:block;font-family:var(--fun);font-weight:600;font-size:20px}.ju .jhead small,.ju .jfoot{color:var(--muted);font-size:13.5px;font-weight:600}
+.ju .road{width:100%;height:auto;display:block;margin:2px 0}
+.ju .calltime{display:flex;align-items:center;gap:12px;border-radius:18px;padding:10px 12px;background:color-mix(in srgb,#2d6fb8 10%,var(--card));border:1px solid color-mix(in srgb,#2d6fb8 22%,transparent)}
+.ju .calltime b{display:block;font-size:15.5px}.ju .calltime small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -1466,6 +1471,60 @@ function homeSheet(){juSheet("Our dream home",()=>{
   if(lg.length)out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Lately"),h("div",{class:"loglist"},lg.map(x=>h("p",{class:"hint"},(x.by===ME?"You ":nm(x.by)+" ")+x.text+" · "+ago(x.at)))));
   return out})}
 
+
+/* ---------- The road to the next visit: you move toward each other day by day ---------- */
+const BZ=[[24,112],[110,8],[236,160],[336,46]];
+function bzPt(t,P=BZ){const u=1-t;return [0,1].map(i=>u*u*u*P[0][i]+3*u*u*t*P[1][i]+3*u*t*t*P[2][i]+t*t*t*P[3][i])}
+function bzSplit(t,P=BZ){const L=(a,b)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];const a=L(P[0],P[1]),b=L(P[1],P[2]),c=L(P[2],P[3]),d=L(a,b),e=L(b,c),f=L(d,e);return [[P[0],a,d,f],[f,e,c,P[3]]]}
+const bzD=P=>`M${P[0]} C${P[1]} ${P[2]} ${P[3]}`;
+function journeyCard(){
+  const v=nextVisit();if(!v)return null;
+  const today=tzNow(P(ME).tz).key,J=(US.main.journey||{});let from=J[v.id];
+  if(!from){from=today;if(US.main&&DB)saveUs({journey:{[v.id]:today}})}
+  const total=Math.max(1,daysBetween(from,v.date)),left=Math.max(0,daysBetween(today,v.date)),p=Math.min(1,Math.max(0,1-left/total));
+  const ids=[ME,PARTNER].sort((a,b)=>tzNow(P(a).tz).off-tzNow(P(b).tz).off);   // western time zone on the left
+  const [w,e]=ids,cw=w===ME?"#5b3b8c":"#e2557c",ce=e===ME?"#5b3b8c":"#e2557c";
+  const half=p/2,[lw]=bzSplit(half),[,re]=bzSplit(1-half),pw=bzPt(half),pe=bzPt(1-half),mid=bzPt(.5),met=p>=1;
+  const deco=[[.14,"🌵"],[.3,"⛰️"],[.42,"🏜️"],[.58,"🌄"],[.72,"🌵"],[.86,"🌾"]].map(([t,em])=>{const q=bzPt(t);return `<text x="${q[0]}" y="${q[1]-14}" font-size="15" text-anchor="middle">${em}</text>`}).join("");
+  const av=(pt,col,u)=>`<g transform="translate(${pt[0]} ${pt[1]})"><circle r="15" fill="${col}" stroke="#fff" stroke-width="3"/><text y="5.5" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="15" fill="#fff">${(nm(u)[0]||"?")}</text></g>`;
+  const svg=`<svg viewBox="0 0 360 172" class="road" role="img" aria-label="${Math.round(p*100)} percent of the way to your visit">
+    <path d="${bzD(BZ)}" fill="none" stroke="var(--line)" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 12"/>
+    <path d="${bzD(lw)}" fill="none" stroke="${cw}" stroke-width="7" stroke-linecap="round"/>
+    <path d="${bzD(re)}" fill="none" stroke="${ce}" stroke-width="7" stroke-linecap="round"/>
+    ${deco}
+    <text x="${mid[0]}" y="${mid[1]+6}" font-size="${met?28:18}" text-anchor="middle" opacity="${met?1:.45}">💞</text>
+    <circle cx="${BZ[0][0]}" cy="${BZ[0][1]}" r="5" fill="${cw}"/><circle cx="${BZ[3][0]}" cy="${BZ[3][1]}" r="5" fill="${ce}"/>
+    <text x="${BZ[0][0]-4}" y="${BZ[0][1]+30}" font-size="12.5" font-weight="700" fill="var(--muted)" font-family="DM Sans, sans-serif">${(P(w).city||"").replace(/[<>&]/g,"")}</text>
+    <text x="${BZ[3][0]+8}" y="${BZ[3][1]-16}" font-size="12.5" font-weight="700" fill="var(--muted)" font-family="DM Sans, sans-serif" text-anchor="end">${(P(e).city||"").replace(/[<>&]/g,"")}</text>
+    ${met?"":av(pw,cw,w)+av(pe,ce,e)}
+  </svg>`;
+  const mi=h("span",null,"");
+  Promise.all(ids.map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b){const m=miles(a,b);mi.textContent=met?"":" · "+Math.round(m*(1-p)).toLocaleString()+" of "+m.toLocaleString()+" miles to go"}});
+  const card=h("button",{type:"button",class:"journey tap",onclick:datesSheet,"aria-label":"The road to your visit"},
+    h("div",{class:"jhead"},h("b",null,met?"You made it 💞":"The road to "+shortDate(v.date)),h("small",null,met?"Together today":Math.round(p*100)+"% of the way",mi)));
+  const box=h("div");box.innerHTML=svg;card.appendChild(box.firstChild);
+  card.appendChild(h("small",{class:"jfoot"},met?"Enjoy every minute.":left===1?"Tomorrow you meet in the middle.":"Each day you both move a little closer. "+left+" days left."));
+  return h("section",{class:"ju"},card);
+}
+
+/* ---------- Best time to call today: when you're both awake and free ---------- */
+function bestCallTimes(){
+  const mn=tzNow(P(ME).tz),on=tzNow(P(PARTNER).tz),shift=mn.off-on.off; // partner minute + shift = my minute
+  const busy=[];const add=(uid,k,sh)=>itemsFor(uid,k).filter(x=>!x.skip&&x.s!=null&&x.e!=null).forEach(x=>busy.push([x.s+sh,x.e+sh]));
+  add(ME,mn.key,0);add(PARTNER,on.key,shift);
+  const lo=Math.max(mn.min,7*60,7*60+shift),hi=Math.min(23*60+30,23*60+30+shift);
+  if(hi-lo<30)return [];
+  busy.sort((a,b)=>a[0]-b[0]);const free=[];let cur=Math.ceil(lo/15)*15;
+  for(const [s,e] of busy){if(e<=cur)continue;if(s>=hi)break;if(s-cur>=30)free.push([cur,Math.min(s,hi)]);cur=Math.max(cur,e)}
+  if(hi-cur>=30)free.push([cur,hi]);
+  return free.slice(0,3).map(([a,b])=>({a,b,pa:a-shift,pb:b-shift}));
+}
+function callLine(){
+  const f=bestCallTimes();if(!f.length)return h("p",{class:"hint"},"No free time left today when you're both awake. Try tomorrow.");
+  const x=f[0];return h("div",{class:"calltime"},emo("📞",28,false),h("div",null,h("b",null,"Best time to call: "+fmt(x.a)+" to "+fmt(x.b)),
+    h("small",null,"That's "+fmt(x.pa)+" to "+fmt(x.pb)+" for "+nm(PARTNER)+(f.length>1?". Also free: "+f.slice(1).map(y=>fmt(y.a)+" to "+fmt(y.b)).join(", "):"")+". From both your schedules, between 7 AM and 11:30 PM.")));
+}
+
 /* ---------- Paint together: one shared canvas ---------- */
 const paintRef=()=>DB.doc("couples/"+CID+"/us/paint");
 let sheetCleanup=null;
@@ -1578,7 +1637,7 @@ function windowSheet(){juSheet(nm(PARTNER)+" right now",()=>{
   return [h("div",{class:"jcities"},cards),dist,
     h("div",{class:"now solid",style:"background:"+catColor(cur||nx)},h("span",{class:"lbl"},cur?"Right now":nx?"Up next":"Free"),h("b",null,cur?cur.title:nx?nx.title:"Nothing scheduled"),
       h("span",null,cur?"Until "+fmt(cur.e)+" there":nx?fmt(nx.s)+" there, "+fmt(nx.s+(mn.off-on.off))+" your time":"Nothing else scheduled today")),
-    tasks.length?h("p",{class:"hint"},dn+" of "+tasks.length+" tasks done today"):null,
+    tasks.length?h("p",{class:"hint"},dn+" of "+tasks.length+" tasks done today"):null,callLine(),
     tel?h("div",{class:"callrow"},h("a",{class:"c1",href:"tel:"+tel},"Call"),h("a",{class:"c2",href:"facetime:"+tel},"FaceTime"),h("a",{class:"c2",href:"facetime-audio:"+tel},"FaceTime audio"))
       :h("p",{class:"hint"},nm(oid)+" can add a phone number in Settings to get Call and FaceTime buttons here."),
     h("button",{type:"button",class:"btn gh",onclick:()=>{closeSheet();S.tab="today";S.viewAs=oid;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"See "+nm(oid)+"'s whole day")]})}
@@ -1816,6 +1875,7 @@ function viewUs(){
     h("button",{type:"button",class:"jpill tap",onclick:datesSheet},svgEl(ICON.plane("#e2557c")),v?h("span",{class:"mono",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},""):"Add a visit"),
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
+  const jc=journeyCard();if(jc)out.push(jc);
   const room=h("div",{class:"room"});room.innerHTML=roomSVG();room.appendChild(h("span",{class:"roomcap"},"Tap anything in your room"));
   room.querySelectorAll("[data-obj]").forEach(g=>{const go=()=>OBJ[g.dataset.obj]();g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
   const top=h("div",{class:"ju"},room);
@@ -1829,7 +1889,7 @@ function viewUs(){
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
   const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
-  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
+  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),callLine(),
     h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},TE(dailyPrompt(k)).t)),emo(TE(dailyPrompt(k)).e||"📸",56,true)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
