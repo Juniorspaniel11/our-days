@@ -341,6 +341,28 @@ body.ro main .robar button{pointer-events:auto}
 .callrow a.c1{background:#3f7d4e;color:#fff}.callrow a.c2{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 .pushbox{display:flex;flex-direction:column;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:6px}
 /* ---------- Us tab: room, prompts, games (all scoped under .ju) ---------- */
+.ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ju .hscroll::-webkit-scrollbar{display:none}
+.ju .tile{flex:0 0 150px;scroll-snap-align:start;border-radius:22px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:150px;cursor:pointer;text-align:left;color:var(--ink);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--card)),var(--card) 85%);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);position:relative}
+.ju .tile svg{width:40px;height:40px;flex:none}
+.ju .tile b{font-family:var(--fun);font-weight:600;font-size:17px;line-height:1.2;margin-top:auto}
+.ju .tile .sub{font-size:13.5px;font-weight:700;color:var(--c)}
+.ju .tile .jbar{width:100%;margin:0}.ju .tile .jbar span{max-width:none}
+.ju .tile.hot::after{content:"";position:absolute;top:12px;right:12px;width:11px;height:11px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 3px var(--card)}
+.ju .pstrip{display:flex;align-items:center;gap:12px;border-radius:24px;padding:12px 14px;color:#fff;box-shadow:var(--shadow);
+  background:radial-gradient(circle at 82% 22%,rgba(255,255,255,.5) 0 1px,transparent 2px),radial-gradient(circle at 64% 70%,rgba(255,255,255,.4) 0 1px,transparent 2px),radial-gradient(circle at 92% 78%,rgba(255,255,255,.4) 0 1px,transparent 2px),linear-gradient(135deg,#14173f,#2e2160 60%,#4a2a6a)}
+.ju .pbtn{width:54px;height:54px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none;cursor:pointer;padding:0}
+.ju .pbtn svg{width:30px;height:30px}
+.ju .pbtn.on{background:#f2b84b;border-color:#f2b84b;box-shadow:0 0 22px rgba(242,184,75,.55)}
+.ju .pmid{flex:1;min-width:0;text-align:left;background:none;border:0;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:0}
+.ju .pmid b{font-family:var(--fun);font-weight:600;font-size:18px;line-height:1.1}
+.ju .pmid span{font-size:14px;opacity:.85}
+.ju .pdots{display:flex;gap:6px;margin-top:2px}
+.ju .pdots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.22)}
+.ju .pdots i.on{background:#f2b84b}.ju .pdots i.cur{outline:1.5px solid rgba(255,255,255,.7);outline-offset:1.5px}
+.ju .chev{font-size:28px;opacity:.55;line-height:1}
 :root{--fun:"Fredoka","Segoe UI",system-ui,sans-serif;--rose:#e2557c;--rose-soft:#fde4ec;--plum:#5b3b8c;--teal-soft:#dff3f1;--amber:#b9661c;--amber-soft:#fdeedb;--gold:#f2b84b;
   --wall1:#f9d9b6;--wall2:#f1bd8f;--floor1:#c58a5c;--floor2:#ad7246;--edge:#5b3a2c;--shelf:#9b6338;--rug:#e9876f}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--rose:#ff7c9e;--rose-soft:#40192a;--plum:#b99cff;--teal-soft:#123532;--amber:#f2a65a;--amber-soft:#3a2614;
@@ -1186,19 +1208,19 @@ function projectCard(pid,x){
   return c;
 }
 
-function usPrayer(){
+function prayerFull(){
   const pid=ME,p=P(pid),oid=partnerOf(pid),o=P(oid),mn=tzNow(p.tz),on=tzNow(o.tz);const out=[];
   /* prayer */
   const nk=nightKey(p.tz),log=S.shared.prayer.log,done=!!log[nk];
   const tonight=S.shared.prayer.tonight[nk];
   const tIn=h("input",{type:"time",class:"inp",style:"width:auto",value:tonight?tonight.time:"","aria-label":"Tonight's prayer time, your time",
-    onchange:()=>{if(tIn.value)S.shared.prayer.tonight[nk]={time:tIn.value,by:pid,off:mn.off};else delete S.shared.prayer.tonight[nk];persist();render()}});
+    onchange:()=>{if(tIn.value)S.shared.prayer.tonight[nk]={time:tIn.value,by:pid,off:mn.off};else delete S.shared.prayer.tonight[nk];persist();render();refreshSheet()}});
   let timeNote="Usually between 11 PM and 2 AM. No fixed time.";
   if(tonight){const m=toMin(tonight.time),mine=m+(mn.off-tonight.off),theirs=mine+(on.off-mn.off);timeNote="Tonight around "+fmt(mine)+" your time, "+fmt(theirs)+" "+o.name+"'s time"}
   const dots=h("div",{class:"dots","aria-label":"Last 14 nights"});for(let i=13;i>=0;i--){const k=addDays(nk,-i);dots.appendChild(h("i",{class:log[k]?"on":"",title:shortDate(k)}))}
   const st=prayerStreak();
-  const cb=h("input",{type:"checkbox",checked:done,onchange:()=>{if(cb.checked)log[nk]={by:pid,at:Date.now()};else delete log[nk];persist();render()}});
-  out.push(h("section",{class:"panel pray",id:"prayerPanel"},h("div",{class:"stars"}),h("div",{class:"sechead"},h("h2",null,"Prayer together"),h("span",{class:"hint"},"10 minutes")),
+  const cb=h("input",{type:"checkbox",checked:done,onchange:()=>{if(cb.checked)log[nk]={by:pid,at:Date.now()};else delete log[nk];persist();render();refreshSheet()}});
+  out.push(h("section",{class:"panel pray"},h("div",{class:"stars"}),h("div",{class:"sechead"},h("span",{class:"meta"},"10 minutes, whenever you're both ready")),
     h("label",{class:"check"},cb,h("span",{class:done?"done":""},done?"We prayed tonight":"Tick when you've prayed tonight")),
     done?h("div",{class:"meta"},"Ticked by "+(log[nk].by===pid?"you":P(log[nk].by).name)+" at "+new Date(log[nk].at).toLocaleTimeString("en-US",{timeZone:p.tz,hour:"numeric",minute:"2-digit"})+". It shows ticked on both phones."):null,
     h("div",{class:"meta"},timeNote),
@@ -1207,6 +1229,22 @@ function usPrayer(){
     h("p",{class:"hint"},"Praying after midnight still counts for the night before.")));
 
   return out[0];
+}
+function prayerSheet(){juSheet("Prayer together",()=>[prayerFull()])}
+const CANDLE=c=>`<svg viewBox="0 0 32 32"><rect x="11" y="13" width="10" height="15" rx="2.5" fill="${c}"/><path d="M16 13v-2" stroke="${c}" stroke-width="2"/></svg>`;
+const CANDLE_LIT=`<svg viewBox="0 0 32 32"><rect x="11" y="13" width="10" height="15" rx="2.5" fill="#3a2430"/><path d="M16 13v-2" stroke="#3a2430" stroke-width="2"/><path d="M16 2c3.5 4 4.5 6.5 0 9.5c-4.5-3-3.5-5.5 0-9.5z" fill="#e2557c"/></svg>`;
+function usPrayer(){
+  const p=P(ME),o=P(PARTNER),mn=tzNow(p.tz),on=tzNow(o.tz),nk=nightKey(p.tz),log=S.shared.prayer.log,done=!!log[nk],st=prayerStreak(),tonight=S.shared.prayer.tonight[nk];
+  const dots=h("div",{class:"pdots","aria-label":"This week"});for(let i=6;i>=0;i--){const k=addDays(nk,-i);dots.appendChild(h("i",{class:(log[k]?"on":"")+(i===0?" cur":""),title:shortDate(k)}))}
+  let when="";if(tonight){const m=toMin(tonight.time)+(mn.off-tonight.off);when=" · tonight "+fmt(m)}
+  const tick=h("button",{type:"button",class:"pbtn tap"+(done?" on":""),"aria-pressed":String(done),"aria-label":done?"Prayed tonight. Tap to undo":"Tick after you pray",
+    onclick:()=>{if(done)delete log[nk];else{log[nk]={by:ME,at:Date.now()};const n=prayerStreak();if([7,14,30,100,365].includes(n)){confetti(180);toast(n+" nights in a row","Your plant just grew")}else confetti(40)}persist();render()}},
+    svgEl(done?CANDLE_LIT:CANDLE("#fff")));
+  return h("section",{class:"ju"},h("div",{class:"pstrip",id:"prayerPanel"},tick,
+    h("button",{type:"button",class:"pmid",onclick:prayerSheet,"aria-label":"Prayer details and tonight's time"},
+      h("b",null,done?"Prayed tonight":"Prayer together"),
+      h("span",null,(st?st+(st===1?" night":" nights")+" in a row":done?"Streak starts tonight":"Tap the candle after you pray")+when),dots),
+    h("span",{class:"chev","aria-hidden":"true"},"›")));
 }
 function usPartner(){
   const pid=ME,p=P(pid),oid=partnerOf(pid),o=P(oid),mn=tzNow(p.tz),on=tzNow(o.tz);const out=[];
@@ -1344,19 +1382,30 @@ function hearts(fromEl,n=14){if(RM||!fromEl)return;const r=fromEl.getBoundingCli
 function juSheet(title,build){const box=h("div",{class:"ju","data-nofocus":"1"});[].concat(build()).flat(9).forEach(n=>n&&box.appendChild(n));openSheet(title,box);sheetFn=()=>juSheet(title,build)}
 const refreshSheet=()=>{if(!el("sheet").hidden&&sheetFn)sheetFn()};
 
-function windowSheet(){juSheet("Where you both are",()=>{
-  const ids=[ME,PARTNER],cards=ids.map(x=>{const n=tzNow(P(x).tz),[a,b,c]=roomSky(n.min);return h("div",{class:"jcity",style:`background:linear-gradient(160deg,${a},${b} 60%,${c})`},h("span",{style:"font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase"},nm(x)),h("b",null,fmt(n.min)),h("span",{style:"font-size:14px"},P(x).city||""))});
-  const dist=h("p",{class:"q",style:"text-align:center"},"…");
-  Promise.all(ids.map(x=>geo(P(x).city))).then(([a,b])=>{dist.textContent=a&&b?miles(a,b).toLocaleString()+" miles apart":"Add both cities in Settings to see the distance"});
-  const diff=(tzNow(P(ME).tz).off-tzNow(P(PARTNER).tz).off)/60;
-  return [h("div",{class:"jcities"},cards),dist,h("p",{class:"hint",style:"text-align:center"},diff===0?"Same time zone.":nm(PARTNER)+" is "+Math.abs(diff)+" hour"+(Math.abs(diff)===1?"":"s")+(diff>0?" behind you.":" ahead of you."))]})}
-
-function gardenSheet(){juSheet("Your plant",()=>{
+function windowSheet(){juSheet(nm(PARTNER)+" right now",()=>{
+  const ids=[ME,PARTNER],cards=ids.map(x=>{const n=tzNow(P(x).tz),[a,b,c]=roomSky(n.min);return h("div",{class:"jcity",style:`background:linear-gradient(160deg,${a},${b} 60%,${c})`},h("span",{style:"font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase"},x===ME?"You":nm(x)),h("b",null,fmt(n.min)),h("span",{style:"font-size:14px"},P(x).city||""))});
+  const dist=h("p",{class:"hint",style:"text-align:center"},"");
+  const diff=(tzNow(P(ME).tz).off-tzNow(P(PARTNER).tz).off)/60,dz=diff===0?"Same time zone":Math.abs(diff)+" hour"+(Math.abs(diff)===1?"":"s")+(diff>0?" behind you":" ahead of you");
+  dist.textContent=dz;Promise.all(ids.map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b)dist.textContent=miles(a,b).toLocaleString()+" miles apart · "+dz});
+  const oid=PARTNER,o=P(oid),on=tzNow(o.tz),mn=tzNow(P(ME).tz),ev=itemsFor(oid,on.key).filter(x=>!x.skip&&!x.done),cur=ev.find(x=>on.min>=x.s&&on.min<x.e),nx=ev.find(x=>x.s>on.min);
+  const tasks=day(oid,on.key).tasks.filter(t=>t.t),dn=tasks.filter(t=>t.d).length;
+  const tel=(o.phone||"").replace(/[^0-9+]/g,"");
+  return [h("div",{class:"jcities"},cards),dist,
+    h("div",{class:"now solid",style:"background:"+catColor(cur||nx)},h("span",{class:"lbl"},cur?"Right now":nx?"Up next":"Free"),h("b",null,cur?cur.title:nx?nx.title:"Nothing scheduled"),
+      h("span",null,cur?"Until "+fmt(cur.e)+" there":nx?fmt(nx.s)+" there, "+fmt(nx.s+(mn.off-on.off))+" your time":"Nothing else scheduled today")),
+    tasks.length?h("p",{class:"hint"},dn+" of "+tasks.length+" tasks done today"):null,
+    tel?h("div",{class:"callrow"},h("a",{class:"c1",href:"tel:"+tel},"Call"),h("a",{class:"c2",href:"facetime:"+tel},"FaceTime"),h("a",{class:"c2",href:"facetime-audio:"+tel},"FaceTime audio"))
+      :h("p",{class:"hint"},nm(oid)+" can add a phone number in Settings to get Call and FaceTime buttons here."),
+    h("button",{type:"button",class:"btn gh",onclick:()=>{closeSheet();S.tab="today";S.viewAs=oid;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"See "+nm(oid)+"'s whole day")]})}
+function gardenSheet(){juSheet("Our garden",()=>{
   const st=prayerStreak(),stages=[[0,"Seed"],[1,"Sprout"],[7,"Young plant"],[30,"In bloom"]],cur=stages.filter(s=>st>=s[0]).pop(),next=stages.find(s=>s[0]>st);
   const days=togetherDays()||0,qs=Object.keys(ANS()).filter(bothAnswered).length,cn=US.main.counts||{};
   const B=[["First question",qs>=1,"chat"],["7 nights of prayer",st>=7,"cross"],["30 nights of prayer",st>=30,"cross"],["100 days together",days>=100,"heart"],["365 days together",days>=365,"heart"],["1,000 days together",days>=1000,"heart"],
     ["First letter",US.letters.length>=1,"mail"],["10 moments",(cn.moments||0)>=10,"camera"],["50 questions",qs>=50,"chat"],["First doodle",(cn.doodles||0)>=1,"spark"],["100 hearts",(cn.hearts||0)>=100,"heart"],["20 jar notes",US.jar.length>=20,"star"]];
-  return [h("p",{class:"hint"},"It grows with your prayer streak. Now: "+cur[1]+(next?". Next stage at "+next[0]+" nights.":".")),
+  const S6=[["Days together",togetherDays()==null?"–":days.toLocaleString(),"#e2557c","heart"],["Questions answered",qs,"#b9661c","chat"],["Nights prayed",Object.keys(S.shared.prayer.log||{}).length,"#5b3b8c","moon"],
+    ["Memories",cn.moments||US.moments.length,"#1f7f78","camera"],["Hearts sent",cn.hearts||0,"#c0398a","heart"],["Love letters",US.letters.length,"#2d6fb8","mail"]];
+  return [h("p",{class:"hint"},"Your plant grows with your prayer streak. Now: "+cur[1]+(next?". Next stage at "+next[0]+" nights.":".")),
+    h("div",{class:"stats"},S6.map(([l,v2,c,ic])=>h("div",{class:"stat",style:"--c:"+c},svgEl(ICON[ic](c)),h("b",null,String(v2)),h("span",null,l)))),
     h("h2",null,"Achievements"),h("div",{class:"badges"},B.map(([n,hit,ic])=>h("div",{class:"badge"+(hit?" hit":"")},svgEl(ICON[ic]("#e2557c")),n)))]})}
 
 function datesSheet(){juSheet("Our dates",()=>{
@@ -1564,7 +1613,7 @@ function roomSVG(){
 </svg>`;
 }
 const OBJ={window:windowSheet,frame:memoriesSheet,calendar:datesSheet,letters:lettersSheet,jar:jarSheet,plant:gardenSheet,
-  candle:()=>{const p=el("prayerPanel");if(p){p.scrollIntoView({behavior:RM?"auto":"smooth",block:"center"});p.animate&&p.animate([{boxShadow:"0 0 0 0 rgba(242,184,75,.9)"},{boxShadow:"0 0 0 14px rgba(242,184,75,0)"}],{duration:1200})}}};
+  candle:()=>prayerSheet()};
 
 /* ---------- the Us tab ---------- */
 function usSeenNudge(){try{return +localStorage.getItem("ourdays-seen-nudge")||0}catch(e){return 0}}
@@ -1575,8 +1624,8 @@ function viewUs(){
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:datesSheet},svgEl(ICON.plane("#e2557c")),v?h("span",{class:"mono",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},""):"Add a visit"),
-    h("button",{type:"button",class:"jpill tap",onclick:OBJ.candle,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
-    h("button",{type:"button",class:"jpill tap",onclick:datesSheet},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
+    h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
+    h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
   const room=h("div",{class:"room"});room.innerHTML=roomSVG();room.appendChild(h("span",{class:"roomcap"},"Tap anything in your room"));
   room.querySelectorAll("[data-obj]").forEach(g=>{const go=()=>OBJ[g.dataset.obj]();g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
   const top=h("div",{class:"ju"},room);
@@ -1595,25 +1644,24 @@ function viewUs(){
     h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},dailyPrompt(k)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},"5 quick picks. How many match?"),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
 
-  out.push(...usPartner());
   out.push(usPrayer());
+  const tile=(c,icon,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},svgEl(ICON[icon](c)),h("b",null,name),sub);
+  const sc=(...kids)=>h("div",{class:"hscroll"},kids);
 
-  out.push(h("section",{class:"ju"},h("h2",null,"Play together"),h("p",{class:"hint"},"Five quick rounds each. Picks stay hidden until you both play."),
-    h("div",{class:"topics"},GAMES.map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
-      return h("button",{type:"button",class:"topic tap",style:"--c:"+g.c,onclick:()=>gameSheet(g)},svgEl(ICON[g.icon](g.c)),h("div",{class:"tx"},h("b",null,g.name),h("small",{class:"sub"},a&&b?"See your matches":a?"Waiting for "+nm(oo):b?nm(oo)+" played. Your turn":g.items.length+" rounds to play")))}))));
+  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Play together"),h("span",{class:"hint"},"5 rounds a day")),
+    sc(GAMES.map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
+      return tile(g.c,g.icon,g.name,h("small",{class:"sub"},a&&b?"See matches":a?"Waiting for "+nm(oo):b?"Your turn":"Play"),b&&!a,()=>gameSheet(g))}))));
 
-  const A=ANS();
-  out.push(h("section",{class:"ju"},h("div",{class:"row",style:"justify-content:space-between"},h("h2",null,"Ask each other"),h("button",{type:"button",class:"lnk",onclick:topicsSettingsSheet},"Choose topics")),
-    h("p",{class:"hint"},enabledTopics().reduce((a,t)=>a+t.qs.length,0)+" questions in "+enabledTopics().length+" topics. Answer at your own pace."),
-    h("div",{class:"topics"},enabledTopics().map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
-      return h("button",{type:"button",class:"topic tap",style:"--c:"+t.c,onclick:()=>topicSheet(t)},svgEl(ICON[t.icon](t.c)),h("div",{class:"tx"},h("b",null,t.name),wt?h("small",{class:"sub"},nm(oo)+" answered "+wt+". Your turn"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"})),h("small",null,pc+"%"))))}))));
+  const A=ANS(),tops=enabledTopics();
+  const waitOn=[];tops.forEach(t=>t.qs.forEach((q,i)=>{const a=A[t.id+":"+i]||{};if(a[oo]&&!a[w])waitOn.push({t,i,q,at:a[oo].at||0})}));waitOn.sort((x,y)=>y.at-x.at);
+  const wq=waitOn[0];
+  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Ask each other"),h("button",{type:"button",class:"lnk",onclick:topicsSettingsSheet},"Choose topics")),
+    wq?h("button",{type:"button",class:"pc tap",style:"--c:"+wq.t.c,onclick:()=>answerSheet(wq.t.id+":"+wq.i,wq.q,wq.t.name)},h("span",{class:"k"},nm(oo)+" is waiting on you"+(waitOn.length>1?" · "+waitOn.length+" questions":"")),h("span",{class:"tx"},wq.q),h("div",{class:"foot"},h("span",{class:"hint"},wq.t.name),h("span",{class:"go"},"Answer"))):null,
+    sc(tops.map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
+      return tile(t.c,t.icon,t.name,wt?h("small",{class:"sub"},wt+" waiting for you"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"})),h("small",null,n+"/"+t.qs.length)),wt>0,()=>topicSheet(t))})),
+    h("p",{class:"hint"},tops.reduce((a,t)=>a+t.qs.length,0)+" questions in "+tops.length+" topics. Swipe for more.")));
 
   out.push(usPlans());
-
-  const allQ=Object.keys(A).filter(bothAnswered).length,cn=US.main.counts||{};
-  const S6=[["Days together",days==null?"–":days.toLocaleString(),"#e2557c","heart"],["Questions answered",allQ,"#b9661c","chat"],["Nights prayed",Object.keys(S.shared.prayer.log||{}).length,"#5b3b8c","moon"],
-    ["Memories",cn.moments||US.moments.length,"#1f7f78","camera"],["Hearts sent",cn.hearts||0,"#c0398a","heart"],["Love letters",US.letters.length,"#2d6fb8","mail"]];
-  out.push(h("section",{class:"ju"},h("h2",null,"Us in numbers"),h("div",{class:"stats"},S6.map(([l,v2,c,ic])=>h("div",{class:"stat",style:"--c:"+c},svgEl(ICON[ic](c)),h("b",null,String(v2)),h("span",null,l))))));
   setTimeout(usTick,0);
   return out;
 }
