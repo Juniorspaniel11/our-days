@@ -191,6 +191,15 @@ async function socialEvents(db, cid, members, people, now) {
     if (x.at > lo && other(x.by)) out.push({ to: other(x.by), key: "pray:" + x.id, at: x.at, title: name(x.by) + " added a prayer request", body: x.text });
     if (x.answered && x.answeredAt > lo && other(x.answeredBy)) out.push({ to: other(x.answeredBy), key: "prayans:" + x.id, at: x.answeredAt, title: "Prayer answered 🙌", body: x.text });
   }
+  const ev = (await db.doc(`couples/${cid}/us/evening`).get()).data() || {};
+  for (const [k, pl] of Object.entries(ev)) {
+    if (!pl || !pl.time) continue;
+    const tz = validTz(pl.tz) ? pl.tz : "America/Chicago", labels = (pl.items || []).map(x => x.label).join(", then ");
+    const when = k === parts(now, tz).key ? "tonight" : "an evening for " + new Date(k + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+    if (pl.at > lo && other(pl.by)) out.push({ to: other(pl.by), key: "evplan:" + k + ":" + pl.at, at: pl.at, title: name(pl.by) + " planned " + when + " 🌙", body: fmt(toMin(pl.time)) + " " + (people[pl.by] && people[pl.by].city ? "(" + people[pl.by].city + " time)" : "") + ": " + labels });
+    const t = wallToMs(k, toMin(pl.time), tz);
+    if (t > lo && t <= now + AHEAD_MIN * 60000) members.forEach(u => out.push({ to: u, key: "evstart:" + k + ":" + pl.time, at: t, title: "Your evening together starts now 🌙", body: labels }));
+  }
   const ck = (await db.doc(`couples/${cid}/us/checkin`).get()).data() || {};
   for (const [mk, m] of Object.entries(ck)) for (const [u, v] of Object.entries(m || {})) {
     const o = other(u); if (!o || !v || !(v.at > lo)) continue;

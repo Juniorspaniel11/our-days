@@ -428,6 +428,21 @@ body.tab-us #avatar{display:none}
 .ju .pagebtn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--line);background:var(--bg);border-radius:16px;padding:6px 8px;cursor:pointer;color:var(--ink);min-width:72px}
 .ju .pagebtn small{font-size:12px;font-weight:600}.ju .pagebtn[aria-pressed="true"]{border-color:var(--rose);background:var(--rose-soft)}
 .ju .bfind{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:18px;padding:12px;background:var(--bg)}
+.ju .pcircle small.online{color:#2a9d5c}
+.ju .odot{position:absolute;right:4px;top:54px;width:16px;height:16px;border-radius:50%;background:#2fbf71;border:3px solid var(--card);box-shadow:0 0 0 0 rgba(47,191,113,.6)}
+@media (prefers-reduced-motion:no-preference){.ju .odot{animation:jupulse 2s infinite}}
+@keyframes jupulse{70%{box-shadow:0 0 0 8px rgba(47,191,113,0)}100%{box-shadow:0 0 0 0 rgba(47,191,113,0)}}
+.tz i.on{box-shadow:0 0 0 2px #2fbf71}
+.ju .evcard{cursor:default}
+.ju .evlist{display:flex;flex-direction:column;gap:6px;width:100%}
+.ju .evrow{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:8px 10px}
+.ju .evrow input{width:22px;height:22px;accent-color:#5b3b8c;flex:none}.ju .evrow .tx{flex:1;min-width:0;font-weight:600}
+.ju .evrow.ok .evgo{text-decoration:line-through;color:var(--muted)}
+.ju .evgo{flex:1;text-align:left;background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--ink);cursor:pointer}.ju .evgo .arrow{color:var(--muted)}
+.ju .evn{width:24px;height:24px;border-radius:50%;background:#5b3b8c;color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center;flex:none}
+.ju .actgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ju .act{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:10px 6px;cursor:pointer;color:var(--ink);text-align:center}
+.ju .act small{font-size:12.5px;font-weight:600;line-height:1.2}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -733,7 +748,7 @@ function watchPerson(u,isMe){
     const cur=S.people[u]||{};
     if(!sn.exists){if(isMe&&cur)cur.loaded=true;return}
     const d=sn.data();
-    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,avatar:cur.avatar,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
+    S.people[u]={...blankPerson(d.name||"",d.city||"",d.tz||"America/Chicago"),...d,days:cur.days||{},photo:cur.photo,avatar:cur.avatar,presence:cur.presence,photoLoaded:cur.photoLoaded,partner:cur.partner,daysLoaded:cur.daysLoaded,cal:cur.cal,loaded:true};
     if(isMe)setTimeout(quickAdd,0);
     if(isMe)sent.person=js(d);
     link();softRender();
@@ -747,6 +762,7 @@ function watchPerson(u,isMe){
     softRender();
   },e=>console.warn(e)));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/calendar").onSnapshot(sn=>{const p=S.people[u];if(!p)return;p.cal=sn.exists?sn.data():null;softRender()},()=>{}));
+  if(!isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/presence").onSnapshot(sn=>{if(S.people[u])S.people[u].presence=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/avatar").onSnapshot(sn=>{if(S.people[u])S.people[u].avatar=sn.exists?sn.data().photo:null;softRender()},()=>{}));
   list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
     if(S.people[u]){S.people[u].photo=ph;S.people[u].photoLoaded=true}if(isMe)sent.photo=js({photo:ph||null});softRender()},()=>{if(S.people[u])S.people[u].photoLoaded=true}));
@@ -765,6 +781,7 @@ function start(profile){
   link();
   watchPerson(ME,true);
   watchUs();
+  presenceBeat("online");
   unsubs.push(sharedRef().onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const d=sn.exists?sn.data():{};
     ["countdowns","prayer","plans"].forEach(f=>{if(d[f]!==undefined){S.shared[f]=d[f];sent["sh:"+f]=js(d[f])}});
     S.shared.prayer=S.shared.prayer||{};S.shared.prayer.log=S.shared.prayer.log||{};S.shared.prayer.tonight=S.shared.prayer.tonight||{};
@@ -1690,7 +1707,7 @@ async function pickAvatar(file){const img=await shrink(file,360);if(!img){toast(
   if(S.people[ME])S.people[ME].avatar=img;avatarRef(ME).set({photo:img}).catch(syncErr);render();toast("Picture updated",nm(PARTNER)+" sees it on the Us tab too")}
 function personCircle(u){
   const x=P(u),ph=x&&x.avatar,c=u===ME?"#5b3b8c":"#e2557c";
-  const box=h("div",{class:"pcircle",style:"--c:"+c},ph?h("img",{src:ph,alt:nm(u)}):h("span",null,(nm(u)[0]||"?")),h("small",null,u===ME?"You":nm(u)));
+  const box=h("div",{class:"pcircle",style:"--c:"+c},ph?h("img",{src:ph,alt:nm(u)}):h("span",null,(nm(u)[0]||"?")),u===ME?h("small",null,"You"):(()=>{const pr=presenceOf(u);return h("small",{class:pr.on?"online":""},pr.on?"Online":nm(u))})(),u!==ME&&presenceOf(u).on?h("i",{class:"odot","aria-label":"Online"}):null);
   if(u===ME){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};box.appendChild(f);
     if(!ph)box.appendChild(h("i",{class:"padd"},"+"))}
   return box}
@@ -1742,6 +1759,69 @@ function homeSheet(){juSheet("Our dream home",()=>{
   const lg=(H.log||[]).slice(-5).reverse();
   if(lg.length)out.push(h("h2",{style:"font-size:19px;margin-top:6px"},"Lately"),h("div",{class:"loglist"},lg.map(x=>h("p",{class:"hint"},(x.by===ME?"You ":nm(x.by)+" ")+x.text+" · "+ago(x.at)))));
   return out})}
+
+
+/* ---------- Online presence ---------- */
+function presenceBeat(state){if(!DB||!CID||!ME)return;DB.doc("couples/"+CID+"/people/"+ME+"/extra/presence").set({at:Date.now(),state}).catch(()=>{})}
+setInterval(()=>{if(!document.hidden)presenceBeat("online")},60000);
+document.addEventListener("visibilitychange",()=>presenceBeat(document.hidden?"away":"online"));
+addEventListener("pagehide",()=>presenceBeat("away"));
+function presenceOf(u){const p=P(u)&&P(u).presence;if(!p||!p.at)return {on:false,text:""};
+  const age=Date.now()-p.at;if(p.state==="online"&&age<150000)return {on:true,text:"Online now"};
+  const m=Math.round(age/60000);return {on:false,text:m<1?"Active just now":m<60?"Active "+m+" min ago":m<1440?"Active "+Math.round(m/60)+" h ago":m<2880?"Active yesterday":"Active "+Math.round(m/1440)+" days ago"}}
+
+/* ---------- Our evening: plan what you'll do together ---------- */
+const EV_EXTRA=[["call","Video call","📹"],["movie","Watch a movie together","🎬"],["cook","Cook the same meal","🍳"],["bible","Read the Bible together","📖"],["music","Share songs","🎶"],["walk","Walk and talk on the phone","🚶"],["study","Study together on video","💻"]];
+function evActs(){const a=[];
+  a.push(["dq","Question of the day","❓"],["photo","Photo of the day","📸"]);
+  GAMES.forEach(g=>a.push(["game:"+g.id,g.name,g.e]));
+  enabledTopics().forEach(t=>a.push(["topic:"+t.id,"Ask: "+t.name,TOPIC_EMOJI[t.id]]));
+  a.push(["prayer","Pray together","🙏"],["paint","Paint together","🎨"],["read","Read and discuss a chapter","📚"],["home","Build our dream home","🏡"],["letter","Write each other a letter","💌"],["plans","Plan the next visit","🗺️"],["checkin","Monthly check-in","🗓️"]);
+  EV_EXTRA.forEach(([k,l,e])=>a.push(["x:"+k,l,e]));return a}
+function openAct(k){const [a,b]=k.split(":");
+  if(a==="dq"){const d=usDay(),q=dailyQ(d);answerSheet("d:"+d,q.q,"Question of the day")}
+  else if(a==="photo")photoSheet();else if(a==="game")gameSheet(gameById(b));else if(a==="topic"){const t=TOPICS.find(x=>x.id===b);if(t)topicSheet(t)}
+  else if(a==="prayer")prayerSheet();else if(a==="paint")paintSheet();else if(a==="read")readSheet();else if(a==="home")homeSheet();else if(a==="letter")writeLetter();else if(a==="plans")plansSheet();else if(a==="checkin")checkinSheet();
+  else if(a==="x"&&b==="call"){const tel=(P(PARTNER).phone||"").replace(/[^0-9+]/g,"");if(tel)location.href="facetime:"+tel;else toast("No number yet",nm(PARTNER)+" can add a phone number in Settings")}}
+const EVE=()=>US.evening||{};
+const myToday=()=>tzNow(P(ME).tz).key;
+function evPlanFor(k){return EVE()[k]||null}
+function evTimeText(pl){const mn=tzNow(P(ME).tz),on=tzNow(P(PARTNER).tz),m=toMin(pl.time)+(mn.off-(pl.off??mn.off));return fmt(m)+(mn.off!==on.off?" · "+fmt(m+(on.off-mn.off))+" for "+nm(PARTNER):"")}
+function suggestPlan(){const g=GAMES[hashN(myToday()+"g",GAMES.length)],tops=enabledTopics(),t=tops[hashN(myToday()+"t",tops.length)];
+  return [["game:"+g.id,g.name,g.e],["topic:"+t.id,"Ask: "+t.name,TOPIC_EMOJI[t.id]],["prayer","Pray together","🙏"]]}
+function eveningSheet(dk){dk=dk||myToday();const d0=DR["ev"+dk]||(DR["ev"+dk]=null);juSheet("Our evening",()=>{
+  const ex=evPlanFor(dk),draft=DR["ev"+dk]||(DR["ev"+dk]=ex?{time:ex.time,items:(ex.items||[]).map(x=>({...x}))}:{time:"21:00",items:[]});
+  const days=[0,1,2,3,4,5,6].map(i=>addDays(myToday(),i));
+  const dayChips=h("div",{class:"chips"},days.map((k,i)=>h("button",{type:"button","aria-pressed":String(k===dk),onclick:()=>eveningSheet(k)},(i===0?"Tonight":i===1?"Tomorrow":parseKey(k).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}))+(evPlanFor(k)?" ✓":""))));
+  const ti=h("input",{type:"time",class:"inp",style:"width:auto",value:draft.time,"aria-label":"Start time, your time",onchange:()=>{draft.time=ti.value||"21:00";refreshSheet()}});
+  const mn=tzNow(P(ME).tz),on=tzNow(P(PARTNER).tz),pm=toMin(draft.time)+(on.off-mn.off);
+  const list=h("div",{class:"evlist"},draft.items.length?draft.items.map((x,i)=>h("div",{class:"evrow"},h("span",{class:"evn"},String(i+1)),emo(x.e,30,false),h("span",{class:"tx"},x.label),
+    h("button",{type:"button",class:"x","aria-label":"Move up",disabled:i===0,onclick:()=>{const a=draft.items;[a[i-1],a[i]]=[a[i],a[i-1]];refreshSheet()}},"↑"),
+    h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>{draft.items.splice(i,1);refreshSheet()}},"×"))):h("p",{class:"hint"},"Pick a few things below, or let the app suggest a plan."));
+  const add=([k,l,e])=>{if(draft.items.length>=6){toast("That's a full evening","Six activities at most");return}draft.items.push({id:uid(),k,label:l,e,d:false});refreshSheet()};
+  const cx=h("input",{type:"text",class:"inp",placeholder:"Something else, e.g. Watch the sunset on video"});
+  const out=[dayChips,
+    h("div",{class:"row"},h("span",{class:"hint"},"Start at"),ti,h("span",{class:"hint"},mn.off!==on.off?fmt(pm)+" for "+nm(PARTNER):"")),
+    h("h2",{style:"font-size:19px"},"The plan"),list,
+    h("div",{class:"row"},h("button",{type:"button",class:"btn",onclick:()=>{if(!draft.items.length){toast("Add something first","Pick an activity below");return}
+        saveDoc("evening",{[dk]:{time:draft.time,off:mn.off,tz:P(ME).tz,items:draft.items,by:ME,at:Date.now()}});delete DR["ev"+dk];confetti(70);toast("Evening planned 💞",nm(PARTNER)+" gets it now, and you both get a reminder at "+fmt(toMin(draft.time)));closeSheet()}},ex?"Save changes":"Share the plan"),
+      h("button",{type:"button",class:"btn gh",onclick:()=>{draft.items=suggestPlan().map(([k,l,e])=>({id:uid(),k,label:l,e,d:false}));refreshSheet()}},"✨ Suggest a plan"),
+      ex?confirmBtn("Cancel this evening",()=>{saveDoc("evening",{[dk]:firebase.firestore.FieldValue.delete()});delete DR["ev"+dk];closeSheet()}):null),
+    h("h2",{style:"font-size:19px"},"Add to the evening"),
+    h("div",{class:"actgrid"},evActs().map(a=>h("button",{type:"button",class:"act tap",onclick:()=>add(a)},emo(a[2],30,false),h("small",null,a[1])))),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();if(!cx.value.trim())return;add(["x:custom",cx.value.trim(),"✨"]);}},h("div",{style:"flex:1 1 200px"},cx),h("button",{type:"submit",class:"ghost"},"Add"))];
+  return out})}
+function eveningCard(){
+  const k=myToday(),pl=evPlanFor(k);
+  if(!pl){const nxt=Object.keys(EVE()).filter(x=>x>k).sort()[0];
+    return h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>eveningSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Our evening"),h("span",{class:"tx"},"Plan tonight together")),emo("🌙",56,true)),
+      h("div",{class:"foot"},h("span",{class:"hint"},nxt?"Next planned: "+parseKey(nxt).toLocaleDateString("en-US",{weekday:"long"}):"Pick a time and a few things to do"),h("span",{class:"go"},"Plan")))}
+  const done=(pl.items||[]).filter(x=>x.d).length;
+  return h("div",{class:"pc evcard",style:"--c:#5b3b8c"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Tonight together · "+evTimeText(pl)),h("span",{class:"tx"},(pl.by===ME?"You":nm(pl.by))+" planned "+(pl.items||[]).length+" thing"+((pl.items||[]).length===1?"":"s"))),emo("🌙",48,true)),
+    h("div",{class:"evlist"},(pl.items||[]).map((x,i)=>{const cb=h("input",{type:"checkbox",checked:!!x.d,"aria-label":"Done",onchange:()=>{saveDoc("evening",{[k]:{items:pl.items.map(y=>y.id===x.id?{...y,d:cb.checked}:y)}});if(cb.checked)confetti(30)}});
+      return h("div",{class:"evrow"+(x.d?" ok":"")},cb,emo(x.e,28,false),h("button",{type:"button",class:"evgo",onclick:()=>openAct(x.k)},x.label,x.k.startsWith("x:")?null:h("span",{class:"arrow"}," ›")))})),
+    h("div",{class:"foot"},h("span",{class:"hint"},done+" of "+(pl.items||[]).length+" done"),h("button",{type:"button",class:"go",style:"background:none;cursor:pointer",onclick:()=>eveningSheet()},"Edit")));
+}
 
 /* ---------- Paint together: colouring pages plus free drawing ---------- */
 const PW=600;
@@ -1845,7 +1925,7 @@ function watchUs(){
   const col=n=>DB.collection("couples/"+CID+"/"+n);
   const list=(n,lim,key)=>unsubs.push(col(n).orderBy("at","desc").limit(lim).onSnapshot(q=>{US[key]=q.docs.map(d=>({id:d.id,...d.data()}));usRefresh()},e=>console.warn(e)));
   unsubs.push(usRef().onSnapshot(sn=>{US.main=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
-  ["home","prayer","visits","books","checkin"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
+  ["home","prayer","visits","books","checkin","evening"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
   list("moments",30,"moments");list("letters",200,"letters");list("jar",500,"jar");list("nudges",20,"nudges");
 }
 function usRefresh(){
@@ -2168,7 +2248,7 @@ function viewUs(){
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
   const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
-  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
+  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),eveningCard(),
     checkinDue()?h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))):null,
     h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
     h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},TE(dailyPrompt(k)).t)),emo(TE(dailyPrompt(k)).e||"📸",56,true)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
@@ -2324,7 +2404,7 @@ function render(){
     sl.appendChild(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
       onclick:()=>{if(ph||S.viewAs===id)return;if(S.tab==="us"&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
-      h("i",null,(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")))});
+      h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")))});
   const th=S.theme||"system";if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
   const main=el("main");main.innerHTML="";
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
