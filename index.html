@@ -515,7 +515,7 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 @media (prefers-reduced-motion:no-preference){.tzon.on{animation:jupulse 2s infinite}}
 .tzst{flex:1 1 0;overflow:hidden;font-family:var(--body);display:flex;align-items:center;gap:4px;min-width:0;background:none;border:0;padding:0;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
 .tzst .e{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;flex:none}
-.tzst .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tzst .t{min-width:0;overflow:hidden;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15;font-size:12.5px;overflow-wrap:break-word}
 .tzst .ed{color:#8b6ad1;flex:none}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -1892,9 +1892,9 @@ const STATUSES=[["Free to talk","📞"],["In the lab","🧪"],["Studying","📚"
 const statusRef=u=>DB.doc("couples/"+CID+"/people/"+u+"/extra/status");
 function statusOf(u){const s=P(u)&&P(u).status;if(s&&s.t&&Date.now()<(s.until||0))return {e:s.e,t:s.t,set:true};
   const n=tzNow(P(u).tz),ev=itemsFor(u,n.key).filter(x=>!x.skip&&x.s!=null),cur=ev.find(x=>n.min>=x.s&&n.min<x.e);
-  if(cur)return {e:kwEmoji(cur.title)||"🗓️",t:cur.title+" until "+fmt(cur.e),set:false};
-  if(n.min<360||n.min>=1410)return {e:"🌙",t:"Probably asleep",set:false};
-  const nx=ev.find(x=>x.s>n.min);return {e:"✨",t:nx?"Free until "+fmt(nx.s):"Free for the rest of the day",set:false}}
+  if(cur)return {e:kwEmoji(cur.title)||"🗓️",t:cur.title+" till "+fmt(cur.e),set:false};
+  if(n.min<360||n.min>=1410)return presenceOf(u).on?{e:"🌙",t:"Up late",set:false}:{e:"😴",t:"Probably asleep",set:false};
+  const nx=ev.find(x=>x.s>n.min);return {e:"✨",t:nx?"Free till "+fmt(nx.s):"Free today",set:false}}
 function statusSheet(){let hrs=4;juSheet("Your status",()=>{
   const cur=P(ME).status,active=cur&&cur.t&&Date.now()<(cur.until||0);
   const dur=h("div",{class:"chips"},[[1,"1 hour"],[4,"4 hours"],[12,"Until tonight"],[24,"All day"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===hrs),onclick:e=>{hrs=v;dur.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
@@ -2547,7 +2547,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-c";
+const APP_VERSION="2026-11-04-d";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
