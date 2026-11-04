@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Fredoka:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: header with photo and both clocks, then one column of soft cards, floating tab bar. Light and dark themes */
 :root{
@@ -340,6 +340,137 @@ body.ro main .robar button{pointer-events:auto}
 .callrow a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:8px 16px}
 .callrow a.c1{background:#3f7d4e;color:#fff}.callrow a.c2{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 .pushbox{display:flex;flex-direction:column;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:6px}
+/* ---------- Us tab: room, prompts, games (all scoped under .ju) ---------- */
+:root{--fun:"Fredoka","Segoe UI",system-ui,sans-serif;--rose:#e2557c;--rose-soft:#fde4ec;--plum:#5b3b8c;--teal-soft:#dff3f1;--amber:#b9661c;--amber-soft:#fdeedb;--gold:#f2b84b;
+  --wall1:#f9d9b6;--wall2:#f1bd8f;--floor1:#c58a5c;--floor2:#ad7246;--edge:#5b3a2c;--shelf:#9b6338;--rug:#e9876f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--rose:#ff7c9e;--rose-soft:#40192a;--plum:#b99cff;--teal-soft:#123532;--amber:#f2a65a;--amber-soft:#3a2614;
+  --wall1:#3e2a4a;--wall2:#2c1d37;--floor1:#55372f;--floor2:#452a25;--edge:#1d1218;--shelf:#6b4330;--rug:#8d3f53}}
+:root[data-theme="dark"]{--rose:#ff7c9e;--rose-soft:#40192a;--plum:#b99cff;--teal-soft:#123532;--amber:#f2a65a;--amber-soft:#3a2614;
+  --wall1:#3e2a4a;--wall2:#2c1d37;--floor1:#55372f;--floor2:#452a25;--edge:#1d1218;--shelf:#6b4330;--rug:#8d3f53}
+.ju{display:flex;flex-direction:column;gap:12px}
+.ju h2{font-family:var(--fun);font-weight:600;font-size:23px}
+.ju .ex{display:inline-block;font-size:11px;font-weight:700;color:#8a5a00;background:#fff1cf;border-radius:999px;padding:1px 8px;vertical-align:2px}
+.ju .btn{border:0;border-radius:999px;padding:11px 20px;font-weight:700;cursor:pointer;font-size:15px;background:var(--rose);color:#fff;align-self:flex-start;box-shadow:0 8px 18px color-mix(in srgb,var(--rose) 28%,transparent)}
+.ju .btn.alt{background:var(--plum);color:#fff}.ju .btn.gh{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none;font-weight:600}
+.ju .btn[disabled]{opacity:.5;cursor:default}
+.ju .lnk{background:none;border:0;color:var(--rose);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:15px;padding:0}
+.ju textarea.inp{min-height:110px;resize:vertical}
+@media (prefers-reduced-motion:no-preference){.ju .tap,.ju .btn{transition:transform .15s cubic-bezier(.3,1.6,.5,1)}.ju .tap:active,.ju .btn:active{transform:scale(.93)}}
+.ju .jpills{display:flex;gap:8px;flex-wrap:wrap}
+.ju .jpill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 8px;font-weight:700;font-size:15px;box-shadow:var(--shadow);cursor:pointer;color:var(--ink)}
+.ju .jpill svg{width:22px;height:22px;flex:none}
+.ju .jpill .mono{font-family:var(--mono);font-weight:500;font-size:14px;color:var(--rose)}
+.ju .room{position:relative;border-radius:30px;overflow:hidden;box-shadow:var(--shadow);background:var(--wall2)}
+.ju .room svg.scene{display:block;width:100%;height:auto}
+.ju .scene [data-obj]{cursor:pointer;outline:none}
+.ju .scene [data-obj]:focus-visible>.hit{stroke:var(--rose);stroke-width:4}
+@media (prefers-reduced-motion:no-preference){
+  .ju .scene [data-obj]{transition:transform .25s cubic-bezier(.3,1.6,.5,1);transform-box:fill-box;transform-origin:center}
+  .ju .scene [data-obj]:hover{transform:scale(1.04)}
+  .ju .scene .flame{animation:juflick 1.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+  .ju .scene .glow{animation:juglow 2s ease-in-out infinite alternate}
+  .ju .scene .sway{animation:jusway 5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+  .ju .scene .twinkle{animation:jutw 3s ease-in-out infinite alternate}
+  .ju .bigbtn.heart svg{animation:jubeat 2.4s ease-in-out infinite}
+}
+@keyframes juflick{0%{transform:scale(1,1) rotate(-2deg)}100%{transform:scale(.9,1.12) rotate(3deg)}}
+@keyframes juglow{to{opacity:.35}}
+@keyframes jusway{50%{transform:rotate(3deg)}}
+@keyframes jutw{to{opacity:.3}}
+@keyframes jubeat{0%,100%{transform:scale(1)}10%{transform:scale(1.15)}20%{transform:scale(1)}30%{transform:scale(1.1)}40%{transform:scale(1)}}
+.ju .roomcap{position:absolute;left:12px;bottom:10px;font-size:12.5px;font-weight:600;color:#fff;background:rgba(40,20,20,.45);border-radius:999px;padding:2px 10px}
+.ju .actions{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.ju .bigbtn{display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:22px;padding:14px 10px;font-family:var(--fun);font-weight:600;font-size:18px;cursor:pointer;box-shadow:var(--shadow);white-space:nowrap}
+.ju .bigbtn svg{width:28px;height:28px;flex:none}
+.ju .bigbtn.heart{background:var(--rose);color:#fff}
+.ju .bigbtn.doodle{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.ju .got{display:flex;align-items:center;gap:12px;background:var(--rose);color:#fff;border-radius:22px;padding:12px 16px;box-shadow:var(--shadow);border:0;text-align:left;width:100%;cursor:pointer}
+.ju .got svg{width:28px;height:28px;flex:none}
+.ju .got b{display:block;font-family:var(--fun);font-weight:600;font-size:18px}
+.ju .got span{font-size:14px;opacity:.9}
+.ju .pc{border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:8px;border:0;text-align:left;cursor:pointer;box-shadow:var(--shadow);background:color-mix(in srgb,var(--c) 14%,var(--card));border-left:6px solid var(--c);width:100%;color:var(--ink)}
+.ju .pc .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--c)}
+.ju .pc .tx{font-family:var(--fun);font-weight:600;font-size:20px;line-height:1.25}
+.ju .pc .foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ju .avs{display:flex}
+.ju .avs i{width:30px;height:30px;border-radius:50%;border:2px solid var(--c);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:13px;color:var(--c);background:var(--card);margin-right:-6px}
+.ju .avs i.on{background:var(--c);color:var(--card)}
+.ju .go{font-weight:700;font-size:14px;color:var(--c);border:1.5px solid var(--c);border-radius:999px;padding:4px 12px}
+.ju .topics{display:flex;flex-direction:column;gap:10px}
+.ju .topic{display:flex;align-items:center;gap:14px;border-radius:22px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--c) 30%,transparent);background:linear-gradient(120deg,color-mix(in srgb,var(--c) 18%,var(--card)),var(--card));cursor:pointer;text-align:left;width:100%;color:var(--ink)}
+.ju .topic svg{width:46px;height:46px;flex:none}
+.ju .topic .tx{flex:1;min-width:0}
+.ju .topic b{display:block;font-family:var(--fun);font-weight:600;font-size:19px}
+.ju .topic .sub{display:block;font-size:14px;font-weight:600;color:var(--c);margin-top:2px}
+.ju .jbar{display:flex;align-items:center;gap:8px;margin-top:4px}
+.ju .jbar span{flex:1;height:7px;border-radius:99px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden;max-width:160px}
+.ju .jbar span i{display:block;height:100%;background:var(--c);border-radius:99px}
+.ju .jbar small{font-weight:700;color:var(--c);font-size:13px}
+.ju .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ju .stat{border-radius:24px;padding:16px;background:color-mix(in srgb,var(--c) 15%,var(--card));position:relative;overflow:hidden;min-height:132px;display:flex;flex-direction:column;justify-content:flex-end}
+.ju .stat svg{position:absolute;right:10px;top:10px;width:52px;height:52px}
+.ju .stat b{font-family:var(--fun);font-weight:700;font-size:40px;line-height:1;color:var(--c)}
+.ju .stat span{font-weight:600;color:var(--c);font-size:15px;line-height:1.2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ju :is(.stat b,.stat span,.jbar small,.pc .k,.go,.topic .sub){color:color-mix(in srgb,var(--c) 55%,#fff)}:root:not([data-theme="light"]) .ju .go{border-color:color-mix(in srgb,var(--c) 55%,#fff)}}
+:root[data-theme="dark"] .ju :is(.stat b,.stat span,.jbar small,.pc .k,.go,.topic .sub){color:color-mix(in srgb,var(--c) 55%,#fff)}
+.ju .q{font-family:var(--fun);font-weight:600;font-size:22px;line-height:1.25;margin:0}
+.ju .answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:440px){.ju .answers{grid-template-columns:1fr}}
+.ju .ans{border-radius:18px;padding:12px;background:var(--bg);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.ju .ans .who{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--plum)}
+.ju .ans.f .who{color:var(--rose)}
+.ju .ans p{margin:0;overflow-wrap:anywhere}
+.ju .ans img{width:100%;border-radius:12px}
+@media (prefers-reduced-motion:no-preference){.ju .answers.reveal .ans{animation:juflip .7s cubic-bezier(.3,1.3,.5,1) both}.ju .answers.reveal .ans:nth-child(2){animation-delay:.15s}}
+@keyframes juflip{from{transform:perspective(600px) rotateY(80deg);opacity:0}}
+.ju .lockbox{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px dashed var(--line);border-radius:18px;padding:12px}
+.ju .lockbox svg{width:32px;height:32px;flex:none}
+.ju .tot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ju .tot button{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:20px;padding:18px 10px;font-family:var(--fun);font-weight:600;font-size:19px;cursor:pointer}
+.ju .tot button:hover{border-color:var(--c,var(--amber))}
+.ju .totres{display:flex;flex-direction:column;gap:8px}
+.ju .totres div{display:flex;flex-direction:column;gap:2px;border-radius:14px;padding:10px 12px;background:var(--bg);font-size:15px}
+.ju .totres div.m{background:var(--teal-soft)}
+.ju .letter{display:flex;align-items:center;gap:12px;border-radius:18px;padding:12px;background:var(--bg);border:1px solid var(--line);cursor:pointer;width:100%;text-align:left;color:var(--ink)}
+.ju .letter svg{width:44px;height:44px;flex:none}
+.ju .letter b{display:block;font-family:var(--fun);font-weight:600;font-size:17px}
+.ju .paper{background:#fffaf0;color:#3a2a20;border-radius:16px;padding:18px;font-family:var(--fun);font-weight:500;font-size:18px;line-height:1.5;box-shadow:inset 0 0 0 1px #f0dfc4;white-space:pre-wrap;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:no-preference){.ju .paper{animation:juunfold .6s cubic-bezier(.3,1.3,.5,1)}.ju .note{animation:jupop .5s cubic-bezier(.3,1.6,.5,1)}}
+@keyframes juunfold{from{transform:scaleY(.2);opacity:0}}
+@keyframes jupop{from{transform:scale(.5) rotate(-12deg);opacity:0}}
+.ju .note{background:#fff3a8;color:#3a2a10;border-radius:6px;padding:22px 18px;font-family:var(--fun);font-weight:500;font-size:21px;line-height:1.35;transform:rotate(-2deg);box-shadow:0 10px 24px rgba(0,0,0,.15);overflow-wrap:anywhere}
+.ju .chips{display:flex;gap:6px;flex-wrap:wrap}
+.ju .chips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer}
+.ju .chips button[aria-pressed="true"]{background:var(--rose);color:#fff;border-color:var(--rose)}
+.ju .canvaswrap{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#fff;touch-action:none}
+.ju .canvaswrap canvas{display:block;width:100%;height:auto;touch-action:none}
+.ju .swatches{display:flex;gap:8px;flex-wrap:wrap}
+.ju .swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.ju .swatches button[aria-pressed="true"]{border-color:var(--ink)}
+.ju .tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.ju .tog small{display:block;color:var(--muted);font-size:14px}
+.ju .sw{width:52px;height:30px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none}
+.ju .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.ju .sw[aria-checked="true"]{background:var(--rose)}.ju .sw[aria-checked="true"]::after{left:25px}
+.ju .badges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ju .badge{border-radius:18px;padding:12px 8px;text-align:center;background:var(--bg);border:1px solid var(--line);font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted)}
+.ju .badge svg{width:38px;height:38px;opacity:.35;filter:grayscale(1)}
+.ju .badge.hit{color:var(--ink);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,var(--card))}
+.ju .badge.hit svg{opacity:1;filter:none}
+.ju .memgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ju .mem{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--bg)}
+.ju .mem img,.ju .mem .ph{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}
+.ju .ph{background:linear-gradient(180deg,#ffb48a,#e2557c 60%,#5b3b8c)}
+.ju .mem small{display:block;padding:6px 8px;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.ju .drow{display:flex;align-items:center;gap:12px;border-radius:16px;padding:10px 12px;background:color-mix(in srgb,var(--c) 12%,var(--card));border-left:5px solid var(--c)}
+.ju .drow .tx{flex:1;min-width:0}.ju .drow small{color:var(--muted);font-size:14px}
+.ju .drow .n{font-family:var(--fun);font-weight:700;font-size:24px;text-align:right;line-height:1}.ju .drow .n small{display:block;font-family:var(--body);font-weight:500;font-size:12px}
+.ju .jcities{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ju .jcity{border-radius:20px;padding:14px;color:#fff}
+.ju .jcity b{display:block;font-family:var(--fun);font-weight:600;font-size:30px;line-height:1.1}
+.ju .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:20px;padding:0 4px}
+#jufx{position:fixed;inset:0;z-index:70;pointer-events:none;width:100%;height:100%}
+.juheart{position:fixed;z-index:71;pointer-events:none;width:28px;height:28px}
 </style>
 </head>
 
@@ -428,7 +559,7 @@ function workingDays(from,to){let n=0;for(let k=from;k<to;k=addDays(k,1)){const 
 
 /* ---------- state ---------- */
 const LKEY="ourdays-ui-1";
-const NOTIF={morning:true,morningAt:"07:30",evening:true,eveningAt:"21:00",countdown:true,meeting:true,prayer:false,prayerAt:"23:00"};
+const NOTIF={morning:true,morningAt:"07:30",evening:true,eveningAt:"21:00",countdown:true,meeting:true,prayer:false,prayerAt:"23:00",partner:true};
 function blankDay(){return {tasks:[],done:[],skip:[],habits:[]}}
 function blankPerson(name,city,tz){return {name,city,tz,routine:[],events:[],habits:[],projects:[],countdowns:[],agenda:{},focus:{},settings:{shareProjects:true,notif:{...NOTIF},cal:""},days:{}}}
 function importPlan(p,txt){
@@ -523,6 +654,7 @@ function start(profile){
   S.people[ME]=S.people[ME]||{...blankPerson(profile.name,profile.city,profile.tz)};
   link();
   watchPerson(ME,true);
+  watchUs();
   unsubs.push(sharedRef().onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const d=sn.exists?sn.data():{};
     ["countdowns","prayer","plans"].forEach(f=>{if(d[f]!==undefined){S.shared[f]=d[f];sent["sh:"+f]=js(d[f])}});
     S.shared.prayer=S.shared.prayer||{};S.shared.prayer.log=S.shared.prayer.log||{};S.shared.prayer.tonight=S.shared.prayer.tonight||{};
@@ -679,9 +811,10 @@ function skyFor(m){
   return {label:"night",s1:"#07091f",s2:"#151643",s3:"#352559",orb:"rgba(230,230,255,.35)",night:true};
 }
 /* ---------- sheet & toast ---------- */
-function openSheet(title,body){el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);el("sheet").hidden=false;
-  setTimeout(()=>{const f=b.querySelector("input[type=text],textarea");if(f&&!f.value)f.focus()},50)}
-function closeSheet(){el("sheet").hidden=true;render()}
+let sheetFn=null;
+function openSheet(title,body){sheetFn=null;el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);el("sheet").hidden=false;
+  setTimeout(()=>{const f=b.querySelector("input[type=text],textarea");if(f&&!f.value&&!b.querySelector("[data-nofocus]"))f.focus()},50)}
+function closeSheet(){el("sheet").hidden=true;sheetFn=null;render()}
 el("sheetClose").onclick=closeSheet;el("sheetBd").onclick=closeSheet;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!el("sheet").hidden)closeSheet()});
 let toastT=null;
@@ -1053,26 +1186,8 @@ function projectCard(pid,x){
   return c;
 }
 
-function viewUs(){
-  const pid=me(),p=P(pid),oid=partnerOf(pid),o=P(oid),mn=tzNow(p.tz),on=tzNow(o.tz);
-  const out=[];
-  const visits=S.shared.countdowns.filter(c=>c.kind==="visit"&&daysBetween(mn.key,c.date)>=0).sort((a,b)=>a.date.localeCompare(b.date));
-  const v=visits[0];
-  const hero=h("section",{style:"gap:10px"});
-  if(v){
-    const box=(id,l)=>h("div",{class:"tb"},h("b",{id:id},"0"),h("span",null,l));
-    hero.appendChild(h("div",{class:"together"},h("span",{class:"lbl"},v.title),
-      h("div",{class:"cap"},"until we're together"),
-      h("div",{class:"tbox",id:"visitClock","data-date":v.date,"data-time":v.time||"00:00"},box("vd","days"),box("vh","hours"),box("vm","min"),box("vs","sec")),
-      h("div",{class:"dt"},longDate(v.date)+(v.time?" at "+fmt(toMin(v.time)):"")),
-      h("div",{class:"row",style:"margin-top:6px;justify-content:center"},h("button",{type:"button",class:"ghost",onclick:()=>countdownSheet(pid,{...v,src:"shared"})},"Details"),
-        h("button",{type:"button",class:"ghost",onclick:()=>addCountdownSheet(pid,S.shared.countdowns.find(x=>x.id===v.id),"shared")},"Edit"))));
-    if(visits.length>1)visits.slice(1).forEach(x=>hero.appendChild(h("button",{type:"button",class:"cdrow",style:"--cdc:"+CDT.visit[1],onclick:()=>countdownSheet(pid,{...x,src:"shared"})},
-      h("span",{class:"ttl"},x.title,h("small",null,longDate(x.date))),h("span",{class:"n"},String(daysBetween(mn.key,x.date)),h("small",null,"days left")))));
-  }else hero.appendChild(h("div",{class:"together"},h("div",{class:"cap"},"When will you see each other next?"),h("button",{type:"button",class:"ghost",onclick:()=>{addCountdownSheet(pid);}},"+ Visit countdown")));
-  out.push(hero);
-  setTimeout(tickVisit,0);
-
+function usPrayer(){
+  const pid=ME,p=P(pid),oid=partnerOf(pid),o=P(oid),mn=tzNow(p.tz),on=tzNow(o.tz);const out=[];
   /* prayer */
   const nk=nightKey(p.tz),log=S.shared.prayer.log,done=!!log[nk];
   const tonight=S.shared.prayer.tonight[nk];
@@ -1083,7 +1198,7 @@ function viewUs(){
   const dots=h("div",{class:"dots","aria-label":"Last 14 nights"});for(let i=13;i>=0;i--){const k=addDays(nk,-i);dots.appendChild(h("i",{class:log[k]?"on":"",title:shortDate(k)}))}
   const st=prayerStreak();
   const cb=h("input",{type:"checkbox",checked:done,onchange:()=>{if(cb.checked)log[nk]={by:pid,at:Date.now()};else delete log[nk];persist();render()}});
-  out.push(h("section",{class:"panel pray"},h("div",{class:"stars"}),h("div",{class:"sechead"},h("h2",null,"Prayer together"),h("span",{class:"hint"},"10 minutes")),
+  out.push(h("section",{class:"panel pray",id:"prayerPanel"},h("div",{class:"stars"}),h("div",{class:"sechead"},h("h2",null,"Prayer together"),h("span",{class:"hint"},"10 minutes")),
     h("label",{class:"check"},cb,h("span",{class:done?"done":""},done?"We prayed tonight":"Tick when you've prayed tonight")),
     done?h("div",{class:"meta"},"Ticked by "+(log[nk].by===pid?"you":P(log[nk].by).name)+" at "+new Date(log[nk].at).toLocaleTimeString("en-US",{timeZone:p.tz,hour:"numeric",minute:"2-digit"})+". It shows ticked on both phones."):null,
     h("div",{class:"meta"},timeNote),
@@ -1091,6 +1206,10 @@ function viewUs(){
     h("div",{class:"meta"},st?h("span",{class:"streak"},st+(st===1?" night in a row":" nights in a row")):"Start your streak tonight"),dots,
     h("p",{class:"hint"},"Praying after midnight still counts for the night before.")));
 
+  return out[0];
+}
+function usPartner(){
+  const pid=ME,p=P(pid),oid=partnerOf(pid),o=P(oid),mn=tzNow(p.tz),on=tzNow(o.tz);const out=[];
   /* partner's day */
   if(o.placeholder){
     out.push(h("section",{class:"invite"},h("h2",null,"Invite your partner"),
@@ -1114,6 +1233,10 @@ function viewUs(){
   out.push(pc);
   }
 
+  return out;
+}
+function usPlans(){
+  const pid=ME,p=P(pid),oid=partnerOf(pid),o=P(oid),mn=tzNow(p.tz),on=tzNow(o.tz);const out=[];
   /* shared plans */
   const pl=h("div");
   if(!S.shared.plans.length)pl.appendChild(h("p",{class:"empty"},"Date plans, trips, things to do together. Add them as they come up."));
@@ -1122,8 +1245,381 @@ function viewUs(){
   const pi=h("input",{type:"text",class:"inp",placeholder:"e.g. Dinner on the Strip in December"});
   pl.appendChild(h("form",{class:"row",style:"margin-top:8px",onsubmit:e=>{e.preventDefault();if(!pi.value.trim())return;S.shared.plans.push({id:uid(),t:pi.value.trim(),d:false,by:pid});persist();render()}},h("div",{style:"flex:1 1 200px"},pi),h("button",{type:"submit",class:"ghost"},"Add")));
   out.push(panel("Plans for us",pl));
+  return out[0];
+}
+/* ================= Us: question bank, games, the room ================= */
+const L=s=>s.split("|").map(x=>x.trim()).filter(Boolean);
+const TOPICS=[
+{id:"faith",name:"Faith & prayer",c:"#5b3b8c",icon:"cross",qs:L(`What are you praying about for us right now?|Which Bible verse has carried you this year?|How do you feel closest to God?|What does a Christ centered home look like to you?|How can I pray for you this week?|When did you last feel God answer a prayer clearly?|What spiritual habit do you want us to build together?|Which worship song do you want playing in our future home?|How has your faith grown since we met?|What does serving others together look like for us?|Which Bible character do you relate to most, and why?|What season of life tested your faith the most?|How do you usually hear God speak to you?|What does Sabbath rest look like for you?|Which church tradition from home do you want to keep?|How should we help each other when one of us feels far from God?|What's a prayer you've been praying for years?|Who has been a spiritual mentor to you?|Which book outside the Bible grew your faith the most?|How do you want us to pray together once we close the distance?|What does forgiveness look like in a Christian relationship?|How do you want to serve in your church community?|What's your favorite psalm?|What would you like our devotion time to look like?|How do you hold faith and science together in your work?|What does trusting God with our future mean to you right now?|Which sermon has stayed with you the longest?|How can I support your walk with God better?|What promise from God do you hold onto?|How do you want to grow spiritually this year?|How do you worship when you're alone?|What do you think God is teaching us through the distance?|What testimony do you love telling?|Should we fast together sometimes? How would that look?|How did you come to faith?|What does your ideal Sunday look like?|Which hymn or gospel song moves you most?|What role should prayer play in our big decisions?|What does being equally yoked mean to you?|Which verse would you want written on a wall in our home?`)},
+{id:"love",name:"Love & romance",c:"#e2557c",icon:"heart",qs:L(`What was the moment you knew you liked me?|What's your favorite memory of us so far?|What's your favorite thing about my face?|What's the most romantic thing someone could do for you?|Which of our calls do you remember most?|What small gesture makes you melt?|Which nickname I call you is your favorite?|What song should be our song?|Describe our relationship in three words.|Which date would you love us to recreate?|What did you think the first time you heard my voice?|What's the sweetest message I've ever sent you?|Which love language do you want more of from me?|What surprise would make you happiest right now?|What do I do that makes you feel chosen?|When did you first think "I love this person"?|What's your favorite photo of us?|What would our perfect anniversary look like?|How do I make ordinary days feel special?|What's the first thing you want to do when we see each other next?|What about me made you curious at first?|What's one thing you'd never want me to change?|Which outfit of mine do you love most?|How do you want me to greet you at the airport?|What line would you love to read in a letter from me?|What's the most thoughtful gift you've ever received?|When do you find me most attractive?|Which romantic movie scene do you love?|How can we keep dating each other while apart?|What's something cute I do without noticing?|What do you love about how we talk?|What would you write on a note hidden in my bag?|How would you plan a surprise visit for me?|Which song would you choose for our slow dance?|What makes you smile when you think about us?`)},
+{id:"deep",name:"Deep talks",c:"#c0398a",icon:"chat",qs:L(`When do you feel most loved by me?|What's a fear you rarely talk about?|What's one thing you wish I understood about you?|What does a healthy argument look like to you?|When did you last feel truly proud of yourself?|What part of long distance is hardest for you?|What do you need from me on a bad day?|How do you like to be comforted?|What's something you've forgiven but not forgotten?|What makes you feel safe with me?|What belief have you changed your mind about?|What do people often misunderstand about you?|When do you feel most like yourself?|When did you last feel really alone?|What are you still healing from?|How do you know when you need a break?|What compliment have you never forgotten?|What's the hardest decision you've ever made?|How do you handle disappointment?|What does respect look like to you in a relationship?|What's something you've never told anyone but would tell me?|When did you last cry, and why?|Which habit of mine do you find hard?|What's one way I could love you better?|What do you admire most in your parents?|What dream have you quietly set aside?|How do you want to be remembered?|What does success mean to you now compared to five years ago?|What boundary matters a lot to you?|What makes you feel appreciated?|What do you do when you feel overwhelmed?|What question are you afraid to ask me?|What's the kindest thing a stranger has done for you?|How do you show love when words are hard?|What lesson did life teach you the hard way?|What does a good apology sound like to you?|What are you most grateful for this month?|When do you feel most anxious?|What's one thing you want us to never stop doing?|What do you think makes us strong as a couple?`)},
+{id:"distance",name:"Long distance",c:"#2d6fb8",icon:"plane48",qs:L(`What's your favorite way to spend a call together?|What time of day do you miss me most?|What helps you most when we're apart?|Which long distance ritual should we start?|How often would you love a surprise package?|What should we watch together this month?|How do you feel right after we hang up?|What was our hardest goodbye?|What should we do on our next visit that we've never done?|How can we make the countdown days feel shorter?|What's something in your city you want to show me?|What's something in my city you want to see?|How should we handle time zones on busy weeks?|What would make our calls better?|When should we start planning to close the distance?|What do you want our first week in the same city to look like?|What makes you trust us even from far away?|Which game could we play over video?|Which meal should we cook together on video?|How do you feel when I'm busy and quiet?|What's one thing you want to hear from me every day?|Honestly, what's the best part about long distance?|How should we celebrate when the distance ends?|What playlist should we make together?|What would you put in a care package for me?|How should we handle missed calls or late replies?|Which book could we read together?|What's your favorite way to say goodnight?|What makes a visit feel too short?|Where should we meet halfway someday?`)},
+{id:"future",name:"Future & home",c:"#1f7f78",icon:"house",qs:L(`Where do you see us in five years?|Which city would you love to live in together?|What traditions do you want our family to have?|How do you picture our weekends after we close the distance?|What does a good career and family balance look like to you?|How should our home feel when guests walk in?|Which values from your parents do you want to keep?|How should we celebrate big milestones?|What's one dream we should chase together?|How do you want to grow old together?|Would you rather live near your family or mine?|House or apartment? City or suburbs?|What does a peaceful Sunday at home look like for us?|How should we split chores?|Which holiday tradition do you want to start?|How involved should our families be in our decisions?|Where would you want to retire?|Which country would you live in for a while?|What pet would you want in our home?|How do you picture our kitchen?|What should we do if one of us gets an offer far away?|How should our home reflect where we both come from?|What do you want our friendships as a couple to look like?|How do we keep dating each other for years?|What's one thing you want to learn together?|What should our family motto be?|Which room in your dream home matters most?|How do you want to celebrate birthdays at home?|How should we host Christmas someday?|Which skill do you want us to master before forty?|Which community would you want us to be part of?|How should we care for our parents as they age?|What do you never want our home to have?|What does a good year look like for us?|What should our first home together have?`)},
+{id:"marriage",name:"Before marriage",c:"#8c2f55",icon:"ring",tag:"wedding",qs:L(`What does marriage mean to you?|What did your parents' marriage teach you?|How do you picture our wedding day?|Big wedding or small wedding? Why?|Who would you want to officiate?|What role should our families play in the wedding?|How should we make big decisions as a married couple?|How do you want to handle disagreements in marriage?|What would you never compromise on in marriage?|How should we handle in laws who overstep?|What does being a good husband look like to you?|What does being a good wife look like to you?|Should we do premarital counseling? With whom?|Where should we live in our first year of marriage?|How do you want to handle finances after marriage?|How should we split holidays between both families?|Which traditions from your culture do you want in our wedding?|How should we celebrate an engagement?|What timeline feels right for engagement and marriage?|What would a perfect honeymoon look like?|How do we keep God at the center of our marriage?|What should we do when one of us feels unheard?|How do we protect our marriage from outside pressure?|What does commitment look like on hard days?|How should we divide roles at home?|What would a weekly check in between us look like?|What kind of proposal would mean the most to you?|Which marriage do you admire, and why?|What should we never say to each other in an argument?|How should we handle career moves after marriage?|What does loyalty mean to you?|How much time apart is healthy in a marriage?|What's one vow you'd want to make?|How do you want to keep romance alive for decades?|What would you want our marriage to look like at fifty years?`)},
+{id:"kids",name:"Kids & parenting",c:"#3f8a4f",icon:"spark",tag:"children",qs:L(`Do you want children someday? How many?|What kind of parent do you want to be?|Which names do you love?|How were you disciplined as a child, and what would you change?|How should we teach our children about faith?|Which languages should our children speak?|Which values matter most to pass on?|Public or private school?|How should we share parenting duties?|What did your parents do that you want to repeat?|What would you do differently from your parents?|How should we celebrate our kids' birthdays?|How much screen time is okay for children?|How involved should grandparents be?|Would you consider adoption?|What would you want our kids to call us?|Which sport or instrument would you want our kids to try?|How should we handle a child who wants a different path than ours?|Which family trip would you want to take with kids?|How should we teach our kids about money?|What bedtime routine would you want for our children?|How do you picture our family on a Saturday morning?|What do you hope our kids say about us someday?|How should we balance two careers with young kids?|What lesson do you want our kids to learn early?`)},
+{id:"know",name:"Get to know each other",c:"#5a6fd6",icon:"smile",qs:L(`What's a small habit of mine you secretly love?|What song reminds you of me?|What was your first impression of me?|What's your comfort food after a long day?|Which memory of us do you replay the most?|What hobby would you love to try together?|What would your perfect Saturday look like?|Which of my friends do you like the most?|What made you smile today?|What's your favorite way I say I love you?|What's your go to karaoke song?|What skill are you secretly proud of?|What's your most used emoji?|What's on your bucket list this year?|What's your favorite season, and why?|How would you rank the five love languages for yourself?|What pet peeve can't you let go?|What was the last thing you searched online?|What's your favorite way to spend a free evening?|Which app do you use most?|Which movie can you watch again and again?|What's your morning routine?|What's your favorite smell?|What do you order at a new restaurant?|What's your favorite word?|Which three things would you take to an island?|Which show would you recommend to everyone?|What's your ideal vacation?|What's your strongest opinion about food?|Which famous person would you have dinner with?|What's your favorite color right now?|What makes you laugh the hardest?|What goal are you working on quietly?|What's the best advice you've ever received?|What's your favorite holiday?|What always cheers you up?|What's your favorite place you've ever been?|What's your hidden talent?|Which word would your friends use to describe you?|What are you looking forward to this week?`)},
+{id:"phd",name:"PhD & career",c:"#246a73",icon:"book",qs:L(`What part of your research excites you most right now?|What's the hardest part of PhD life for you?|How can I support you during deadline weeks?|What does your dream job look like after the PhD?|Academia or industry, honestly?|Who in your field do you look up to?|What's a small win from this week?|How do you want to celebrate when we both defend?|What do you wish people understood about your research?|What keeps you going when the data doesn't cooperate?|How do you rest when your brain is tired?|What's your best time of day to work?|What would you research if funding didn't matter?|How do you handle rejection from journals or applications?|Which conference would you love to attend together?|How should we balance two academic careers?|Which skill do you want to master before graduating?|What's your advisor's best quality?|How should we handle job offers in different cities?|What does a healthy work week look like to you?|What's the most interesting thing you learned this month?|How can we study together over video?|What would you name your future lab or company?|Which grad school mistake would you warn others about?|How do you want to mentor others someday?|Which part of my work do you want to understand better?|What makes a good day in the lab or office for you?|Which paper or idea are you proud of?|What's your plan for the next six months?|How should we celebrate each other's publications?`)},
+{id:"money",name:"Money & finances",c:"#6b8a2f",icon:"coin",tag:"money",qs:L(`Are you more of a saver or a spender?|What money goal do you have for next year?|How did your family talk about money growing up?|Joint or separate accounts later?|What's one thing worth spending more on?|How do you feel about giving and tithing?|What would financial peace look like for us?|What's your biggest money fear?|How should we plan for big trips?|Which purchase are you proud of?|How do you feel about debt?|How much should we keep for emergencies?|How should we support family financially, and how much is okay?|What's your dream big purchase?|How do you feel about investing?|Budget app or spreadsheet?|Which money mistake taught you the most?|How should we decide on purchases above a certain amount?|What does being generous mean to you?|How should we split costs while dating long distance?|What's your relationship with shopping?|Buy a house first or rent first?|What will you never be cheap about?|Which side income idea would you try?|How should we plan for retirement?|What would you do with a surprise bonus?|How often should we talk about money together?|Which money habit of mine do you admire?|How should we handle it if one of us earns much more?|What did your first paycheck go to?`)},
+{id:"childhood",name:"Childhood",c:"#b9661c",icon:"star",tag:"childhood",qs:L(`What was your favorite childhood game?|Who was your hero growing up?|Which childhood memory still makes you laugh?|What did you want to be when you grew up?|What was your favorite meal at home?|Which teacher shaped you the most?|Which tradition from your childhood did you love?|What were you scared of as a kid?|What's the best gift you got as a child?|Where did you spend most holidays?|Which cartoon did you never miss?|What trouble did you get into as a kid?|Who was your best friend in primary school?|Which chore did you hate most?|Which smell takes you back to childhood?|What were you known for in school?|What was your favorite subject, and why?|What's the first song you remember loving?|Did you have a nickname growing up?|What lesson did your mom teach you?|What lesson did your dad teach you?|What did Sundays look like when you were young?|What was your favorite snack after school?|What did you collect as a kid?|What's the bravest thing you did as a child?|What were your teenage years like?|Who in your family were you closest to?|Which toy would you love to have again?|When did you feel really proud as a kid?|What would little you think of you now?`)},
+{id:"travel",name:"Travel & dreams",c:"#2d8fa8",icon:"globe",qs:L(`Which country should be our first trip together?|Beach resort or city exploring?|Which place do you dream of seeing before forty?|What's your best travel memory?|Road trip or flight?|Which food do you want to try in its home country?|Which place from your home country should we visit together?|Which city would you spend a month in?|Window seat or aisle?|What dream scares you a little?|Where would you celebrate a big anniversary?|Are you a planner or an explorer when you travel?|Which national park do you want to visit?|Would you go on a mission trip together?|Where would we go if we had one free week?|Which festival would you love to attend?|What do you always pack?|Would you live abroad for a few years?|What's the most beautiful place you've seen?|Mountains, ocean, or desert?|Which souvenir do you treasure?|Where would we go for a surprise weekend?|What's your dream car?|Which wild experience would you try once?|Which city would you visit at Christmas?|Which landmark should we take a photo in front of?|Train across Europe or safari in Africa?|What would our dream travel day look like?|Which trip should we actually plan next?|Which place feels like home to you?`)},
+{id:"fun",name:"Fun & what ifs",c:"#d4508f",icon:"smile",qs:L(`If we could teleport anywhere tonight, where would we go?|What would our couple name be?|Which movie couple are we most like?|If you won a million dollars tomorrow, what would you do first?|Which superpower would help our relationship most?|Which food could you eat forever?|What's the funniest thing I've ever done?|If we had a podcast, what would it be about?|What would your perfect date night be?|Who would play us in a movie?|If we were animals, what would we be?|If our love story were a book, what would the title be?|What would you do if we swapped lives for a day?|Which cartoon character am I most like?|If we opened a restaurant, what would we serve?|Which weird food combo do you secretly like?|Which instrument would you master overnight?|What's our zombie apocalypse plan?|Which game show would we win together?|What would be our theme song?|Which historical figure would you have dinner with?|What's the silliest argument we could have?|If our future pet could talk, what would it say about us?|Which emoji describes us best?|If we started a YouTube channel, what would it be?|Which job would you be terrible at?|What would your autobiography be called?|Which decade would you live in?|Which dance move would you teach me?|If there were a holiday named after us, how would people celebrate?|What's your most useless talent?|What would you do with a day of being invisible?|What would you want to be famous for?|Which fictional world would you live in?|What would you name a boat?|If we were spies, what would our code names be?|What's the funniest misunderstanding we've had?|Could you text only in emojis for a week?|What ridiculous rule would you make if you ran the world?|What would go in our couple time capsule?`)}
+];
+const TOPICTOGGLES=[["wedding","Before marriage","Engagement, weddings and married life"],["children","Kids & parenting","Future family and raising children"],["money","Money","Finances and money habits"],["childhood","Childhood","Growing up and family memories"]];
+const PHOTOPROMPTS=L(`Show me your view right now|What are you eating today?|Your study or work spot|Something that made you smile today|The sky where you are|Something that reminds you of me|Your outfit today|Your favorite corner of your room|Your coffee or tea right now|The last thing you bought|Your hands doing what you're doing|Something blue near you|Your bookshelf|Your shoes today|Something you're grateful for today|The most beautiful thing you saw today|Your desk, messy or not|A selfie with your best smile|Something that would make me laugh|Your walk home|What's in your fridge|Your Bible or devotional spot|The weather out your window|Something you made today|Your lock screen|Your favorite mug|Your church this week|A plant or flower near you|Something old you treasure|Your lab bench or office|Your favorite snack|Something that smells good|Your pillow, ready for our call|A street sign near you|The best thing on your plate this week|Something red|Your current read|Your view on the commute|The last photo in your camera roll|Something you want to show me in person`);
+const OPENWHEN=["you miss me","you're stressed","you can't sleep","you need a laugh","you're proud of yourself","it's a hard lab day","you doubt yourself","it's our anniversary"];
+const pairs=s=>L(s).map(x=>x.split(" / "));
+const GAMES=[
+{id:"likely",name:"Who's more likely to",c:"#c0398a",icon:"smile",intro:"Pick who fits best.",items:L(`fall asleep first on a call|forget an anniversary|cry at a movie|get lost in a new city|plan a surprise|eat the last slice|text back late|spend too much shopping|win an argument|say sorry first|start a dance party in the kitchen|burn the rice|finish their PhD first|become famous|adopt a pet without asking|wake up early without an alarm|laugh at their own joke|overpack for a trip|pray for the other without being asked|take too many selfies|get hangry|binge a whole series in one night|remember tiny details|plan the whole vacation|lose their keys|sing in the shower|be late to church|start a business|cry at our wedding|talk to strangers|get a speeding ticket|befriend the waiter|ask for directions|stay up all night working|keep a secret|forget to reply to a text|buy flowers for no reason|try a weird food|quit a game when losing|save the most money|be the strict parent|read the manual|laugh in a serious moment|send a voice note instead of typing|spend hours on their phone|go back for seconds|move across the world for a job|check the weather all the time|sleep through an alarm|fix things around the house|organize the fridge|win at trivia night|sneak a snack in bed|bring up an old argument|write a love letter|remember friends' birthdays|fall asleep in a movie theater|say goodnight first|get emotional at a graduation|make the first move`),q:x=>"Who's more likely to "+x+"?",opts:()=>COUPLE().map(nm)},
+{id:"wyr",name:"Would you rather",c:"#2d6fb8",icon:"spark",intro:"Choose one. No in between.",items:pairs(`have a picnic in the park / a candlelit dinner at home|travel back in time / see the future|visit every country / every national park|live by the beach / in the mountains|always be early / always be on time exactly|give up social media / give up dessert|have a big wedding / elope somewhere beautiful|cook every meal / wash every dish|read minds / be invisible|get a handwritten letter / a surprise visit|have breakfast in bed / a sunset walk|relive our first call / skip ahead to our wedding|live in a tiny house by the sea / a big house in the city|win a Nobel prize / an Olympic medal|have a weekly date night / one big trip a year|sing every word / dance everywhere|only watch comedies / only watch thrillers|never be cold / never be hot|always have the right words / always have the right outfit|speak every language / play every instrument|have a pet dog / a pet cat|travel by train / by road trip|get a long hug / a long kiss|plan every detail / be completely surprised|celebrate Christmas in the snow / on a beach|have a library at home / a cinema at home|go camping / stay at a five star hotel|lose your phone / lose your wallet|be a famous scientist / a famous musician|have more time / more money|live without music / without movies|cook together / order in together|grow old in one city / move every few years|know every recipe / know every song|write a book together / start a business together|have a quiet Saturday / a busy adventure Saturday|go on a cruise / go on a safari|eat only Ghanaian food / only Italian food forever|have a garden / a home gym|watch the sunrise / watch the sunset|be able to fly / be able to teleport|have a morning call / a midnight call|meet your favorite pastor / your favorite author|pay off all debt / take a dream vacation|always win at games / always win arguments|live a year in Paris / a year in Tokyo|get flowers every week / chocolate every week|have a surprise party / a quiet dinner|know how many kids we'll have / where we'll live|forget your birthday / have me forget it`),q:()=>"Would you rather…",lab:x=>x[0]+" or "+x[1],opts:x=>x},
+{id:"tot",name:"This or That",c:"#b9661c",icon:"star",intro:"Pick fast, don't overthink.",items:pairs(`Coffee / Tea|Beach / Mountains|Morning person / Night owl|Text / Call|Movie night / Game night|Sweet / Savory|City trip / Nature trip|Cook together / Eat out|Summer / Winter|Plan everything / Go with the flow|Books / Podcasts|Sunrise / Sunset|Big wedding / Small wedding|Dogs / Cats|Gospel / Afrobeats|Pizza / Burgers|Rice / Yam|Sneakers / Sandals|Netflix / YouTube|Rain / Sunshine|Hugs / Kisses|Early flight / Late flight|Window / Aisle|Chocolate / Vanilla|Spicy / Mild|Jollof / Fried rice|Gym / Walk|Android / iPhone|Car / Train|Breakfast / Dinner|Shower at night / Shower in the morning|Candles / Fairy lights|Cards / Board games|Tidy / Cozy mess|Paper book / E reader|Hot drink / Cold drink|Road trip snacks / Gas station surprise|Matching outfits / Our own style|Selfie / Photo of the view|Lake / Ocean|Romance / Comedy|Pancakes / Waffles|Cook / Bake|Ice cream / Cake|Voice note / Long text|Flowers / Chocolate|Theme park / Museum|Sing / Dance|Sofa date / Fancy date|Short call daily / Long call weekly|Juice / Smoothie|Cinema / Home movie|Day trip / Weekend away|Puzzle / Video game|Early to bed / Late night talks|Fruit / Chips|Soup / Salad|Snow / Sand|Handwritten / Typed|Surprise / Planned`),q:()=>"This or that?",lab:x=>x[0]+" or "+x[1],opts:x=>x},
+{id:"nhie",name:"Never have I ever",c:"#1f7f78",icon:"chat",intro:"Be honest. You'll see each other's answers.",items:L(`stayed up all night talking to someone|cried at a wedding|fallen asleep during a sermon|eaten a whole pizza alone|lied about liking a gift|sent a text to the wrong person|been on a plane for more than ten hours|sung karaoke in public|broken a bone|cooked a meal from another country|missed a flight|forgotten someone's name right after meeting them|pulled an all nighter for an exam|read a whole book in one day|gone a full day without my phone|danced in the rain|laughed so hard I cried in class|had a crush on a teacher|written a poem|gotten lost in a new city|eaten something I couldn't pronounce|been on TV|ridden a horse|stalked someone's old photos online|watched the same movie three times in a week|fallen asleep on a video call|faked being sick to skip something|burned food so badly the alarm went off|tried to cut my own hair|gone to a concert alone|cried during a movie on a plane|re read our old messages|planned a surprise that went wrong|eaten dessert before dinner|apologized to an object I bumped into|won a competition|been stung by a bee|stayed in a hostel|ignored a call and then texted "sorry, missed it"|prayed for someone without telling them|tried to learn a dance from a video|baked bread from scratch|been to a wedding where I knew nobody|walked into a glass door|regretted a haircut|seen snow fall|eaten at a restaurant alone|kept a plant alive for a year|lost something important on a trip|said "I love you" first`),q:x=>"Never have I ever "+x+".",opts:()=>["I have","I haven't"]},
+{id:"agree",name:"Agree or disagree",c:"#3f8a4f",icon:"heart",intro:"See where you line up.",items:L(`Couples should share their phone passwords.|It's fine to go to bed angry if you talk in the morning.|Long distance makes a relationship stronger.|Pineapple belongs on pizza.|The person who plans the date should also pay.|Couples should have separate hobbies.|Social media posts about your partner matter.|A clean home is a happy home.|It's okay to cry in front of your partner often.|Best friends of the opposite sex are fine in a relationship.|Birthdays should be a big celebration every year.|Breakfast is the most important meal.|Couples should pray together every day.|Surprises are better than planned gifts.|You should always answer your partner's calls.|Moving for a partner's career is a fair sacrifice.|Morning people are more productive.|Couples should talk about money before marriage.|Matching outfits are cute.|It's okay to have a few secrets.|Weekends are for rest, not chores.|Watching a show ahead of your partner is betrayal.|Hard work beats talent.|Family opinions should matter in relationship decisions.|A good laugh fixes most bad days.|Love is a choice more than a feeling.|Sunday should be a phone free day.|Pets are part of the family.|Compliments should be given every day.|It's important to have a five year plan.|Cooking together is better than eating out.|A messy car says a lot about a person.|Arguments should be finished the same day.|Gifts should be practical.|Saying sorry first is a strength.|Texting all day is necessary in a relationship.|Holidays should alternate between families.|Anniversaries deserve a trip.|Silence can be comfortable on a call.|Every couple needs inside jokes.|Weddings are more for family than for the couple.|Both partners should cook.|You can tell a lot from someone's playlist.|The best dates are free.|Dessert can be dinner.|Planning ahead is romantic.|Couples should travel together before marriage.|Physical touch is the most important love language.|We should try one new thing every month.|Faith should guide our biggest decisions.`),q:x=>x,opts:()=>["Agree","Disagree"]}
+];
+const gameById=id=>GAMES.find(g=>g.id===id);
+
+/* ---------- Us data: couples/{cid}/us/main plus moments, letters, jar, nudges ---------- */
+const usRef=()=>DB.doc("couples/"+CID+"/us/main");
+const US={main:{},moments:[],letters:[],jar:[],nudges:[]};
+function watchUs(){
+  const col=n=>DB.collection("couples/"+CID+"/"+n);
+  const list=(n,lim,key)=>unsubs.push(col(n).orderBy("at","desc").limit(lim).onSnapshot(q=>{US[key]=q.docs.map(d=>({id:d.id,...d.data()}));usRefresh()},e=>console.warn(e)));
+  unsubs.push(usRef().onSnapshot(sn=>{US.main=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
+  list("moments",30,"moments");list("letters",200,"letters");list("jar",500,"jar");list("nudges",20,"nudges");
+}
+function usRefresh(){
+  if(el("sheet").hidden){if(S.tab==="us")softRender();return}
+  if(!sheetFn)return;const a=document.activeElement;
+  if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName)&&el("sheet").contains(a))return;
+  sheetFn();
+}
+const saveUs=o=>{if(DB&&CID)usRef().set(o,{merge:true}).catch(syncErr)};
+const addTo=(n,o)=>{if(DB&&CID)DB.collection("couples/"+CID+"/"+n).add(o).catch(syncErr)};
+const INC=n=>firebase.firestore.FieldValue.increment(n);
+const nm=u=>(P(u)&&P(u).name)||"Your partner";
+const COUPLE=()=>[ME,PARTNER].sort();
+const DR={};
+function usDay(){const a=tzNow(P(ME).tz).key,o=PARTNER&&P(PARTNER);const b=o&&!o.placeholder?tzNow(o.tz).key:a;return a<b?a:b}
+const hashN=(s,n)=>{let x=7;for(const c of s)x=(x*31+c.charCodeAt(0))>>>0;return x%n};
+const ago=ts=>{const s=Math.round((Date.now()-ts)/1000);if(s<60)return "just now";const m=Math.round(s/60);if(m<60)return m+" min ago";const hh=Math.round(m/60);if(hh<24)return hh+" h ago";return Math.round(hh/24)+" d ago"};
+const svgEl=s=>{const t=document.createElement("template");t.innerHTML=s.trim();return t.content.firstChild};
+const HEART='<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.4-9.3C1.2 8.2 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.9 1.4-1.8 3-2.9 5-2.9 3.6 0 5.8 3.7 4.4 7.2C19.5 16.4 12 21 12 21z"/></svg>';
+const ANS=()=>US.main.answers||{};
+const bothAnswered=id=>{const a=ANS()[id];return !!(a&&a[ME]&&a[PARTNER])};
+function enabledTopics(){const pr=US.main.prefs||{};return TOPICS.filter(t=>!t.tag||pr[t.tag]!==false)}
+function dailyQ(k){const pool=[];enabledTopics().forEach(t=>t.qs.forEach((q,i)=>pool.push({tid:t.id,i,q})));return pool[hashN(k+"q",pool.length)]}
+const dailyPrompt=k=>PHOTOPROMPTS[hashN(k+"p",PHOTOPROMPTS.length)];
+const GM=gid=>((US.main.games||{})[gid])||{};
+const gameRound=(gid,k)=>(GM(gid).rounds||{})[k]||0;
+const gkey=(k,r)=>r?k+"#"+r:k;
+function dailySet(gid,k){const n=gameById(gid).items.length,out=[],used=new Set();let s=hashN(gid+k,n);while(out.length<5){while(used.has(s))s=(s+1)%n;used.add(s);out.push(s);s=(s+13)%n}return out}
+function togetherDays(){return US.main.since?daysBetween(US.main.since,tzNow(P(ME).tz).key):null}
+function nextVisit(){const k=tzNow(P(ME).tz).key;return S.shared.countdowns.filter(c=>c.kind==="visit"&&c.date&&daysBetween(k,c.date)>=0).sort((a,b)=>a.date.localeCompare(b.date))[0]||null}
+function visitLeft(v){const t=tzNow(P(ME).tz),tm=v.time?toMin(v.time):0;return Math.max(0,(daysBetween(t.key,v.date)*1440+tm-t.min)*60-new Date().getSeconds())}
+const unreadLetters=()=>US.letters.filter(l=>l.to===ME&&!l.openedAt).length;
+const dailyPhotos=k=>{const o={};US.moments.filter(m=>m.kind==="daily"&&m.day===k).forEach(m=>{if(!o[m.from])o[m.from]=m});return o};
+function roomSky(m){if(m>=300&&m<480)return ["#6e7fc4","#f2a7a0","#fbd3a0",false];if(m>=480&&m<1000)return ["#5aa0e0","#8cc4ee","#d4ecfb",false];
+  if(m>=1000&&m<1170)return ["#3b4588","#c45a7a","#f6a65e",false];return ["#0c1030","#1d1b4c","#3a2a63",true]}
+const GEO=(()=>{try{return JSON.parse(localStorage.getItem("ourdays-geo"))||{}}catch(e){return {}}})();
+async function geo(city){if(!city)return null;if(GEO[city])return GEO[city];
+  try{const r=await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name="+encodeURIComponent(city.split(",")[0].trim()));const j=await r.json();const x=j.results&&j.results[0];if(!x)return null;
+    GEO[city]={lat:x.latitude,lng:x.longitude};try{localStorage.setItem("ourdays-geo",JSON.stringify(GEO))}catch(e){}return GEO[city]}catch(e){return null}}
+function miles(a,b){const R=3958.8,r=x=>x*Math.PI/180,dLat=r(b.lat-a.lat),dLng=r(b.lng-a.lng);const s=Math.sin(dLat/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLng/2)**2;return Math.round(2*R*Math.asin(Math.sqrt(s)))}
+
+/* ---------- effects ---------- */
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let fxCv=null,fxCx=null,fxParts=[],fxRaf=0;
+function confetti(n=120){if(RM)return;if(!fxCv){fxCv=h("canvas",{id:"jufx","aria-hidden":"true"});document.body.appendChild(fxCv);fxCx=fxCv.getContext("2d")}
+  fxCv.width=innerWidth*devicePixelRatio;fxCv.height=innerHeight*devicePixelRatio;const cols=["#e2557c","#ffd27a","#5b3b8c","#ffb48a","#5fd0c4","#ffffff"];
+  for(let i=0;i<n;i++)fxParts.push({x:innerWidth/2+(Math.random()-.5)*80,y:innerHeight*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*12-4,s:6+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[i%cols.length],life:0});if(!fxRaf)fxLoop()}
+function fxLoop(){const cx=fxCx;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cx.clearRect(0,0,innerWidth,innerHeight);
+  fxParts.forEach(p=>{p.vy+=.32;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life++;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,1-p.life/150);cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()});
+  fxParts=fxParts.filter(p=>p.life<150&&p.y<innerHeight+40);if(fxParts.length)fxRaf=requestAnimationFrame(fxLoop);else{fxRaf=0;cx.clearRect(0,0,innerWidth,innerHeight)}}
+function hearts(fromEl,n=14){if(RM||!fromEl)return;const r=fromEl.getBoundingClientRect();
+  for(let i=0;i<n;i++){const s=svgEl(HEART);s.classList.add("juheart");s.style.color=["#e2557c","#ff8fab","#ffb48a","#b99cff"][i%4];
+    s.style.left=(r.left+r.width/2-14)+"px";s.style.top=(r.top+r.height/2-14)+"px";document.body.appendChild(s);
+    const dx=(Math.random()-.5)*240,dy=-(160+Math.random()*280);
+    s.animate([{transform:"translate(0,0) scale(.3)",opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${(Math.random()-.5)*60}deg) scale(${.6+Math.random()})`,opacity:0}],{duration:1300+Math.random()*700,easing:"cubic-bezier(.2,.7,.3,1)",delay:i*40}).onfinish=()=>s.remove()}}
+
+/* ---------- sheets ---------- */
+function juSheet(title,build){const box=h("div",{class:"ju","data-nofocus":"1"});[].concat(build()).flat(9).forEach(n=>n&&box.appendChild(n));openSheet(title,box);sheetFn=()=>juSheet(title,build)}
+const refreshSheet=()=>{if(!el("sheet").hidden&&sheetFn)sheetFn()};
+
+function windowSheet(){juSheet("Where you both are",()=>{
+  const ids=[ME,PARTNER],cards=ids.map(x=>{const n=tzNow(P(x).tz),[a,b,c]=roomSky(n.min);return h("div",{class:"jcity",style:`background:linear-gradient(160deg,${a},${b} 60%,${c})`},h("span",{style:"font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase"},nm(x)),h("b",null,fmt(n.min)),h("span",{style:"font-size:14px"},P(x).city||""))});
+  const dist=h("p",{class:"q",style:"text-align:center"},"…");
+  Promise.all(ids.map(x=>geo(P(x).city))).then(([a,b])=>{dist.textContent=a&&b?miles(a,b).toLocaleString()+" miles apart":"Add both cities in Settings to see the distance"});
+  const diff=(tzNow(P(ME).tz).off-tzNow(P(PARTNER).tz).off)/60;
+  return [h("div",{class:"jcities"},cards),dist,h("p",{class:"hint",style:"text-align:center"},diff===0?"Same time zone.":nm(PARTNER)+" is "+Math.abs(diff)+" hour"+(Math.abs(diff)===1?"":"s")+(diff>0?" behind you.":" ahead of you."))]})}
+
+function gardenSheet(){juSheet("Your plant",()=>{
+  const st=prayerStreak(),stages=[[0,"Seed"],[1,"Sprout"],[7,"Young plant"],[30,"In bloom"]],cur=stages.filter(s=>st>=s[0]).pop(),next=stages.find(s=>s[0]>st);
+  const days=togetherDays()||0,qs=Object.keys(ANS()).filter(bothAnswered).length,cn=US.main.counts||{};
+  const B=[["First question",qs>=1,"chat"],["7 nights of prayer",st>=7,"cross"],["30 nights of prayer",st>=30,"cross"],["100 days together",days>=100,"heart"],["365 days together",days>=365,"heart"],["1,000 days together",days>=1000,"heart"],
+    ["First letter",US.letters.length>=1,"mail"],["10 moments",(cn.moments||0)>=10,"camera"],["50 questions",qs>=50,"chat"],["First doodle",(cn.doodles||0)>=1,"spark"],["100 hearts",(cn.hearts||0)>=100,"heart"],["20 jar notes",US.jar.length>=20,"star"]];
+  return [h("p",{class:"hint"},"It grows with your prayer streak. Now: "+cur[1]+(next?". Next stage at "+next[0]+" nights.":".")),
+    h("h2",null,"Achievements"),h("div",{class:"badges"},B.map(([n,hit,ic])=>h("div",{class:"badge"+(hit?" hit":"")},svgEl(ICON[ic]("#e2557c")),n)))]})}
+
+function datesSheet(){juSheet("Our dates",()=>{
+  const t=tzNow(P(ME).tz),dates=US.main.dates||[];
+  const rows=dates.map(d=>{const Y=+t.key.slice(0,4);let k=Y+"-"+d.md;if(daysBetween(t.key,k)<0)k=(Y+1)+"-"+d.md;return {...d,k,n:daysBetween(t.key,k)}});
+  const v=nextVisit();if(v)rows.push({title:v.title||"Next visit",k:v.date,n:daysBetween(t.key,v.date),c:"#8c2f55",visit:v});
+  rows.sort((a,b)=>a.n-b.n);
+  const ti=h("input",{type:"text",class:"inp",placeholder:"e.g. Fiona's birthday"}),dt=h("input",{type:"date",class:"inp"}),since=h("input",{type:"date",class:"inp",value:US.main.since||""});
+  return [h("p",{class:"hint"},"Birthdays and anniversaries repeat every year. You both see the same list."),
+    h("div",{style:"display:flex;flex-direction:column;gap:8px"},rows.length?rows.map(r=>h("div",{class:"drow",style:"--c:"+r.c},h("div",{class:"tx"},h("b",null,r.title),h("br"),h("small",null,longDate(r.k))),
+      h("div",{class:"n"},r.n===0?"Today":String(r.n),r.n?h("small",null,r.n===1?"day left":"days left"):null),
+      r.visit?h("button",{type:"button",class:"ghost",onclick:()=>addCountdownSheet(ME,S.shared.countdowns.find(x=>x.id===r.visit.id),"shared")},"Edit")
+        :h("button",{type:"button",class:"x","aria-label":"Remove "+r.title,onclick:()=>{saveUs({dates:dates.filter(x=>x.id!==r.id)})}},"×"))):h("p",{class:"hint"},"No dates yet.")),
+    v?null:h("button",{type:"button",class:"btn gh",onclick:()=>addCountdownSheet(ME)},"Add a visit countdown"),
+    h("div",{class:"row"},h("div",{style:"flex:1 1 180px"},ti),h("div",{style:"flex:1 1 140px"},dt),h("button",{type:"button",class:"btn",onclick:()=>{if(!ti.value.trim()||!dt.value)return;
+      saveUs({dates:dates.concat([{id:uid(),title:ti.value.trim(),md:dt.value.slice(5),c:["#e2557c","#5b3b8c","#1f7f78","#2d6fb8","#b9661c"][dates.length%5]}])})}},"Add")),
+    h("h2",{style:"font-size:19px;margin-top:8px"},"Together since"),h("p",{class:"hint"},"Starts your days together counter."),
+    h("div",{class:"row"},h("div",{style:"flex:1"},since),h("button",{type:"button",class:"btn gh",onclick:()=>{if(since.value){saveUs({since:since.value});confetti(60)}}},"Save"))]})}
+
+function lettersSheet(){juSheet("Love letters",()=>{
+  const mine=US.letters.filter(l=>l.to===ME),sent=US.letters.filter(l=>l.from===ME);
+  return [h("p",{class:"hint"},"Longer than a text, kept forever. Label one \"open when…\" and "+nm(PARTNER)+" saves it for the right moment."),
+    ...(mine.length?mine.map(l=>h("button",{type:"button",class:"letter tap",onclick:()=>openLetter(l)},svgEl(ICON.mail(l.openedAt?"#b9a1ad":"#e2557c")),
+      h("div",null,h("b",null,l.openWhen?"Open when "+l.openWhen:"A letter for you"),h("span",{class:"hint",style:"font-size:14px"},(l.openedAt?"Opened · ":"Sealed · ")+ago(l.at))))):[h("p",{class:"hint"},"No letters for you yet.")]),
+    h("button",{type:"button",class:"btn",onclick:writeLetter},"Write a letter to "+nm(PARTNER)),
+    sent.length?h("p",{class:"hint"},"You've written "+sent.length+" letter"+(sent.length>1?"s":"")+". "+sent.filter(l=>l.openedAt).length+" opened."):null]})}
+function openLetter(l){if(!l.openedAt&&l.to===ME){DB.doc("couples/"+CID+"/letters/"+l.id).update({openedAt:Date.now()}).catch(syncErr);confetti(50)}
+  const b=()=>[h("div",{class:"paper"},l.body),h("p",{class:"hint"},"From "+nm(l.from)+" · "+new Date(l.at).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})),h("button",{type:"button",class:"btn gh",onclick:lettersSheet},"Back to letters")];
+  juSheet(l.openWhen?"Open when "+l.openWhen:"A letter",b);sheetFn=null}
+function writeLetter(){let ow=DR.ow||"";juSheet("Write a letter",()=>{
+  const ta=h("textarea",{class:"inp",placeholder:"Dear "+nm(PARTNER)+",","aria-label":"Your letter"});ta.value=DR.letter||"";ta.oninput=()=>{DR.letter=ta.value};
+  const chips=h("div",{class:"chips"},["",...OPENWHEN].map(x=>h("button",{type:"button","aria-pressed":String(ow===x),onclick:e=>{ow=DR.ow=x;chips.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},x?"Open when "+x:"Read anytime")));
+  return [chips,ta,h("button",{type:"button",class:"btn",onclick:e=>{if(!ta.value.trim()){ta.focus();return}addTo("letters",{from:ME,to:PARTNER,openWhen:ow,body:ta.value.trim(),at:Date.now(),openedAt:0});
+    DR.letter="";DR.ow="";hearts(e.currentTarget,10);toast("Letter sealed",nm(PARTNER)+" gets a new envelope in the letterbox");lettersSheet()}},"Seal and send")]})}
+
+function jarSheet(){juSheet("Love notes jar",()=>{
+  const theirs=US.jar.filter(j=>j.from===PARTNER),pick=h("div");const inp=h("input",{type:"text",class:"inp",placeholder:"I love how you…"});
+  return [h("p",{class:"hint"},"Drop in small things you love about each other. On a hard day, pull one out."),
+    h("button",{type:"button",class:"btn alt",disabled:!theirs.length,onclick:()=>{const j=theirs[Math.floor(Math.random()*theirs.length)];pick.innerHTML="";pick.append(h("div",{class:"note"},j.text),h("p",{class:"hint",style:"margin-top:10px"},"From "+nm(PARTNER)+" · "+ago(j.at)))}},theirs.length?"Pull a note from "+nm(PARTNER):"No notes from "+nm(PARTNER)+" yet"),pick,
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();if(!inp.value.trim())return;addTo("jar",{from:ME,text:inp.value.trim(),at:Date.now()});hearts(e.submitter||inp,8);toast("Note added",nm(PARTNER)+" can pull it out any time");inp.value=""}},
+      h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"btn"},"Add note")),
+    h("p",{class:"hint"},US.jar.filter(j=>j.from===ME).length+" from you · "+theirs.length+" from "+nm(PARTNER))]})}
+
+function memoriesSheet(){juSheet("Memories",()=>[h("p",{class:"hint"},"Photos, doodles and moments you've shared. The newest hangs in your frame."),
+  US.moments.length?h("div",{class:"memgrid"},US.moments.map(m=>h("div",{class:"mem"},m.img?h("img",{src:m.img,alt:"",loading:"lazy"}):h("div",{class:"ph"}),h("small",null,(m.note||"A moment")+" · "+nm(m.from)+" · "+ago(m.at))))):h("p",{class:"hint"},"Nothing yet. Share today's photo to start."),
+  h("button",{type:"button",class:"btn",onclick:photoSheet},"Share today's photo")])}
+
+function answerSheet(id,question,title,onBack){juSheet(title,()=>{
+  const o=PARTNER,a=ANS()[id]||{},mine=a[ME],theirs=a[o],out=[h("p",{class:"q"},question)];
+  if(!mine){const ta=h("textarea",{class:"inp","aria-label":"Your answer",placeholder:nm(o)+" sees your answer only after answering too."});ta.value=DR[id]||"";ta.oninput=()=>{DR[id]=ta.value};
+    out.push(ta,h("button",{type:"button",class:"btn alt",onclick:()=>{if(!ta.value.trim()){ta.focus();return}saveUs({answers:{[id]:{[ME]:{text:ta.value.trim(),at:Date.now()}}}});delete DR[id];
+      if(theirs){confetti(140);toast("Answers unlocked","You both answered")}else toast("Locked in",nm(o)+" gets a nudge to answer");ta.blur()}},"Lock in my answer"),
+      h("p",{class:"hint"},theirs?nm(o)+" already answered. Yours unlocks both.":"Answers stay hidden until you both reply."))}
+  else if(!theirs)out.push(h("div",{class:"lockbox"},svgEl(ICON.lock("#5b3b8c")),h("div",null,h("b",null,"Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"Both answers unlock when "+nm(o)+" replies."))));
+  else out.push(h("div",{class:"answers reveal"},[ME,PARTNER].map(x=>h("div",{class:"ans"+(x!==ME?" f":"")},h("span",{class:"who"},x===ME?"You":nm(x)),h("p",null,a[x].text)))));
+  if(onBack)out.push(h("button",{type:"button",class:"btn gh",onclick:onBack},"Back"));
+  return out})}
+
+function topicSheet(t){juSheet(t.name,()=>{
+  const A=ANS(),next=t.qs.findIndex((q,i)=>!(A[t.id+":"+i]||{})[ME]),done=t.qs.map((q,i)=>({q,i})).filter(x=>bothAnswered(t.id+":"+x.i));
+  const waiting=t.qs.map((q,i)=>({q,i})).filter(x=>{const a=A[t.id+":"+x.i]||{};return a[PARTNER]&&!a[ME]});
+  return [h("div",{class:"jbar",style:"--c:"+t.c},h("span",{style:"max-width:none"},h("i",{style:"width:"+Math.round(done.length/t.qs.length*100)+"%"})),h("small",null,done.length+" of "+t.qs.length+" answered together")),
+    waiting.length?h("p",{class:"hint"},nm(PARTNER)+" answered "+waiting.length+" you haven't yet."):null,
+    next>=0?h("button",{type:"button",class:"btn",style:"background:"+t.c,onclick:()=>{const nx=waiting[0]?waiting[0].i:next;answerSheet(t.id+":"+nx,t.qs[nx],t.name,()=>topicSheet(t))}},waiting.length?"Answer "+nm(PARTNER)+"'s next one":"Answer the next question"):h("p",{class:"hint"},"You've answered all of these."),
+    h("h2",{style:"font-size:19px"},"Answered together"),
+    done.length?done.slice().reverse().map(x=>h("button",{type:"button",class:"letter tap",onclick:()=>answerSheet(t.id+":"+x.i,x.q,t.name,()=>topicSheet(t))},svgEl(ICON[t.icon](t.c)),h("div",null,h("b",{style:"font-size:16px"},x.q)))):h("p",{class:"hint"},"Nothing yet.")]})}
+
+async function shrink(f,max=700){try{const b=await createImageBitmap(f),sc=Math.min(1,max/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=Math.round(b.width*sc);c.height=Math.round(b.height*sc);c.getContext("2d").drawImage(b,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.8)}
+  catch(e){return null}}
+function photoSheet(){let img=null;juSheet("Photo of the day",()=>{
+  const o=PARTNER,k=usDay(),d=dailyPhotos(k),mine=d[ME],theirs=d[o],out=[h("p",{class:"q"},dailyPrompt(k))];
+  if(!mine){const thumb=h("div",{style:"width:100%;aspect-ratio:4/3;border-radius:18px;background:var(--bg);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);overflow:hidden"},img?h("img",{src:img,alt:"",style:"width:100%;height:100%;object-fit:cover"}):"No photo yet");
+    const file=h("input",{type:"file",accept:"image/*",style:"position:absolute;inset:0;opacity:0;cursor:pointer","aria-label":"Choose a photo"});
+    file.onchange=async()=>{const f=file.files&&file.files[0];if(!f)return;img=await shrink(f);if(!img){toast("Couldn't read that photo","Try a different one");return}thumb.innerHTML="";thumb.appendChild(h("img",{src:img,alt:"",style:"width:100%;height:100%;object-fit:cover"}))};
+    const note=h("input",{type:"text",class:"inp",placeholder:"Add a line (optional)"});
+    out.push(thumb,h("span",{class:"btn gh",style:"position:relative;overflow:hidden"},img?"Choose a different photo":"Take or choose a photo",file),note,
+      h("button",{type:"button",class:"btn",onclick:e=>{if(!img){toast("Add a photo first","Tap Take or choose a photo");return}
+        addTo("moments",{from:ME,at:Date.now(),kind:"daily",day:k,note:dailyPrompt(k)+(note.value.trim()?": "+note.value.trim():""),img});saveUs({counts:{moments:INC(1)}});
+        if(theirs){confetti(120);toast("Photos unlocked","You both shared today's photo")}else{hearts(e.currentTarget,8);toast("Sent",nm(o)+" sees yours after sharing theirs")}img=null}},"Share"),
+      h("p",{class:"hint"},theirs?nm(o)+" already shared. Yours unlocks both.":"Photos unlock when you both share."))}
+  else if(!theirs)out.push(h("div",{class:"lockbox"},svgEl(ICON.lock("#1f7f78")),h("div",null,h("b",null,"Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"Yours is in. Both unlock when "+nm(o)+" shares."))));
+  else out.push(h("div",{class:"answers reveal"},[ME,PARTNER].map(x=>h("div",{class:"ans"+(x!==ME?" f":"")},h("span",{class:"who"},x===ME?"You":nm(x)),d[x].img?h("img",{src:d[x].img,alt:""}):null,h("p",null,(d[x].note||"").split(": ").slice(1).join(": "))))));
+  return out})}
+
+function gameSheet(g){juSheet(g.name,()=>{
+  const k=usDay(),r=gameRound(g.id,k),key=gkey(k,r),set=dailySet(g.id,key),d=GM(g.id)[key]||{},o=PARTNER,mine=d[ME]||[],theirs=d[o],lab=g.lab||g.q;
+  if(mine.length<5){const i=mine.length,it=g.items[set[i]];
+    return [h("p",{class:"hint"},"Round "+(i+1)+" of 5. "+g.intro),h("p",{class:"q"},g.q(it)),
+      h("div",{class:"tot",style:"--c:"+g.c},g.opts(it).map((x,j)=>h("button",{type:"button",class:"tap",onclick:()=>{const nx=mine.concat([j]);saveUs({games:{[g.id]:{[key]:{[ME]:nx}}}});
+        if(nx.length===5&&theirs&&theirs.length===5){const m=nx.filter((v,n)=>v===theirs[n]).length;confetti(m>=4?160:60);toast(m+" of 5 match",m>=4?"You two are in sync":"Opposites attract")}}},x)))]}
+  if(!theirs||theirs.length<5)return [h("div",{class:"lockbox"},svgEl(ICON.lock(g.c)),h("div",null,h("b",null,"Done. Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"You'll see each other's picks once "+nm(o)+" plays.")))];
+  const m=mine.filter((v,n)=>v===theirs[n]).length;
+  return [h("p",{class:"q"},m+" of 5 match"),
+    h("div",{class:"totres"},set.map((s,n)=>{const it=g.items[s],op=g.opts(it);return h("div",{class:mine[n]===theirs[n]?"m":""},h("b",null,lab(it)),h("span",null,"You: "+op[mine[n]]+" · "+nm(o)+": "+op[theirs[n]]))})),
+    h("button",{type:"button",class:"btn",style:"background:"+g.c,onclick:()=>saveUs({games:{[g.id]:{rounds:{[k]:r+1}}}})},"Play 5 more"),
+    h("p",{class:"hint"},g.items.length+" in this game. New rounds every day.")]})}
+
+function doodleSheet(){let col="#e2557c",size=6;juSheet("Doodle for "+nm(PARTNER),()=>{
+  const c=h("canvas",{width:"640",height:"640","aria-label":"Drawing area"}),ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,640,640);ctx.lineCap="round";ctx.lineJoin="round";
+  let drawing=false,lx=0,ly=0,any=false;const pos=e=>{const r=c.getBoundingClientRect();return [(e.clientX-r.left)*640/r.width,(e.clientY-r.top)*640/r.height]};
+  c.addEventListener("pointerdown",e=>{drawing=true;any=true;[lx,ly]=pos(e);c.setPointerCapture(e.pointerId);ctx.beginPath();ctx.fillStyle=col;ctx.arc(lx,ly,size,0,7);ctx.fill()});
+  c.addEventListener("pointermove",e=>{if(!drawing)return;const [x,y]=pos(e);ctx.strokeStyle=col;ctx.lineWidth=size*2;ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();lx=x;ly=y});
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>c.addEventListener(t,()=>drawing=false));
+  const sw=h("div",{class:"swatches"},["#e2557c","#5b3b8c","#1f7f78","#f2b84b","#2a1a22","#2d6fb8"].map(x=>h("button",{type:"button",style:"background:"+x,"aria-label":"Color","aria-pressed":String(x===col),onclick:e=>{col=x;sw.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}})));
+  const sz=h("div",{class:"chips"},[[3,"Thin"],[6,"Medium"],[12,"Thick"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===size),onclick:e=>{size=v;sz.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
+  return [h("div",{class:"canvaswrap"},c),sw,sz,h("div",{class:"row"},h("button",{type:"button",class:"btn",onclick:e=>{if(!any){toast("Draw something first","Use your finger on the white square");return}
+      addTo("moments",{from:ME,at:Date.now(),kind:"doodle",note:"A doodle for you",img:c.toDataURL("image/jpeg",.8)});saveUs({counts:{moments:INC(1),doodles:INC(1)}});hearts(e.currentTarget,10);toast("Doodle sent","It shows up in "+nm(PARTNER)+"'s frame");closeSheet()}},"Send doodle"),
+    h("button",{type:"button",class:"btn gh",onclick:()=>{ctx.fillStyle="#fff";ctx.fillRect(0,0,640,640);any=false}},"Clear"))]});sheetFn=null}
+
+function topicsSettingsSheet(){juSheet("Topics",()=>{const pr=US.main.prefs||{};return [
+  h("p",{class:"hint"},"Choose which kinds of questions show up. You both see the same set."),
+  ...TOPICTOGGLES.map(([k,n,d])=>{const on=pr[k]!==false;return h("div",{class:"tog"},h("div",null,h("b",null,n),h("small",null,d)),h("button",{type:"button",class:"sw",role:"switch","aria-checked":String(on),"aria-label":n,onclick:()=>saveUs({prefs:{[k]:!on}})}))})]})}
+
+/* ---------- icons ---------- */
+const ICON={
+  cross:c=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="${c}" opacity=".18"/><rect x="21" y="9" width="6" height="30" rx="3" fill="${c}"/><rect x="13" y="17" width="22" height="6" rx="3" fill="${c}"/></svg>`,
+  chat:c=>`<svg viewBox="0 0 48 48"><path d="M8 12a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H20l-8 7v-7h0a6 6 0 0 1-4-5.7z" fill="${c}"/><circle cx="17" cy="19" r="2.5" fill="#fff"/><circle cx="24" cy="19" r="2.5" fill="#fff"/><circle cx="31" cy="19" r="2.5" fill="#fff"/></svg>`,
+  house:c=>`<svg viewBox="0 0 48 48"><path d="M8 22 24 8l16 14v18a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z" fill="${c}"/><rect x="20" y="28" width="8" height="14" rx="2" fill="#fff"/><path d="M24 19s-4-2.4-4-5a2.2 2.2 0 0 1 4-1.3A2.2 2.2 0 0 1 28 14c0 2.6-4 5-4 5z" fill="#fff"/></svg>`,
+  spark:c=>`<svg viewBox="0 0 48 48"><path d="M24 4l5 13 13 5-13 5-5 13-5-13-13-5 13-5z" fill="${c}"/><circle cx="38" cy="38" r="4" fill="${c}" opacity=".5"/></svg>`,
+  coin:c=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="${c}"/><circle cx="24" cy="24" r="13" fill="none" stroke="#fff" stroke-width="2.5" opacity=".7"/><path d="M28 18c-1-1.5-3-2-5-2-3 0-4.5 1.5-4.5 3.5s2 3 5 3.5 5 1.5 5 3.8-2 3.6-5 3.6c-2.4 0-4.2-.8-5.2-2.4M23.5 13v4M23.5 31v4" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+  star:c=>`<svg viewBox="0 0 48 48"><path d="M24 5l5.6 11.6 12.7 1.8-9.2 9 2.2 12.6L24 34l-11.3 6 2.2-12.6-9.2-9 12.7-1.8z" fill="${c}"/></svg>`,
+  smile:c=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19" fill="${c}"/><circle cx="18" cy="20" r="2.6" fill="#fff"/><circle cx="30" cy="20" r="2.6" fill="#fff"/><path d="M16 28c4 5 12 5 16 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  heart:c=>`<svg viewBox="0 0 48 48"><path d="M24 42S9 32.8 5.2 23.4C2.4 16.4 6.8 9 14 9c4 0 7.2 2.2 10 5.8C26.8 11.2 30 9 34 9c7.2 0 11.6 7.4 8.8 14.4C39 32.8 24 42 24 42z" fill="${c}"/><ellipse cx="15" cy="18" rx="4" ry="2.5" fill="#fff" opacity=".45" transform="rotate(-30 15 18)"/></svg>`,
+  mail:c=>`<svg viewBox="0 0 48 48"><rect x="5" y="11" width="38" height="28" rx="5" fill="${c}"/><path d="M6 14l18 13 18-13" fill="none" stroke="#fff" stroke-width="3"/><path d="M24 34s-3-1.8-3-3.8a1.7 1.7 0 0 1 3-1 1.7 1.7 0 0 1 3 1c0 2-3 3.8-3 3.8z" fill="#fff"/></svg>`,
+  camera:c=>`<svg viewBox="0 0 48 48"><rect x="5" y="13" width="38" height="27" rx="6" fill="${c}"/><rect x="16" y="8" width="16" height="8" rx="3" fill="${c}"/><circle cx="24" cy="27" r="8" fill="#fff"/><circle cx="24" cy="27" r="4.5" fill="${c}"/></svg>`,
+  lock:c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`,
+  moon:c=>`<svg viewBox="0 0 24 24" style="padding:6px"><path fill="${c}" d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>`,
+  plane:c=>`<svg viewBox="0 0 24 24"><path fill="${c}" d="M21 15.5v-2l-8-5V3.8a1.5 1.5 0 0 0-3 0V8.5l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5z"/></svg>`,
+  plane48:c=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="${c}" opacity=".18"/><path fill="${c}" d="M40 29v-4l-14-9V8a2.5 2.5 0 0 0-5 0v8L7 25v4l14-4.5V33l-4 3v3l6.5-2 6.5 2v-3l-4-3v-8.5z"/></svg>`,
+  ring:c=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="30" r="13" fill="none" stroke="${c}" stroke-width="5"/><path d="M17 12l7-6 7 6-7 6z" fill="${c}"/><path d="M24 6l3 6h-6z" fill="#fff" opacity=".6"/></svg>`,
+  book:c=>`<svg viewBox="0 0 48 48"><path d="M6 10c6-2 12-2 18 2v28c-6-4-12-4-18-2z" fill="${c}"/><path d="M42 10c-6-2-12-2-18 2v28c6-4 12-4 18-2z" fill="${c}" opacity=".7"/></svg>`,
+  globe:c=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19" fill="${c}"/><path d="M5 24h38M24 5c6 6 6 32 0 38M24 5c-6 6-6 32 0 38" stroke="#fff" stroke-width="2.5" fill="none" opacity=".75"/></svg>`
+};
+
+/* ---------- the room ---------- */
+function roomSVG(){
+  const t=tzNow(P(ME).tz),[s1,s2,s3,night]=roomSky(t.min),st=prayerStreak(),prayed=!!S.shared.prayer.log[nightKey(P(ME).tz)];
+  const v=nextVisit(),vd=v?Math.max(0,daysBetween(t.key,v.date)):null,unread=unreadLetters(),jarN=Math.min(US.jar.length,9);
+  const mom=US.moments.find(m=>m.img);
+  const stage=st>=30?3:st>=7?2:st>=1?1:0;
+  const leaves=[[],[[0,-18,-30],[0,-18,30]],[[0,-18,-35],[0,-18,35],[0,-34,-15],[0,-34,15],[0,-48,0]],[[0,-18,-35],[0,-18,35],[0,-34,-20],[0,-34,20],[0,-50,-8],[0,-50,8],[0,-62,0]]][stage];
+  const E="var(--edge)",HP="M12 21s-7.5-4.6-9.4-9.3C1.2 8.2 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.9 1.4-1.8 3-2.9 5-2.9 3.6 0 5.8 3.7 4.4 7.2C19.5 16.4 12 21 12 21z";
+  let jar="";for(let i=0;i<jarN;i++){const x=268+(i%3)*12,y=244-Math.floor(i/3)*11;jar+=`<path transform="translate(${x} ${y}) scale(.42)" fill="${["#ff8fab","#ffd27a","#b99cff"][i%3]}" d="${HP}"/>`}
+  const stars=night?`<g class="twinkle"><circle cx="58" cy="62" r="1.6" fill="#fff"/><circle cx="96" cy="54" r="1.2" fill="#fff"/><circle cx="118" cy="88" r="1.4" fill="#fff"/><circle cx="70" cy="100" r="1" fill="#fff"/></g>`:"";
+  const orb=night?`<circle cx="104" cy="70" r="13" fill="#f6efc9"/><circle cx="110" cy="66" r="11" fill="${s1}"/>`:`<circle cx="102" cy="72" r="14" fill="#ffe08a"/>`;
+  const img=mom?`<image href="${mom.img}" x="236" y="58" width="78" height="64" preserveAspectRatio="xMidYMid slice" clip-path="url(#jufclip)"/>`:`<rect x="236" y="58" width="78" height="64" fill="url(#juph)"/><path transform="translate(263 78)" fill="#fff" opacity=".9" d="${HP}"/>`;
+  return `<svg class="scene" viewBox="0 0 360 430" role="group" aria-label="Your room. Tap an object.">
+  <defs>
+    <linearGradient id="juwall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--wall1)"/><stop offset="1" stop-color="var(--wall2)"/></linearGradient>
+    <linearGradient id="jusky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset=".6" stop-color="${s2}"/><stop offset="1" stop-color="${s3}"/></linearGradient>
+    <linearGradient id="juph" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb48a"/><stop offset=".6" stop-color="#e2557c"/><stop offset="1" stop-color="#5b3b8c"/></linearGradient>
+    <radialGradient id="jucglow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+    <clipPath id="jufclip"><rect x="236" y="58" width="78" height="64" rx="4"/></clipPath>
+  </defs>
+  <rect width="360" height="430" fill="url(#juwall)"/>
+  <rect y="322" width="360" height="108" fill="var(--floor1)"/>
+  <g stroke="var(--floor2)" stroke-width="3">${[340,362,384,406].map(y=>`<line x1="0" y1="${y}" x2="360" y2="${y}"/>`).join("")}</g>
+  <rect y="316" width="360" height="8" fill="var(--floor2)"/>
+  <ellipse cx="180" cy="380" rx="120" ry="26" fill="var(--rug)" opacity=".85"/>
+  <g data-obj="window" tabindex="0" role="button" aria-label="Window: both your times and the distance">
+    <rect class="hit" x="34" y="34" width="112" height="112" rx="14" fill="#fff6ea" stroke="${E}" stroke-width="4"/>
+    <rect x="44" y="44" width="92" height="92" rx="8" fill="url(#jusky)"/>${stars}${orb}
+    <line x1="90" y1="44" x2="90" y2="136" stroke="#fff6ea" stroke-width="5"/><line x1="44" y1="90" x2="136" y2="90" stroke="#fff6ea" stroke-width="5"/>
+    <path d="M34 40 q-8 50 4 104" fill="none" stroke="#e98f8f" stroke-width="10" stroke-linecap="round" opacity=".8"/>
+  </g>
+  <g data-obj="frame" tabindex="0" role="button" aria-label="Picture frame: memories">
+    <rect class="hit" x="226" y="48" width="98" height="84" rx="10" fill="#c98a55" stroke="${E}" stroke-width="4"/>
+    <rect x="236" y="58" width="78" height="64" rx="4" fill="#fff"/>${img}
+  </g>
+  <g data-obj="calendar" tabindex="0" role="button" aria-label="Calendar: ${vd==null?"add a visit":vd+" days until your visit"} and your special dates">
+    <rect class="hit" x="40" y="176" width="88" height="90" rx="12" fill="#fff8ec" stroke="${E}" stroke-width="4"/>
+    <path d="M40 188 a12 12 0 0 1 12 -12 h64 a12 12 0 0 1 12 12 v12 h-88z" fill="#e2557c" stroke="${E}" stroke-width="4"/>
+    ${[60,84,108].map(x=>`<rect x="${x-3}" y="168" width="6" height="16" rx="3" fill="#fff" stroke="${E}" stroke-width="2.5"/>`).join("")}
+    <text x="84" y="240" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="34" fill="#3a2430">${vd==null?"+":vd}</text>
+    <text x="84" y="257" text-anchor="middle" font-family="DM Sans, sans-serif" font-weight="700" font-size="11" fill="#8a6070">${vd==null?"ADD A VISIT":"DAYS TO VISIT"}</text>
+  </g>
+  <rect x="200" y="262" width="140" height="10" rx="4" fill="var(--shelf)" stroke="${E}" stroke-width="3"/>
+  <g data-obj="letters" tabindex="0" role="button" aria-label="Letterbox: love letters${unread?", "+unread+" unopened":""}">
+    <rect class="hit" x="206" y="214" width="56" height="48" rx="8" fill="#b9733f" stroke="${E}" stroke-width="3.5"/>
+    <path d="M214 214 l20 -18 l26 6 l-6 24 z" fill="#fffaf0" stroke="${E}" stroke-width="3"/>
+    <path d="M220 210 l16 8 l18 -4" fill="none" stroke="#e2557c" stroke-width="2.5"/>
+    <rect x="212" y="232" width="44" height="22" rx="4" fill="#a3622f"/>
+    ${unread?`<circle cx="258" cy="212" r="11" fill="#e2557c" stroke="#fff" stroke-width="3"/><text x="258" y="216.5" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="12" fill="#fff">${unread}</text>`:""}
+  </g>
+  <g data-obj="jar" tabindex="0" role="button" aria-label="Jar of love notes, ${US.jar.length} notes">
+    <rect x="270" y="206" width="38" height="10" rx="4" fill="#e98f8f" stroke="${E}" stroke-width="3"/>
+    <path class="hit" d="M266 218 h46 v34 a10 10 0 0 1 -10 10 h-26 a10 10 0 0 1 -10 -10z" fill="rgba(255,255,255,.55)" stroke="${E}" stroke-width="3.5"/>${jar}
+    <path d="M272 224 v22" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+  </g>
+  <g data-obj="candle" tabindex="0" role="button" aria-label="Prayer candle: ${prayed?"you prayed tonight":"not lit yet tonight"}">
+    ${prayed?`<circle class="glow" cx="168" cy="262" r="46" fill="url(#jucglow)"/>`:""}
+    <rect x="136" y="300" width="64" height="12" rx="4" fill="#8b5a36" stroke="${E}" stroke-width="3"/>
+    <rect x="146" y="312" width="8" height="20" fill="#8b5a36" stroke="${E}" stroke-width="2.5"/><rect x="182" y="312" width="8" height="20" fill="#8b5a36" stroke="${E}" stroke-width="2.5"/>
+    <rect class="hit" x="156" y="258" width="24" height="42" rx="5" fill="#fff4dc" stroke="${E}" stroke-width="3.5"/>
+    <line x1="168" y1="258" x2="168" y2="250" stroke="${E}" stroke-width="2.5"/>
+    ${prayed?`<path class="flame" d="M168 230 c7 9 9 14 0 22 c-9 -8 -7 -13 0 -22z" fill="#ffb238" stroke="#e2557c" stroke-width="1.5"/>`:""}
+  </g>
+  <g data-obj="plant" tabindex="0" role="button" aria-label="Plant: grows with your prayer streak of ${st} nights">
+    <g class="sway">${leaves.map(([x,y,r],i)=>`<ellipse cx="${292+x}" cy="${292+y}" rx="9" ry="20" transform="rotate(${r} ${292+x} ${292+y+14})" fill="${i%2?"#4f9a52":"#3f8a4f"}" stroke="${E}" stroke-width="2.5"/>`).join("")}
+    ${stage===3?`<circle cx="276" cy="250" r="6" fill="#ff8fab" stroke="${E}" stroke-width="2"/><circle cx="310" cy="256" r="6" fill="#ffd27a" stroke="${E}" stroke-width="2"/>`:""}
+    ${stage===0?`<path d="M292 292 q-2 -10 4 -16" fill="none" stroke="#3f8a4f" stroke-width="4" stroke-linecap="round"/>`:""}</g>
+    <path class="hit" d="M268 290 h48 l-6 40 h-36z" fill="#d9734f" stroke="${E}" stroke-width="3.5"/>
+    <rect x="264" y="286" width="56" height="10" rx="4" fill="#e48a62" stroke="${E}" stroke-width="3"/>
+  </g>
+</svg>`;
+}
+const OBJ={window:windowSheet,frame:memoriesSheet,calendar:datesSheet,letters:lettersSheet,jar:jarSheet,plant:gardenSheet,
+  candle:()=>{const p=el("prayerPanel");if(p){p.scrollIntoView({behavior:RM?"auto":"smooth",block:"center"});p.animate&&p.animate([{boxShadow:"0 0 0 0 rgba(242,184,75,.9)"},{boxShadow:"0 0 0 14px rgba(242,184,75,0)"}],{duration:1200})}}};
+
+/* ---------- the Us tab ---------- */
+function usSeenNudge(){try{return +localStorage.getItem("ourdays-seen-nudge")||0}catch(e){return 0}}
+function setSeenNudge(){try{localStorage.setItem("ourdays-seen-nudge",String(Date.now()))}catch(e){}}
+function viewUs(){
+  const o=P(partnerOf(ME)),out=[];
+  if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
+  const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
+  out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
+    h("button",{type:"button",class:"jpill tap",onclick:datesSheet},svgEl(ICON.plane("#e2557c")),v?h("span",{class:"mono",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},""):"Add a visit"),
+    h("button",{type:"button",class:"jpill tap",onclick:OBJ.candle,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
+    h("button",{type:"button",class:"jpill tap",onclick:datesSheet},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
+  const room=h("div",{class:"room"});room.innerHTML=roomSVG();room.appendChild(h("span",{class:"roomcap"},"Tap anything in your room"));
+  room.querySelectorAll("[data-obj]").forEach(g=>{const go=()=>OBJ[g.dataset.obj]();g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
+  const top=h("div",{class:"ju"},room);
+  const got=US.nudges.find(n=>n.from===PARTNER);
+  const heartBtn=h("button",{type:"button",class:"bigbtn heart tap","aria-label":"Send thinking of you"},svgEl(HEART.replace("currentColor","#fff")),"Thinking of you");
+  heartBtn.onclick=()=>{addTo("nudges",{from:ME,at:Date.now()});saveUs({counts:{hearts:INC(1)}});setSeenNudge();hearts(heartBtn);toast("Sent to "+nm(PARTNER),nm(PARTNER)+" gets: "+nm(ME)+" is thinking of you")};
+  if(got&&got.at>usSeenNudge()&&Date.now()-got.at<2*864e5)top.appendChild(h("button",{type:"button",class:"got tap",onclick:()=>heartBtn.click()},svgEl(HEART),h("div",null,h("b",null,nm(PARTNER)+" is thinking of you"),h("span",null,ago(got.at)+" · tap to send one back"))));
+  top.appendChild(h("div",{class:"actions"},heartBtn,h("button",{type:"button",class:"bigbtn doodle tap",onclick:doodleSheet},svgEl(ICON.spark("#5b3b8c")),"Doodle")));
+  out.push(top);
+
+  const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
+  const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
+  const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
+  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
+    h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
+    h("button",{type:"button",class:"pc tap",style:"--c:#1f7f78",onclick:photoSheet},h("span",{class:"k"},"Photo of the day"),h("span",{class:"tx"},dailyPrompt(k)),h("div",{class:"foot"},av(x=>ph[x]),h("span",{class:"go"},stat(ph[w],ph[oo],"See photos","Share")))),
+    h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},"5 quick picks. How many match?"),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
+
+  out.push(...usPartner());
+  out.push(usPrayer());
+
+  out.push(h("section",{class:"ju"},h("h2",null,"Play together"),h("p",{class:"hint"},"Five quick rounds each. Picks stay hidden until you both play."),
+    h("div",{class:"topics"},GAMES.map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
+      return h("button",{type:"button",class:"topic tap",style:"--c:"+g.c,onclick:()=>gameSheet(g)},svgEl(ICON[g.icon](g.c)),h("div",{class:"tx"},h("b",null,g.name),h("small",{class:"sub"},a&&b?"See your matches":a?"Waiting for "+nm(oo):b?nm(oo)+" played. Your turn":g.items.length+" rounds to play")))}))));
+
+  const A=ANS();
+  out.push(h("section",{class:"ju"},h("div",{class:"row",style:"justify-content:space-between"},h("h2",null,"Ask each other"),h("button",{type:"button",class:"lnk",onclick:topicsSettingsSheet},"Choose topics")),
+    h("p",{class:"hint"},enabledTopics().reduce((a,t)=>a+t.qs.length,0)+" questions in "+enabledTopics().length+" topics. Answer at your own pace."),
+    h("div",{class:"topics"},enabledTopics().map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
+      return h("button",{type:"button",class:"topic tap",style:"--c:"+t.c,onclick:()=>topicSheet(t)},svgEl(ICON[t.icon](t.c)),h("div",{class:"tx"},h("b",null,t.name),wt?h("small",{class:"sub"},nm(oo)+" answered "+wt+". Your turn"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"})),h("small",null,pc+"%"))))}))));
+
+  out.push(usPlans());
+
+  const allQ=Object.keys(A).filter(bothAnswered).length,cn=US.main.counts||{};
+  const S6=[["Days together",days==null?"–":days.toLocaleString(),"#e2557c","heart"],["Questions answered",allQ,"#b9661c","chat"],["Nights prayed",Object.keys(S.shared.prayer.log||{}).length,"#5b3b8c","moon"],
+    ["Memories",cn.moments||US.moments.length,"#1f7f78","camera"],["Hearts sent",cn.hearts||0,"#c0398a","heart"],["Love letters",US.letters.length,"#2d6fb8","mail"]];
+  out.push(h("section",{class:"ju"},h("h2",null,"Us in numbers"),h("div",{class:"stats"},S6.map(([l,v2,c,ic])=>h("div",{class:"stat",style:"--c:"+c},svgEl(ICON[ic](c)),h("b",null,String(v2)),h("span",null,l))))));
+  setTimeout(usTick,0);
   return out;
 }
+function usTick(){const e=el("vpill");if(!e||!P(ME))return;let s=visitLeft({date:e.dataset.date,time:e.dataset.time});const d=Math.floor(s/86400);s-=d*86400;const hh=Math.floor(s/3600);s-=hh*3600;const mm=Math.floor(s/60);
+  e.textContent=d+"d "+pad(hh)+":"+pad(mm)+":"+pad(s-mm*60)}
+setInterval(usTick,1000);
 
 /* ---------- settings ---------- */
 const VAPID_PUBLIC="BMUJsWU9rc_xiWa16ujIUeNcvlDAot-lPoFYKX3hVAjALmPRWXrAgNU8OvTkbmKEdpuBKVUbeOGlO63qk_Gqv24";
@@ -1169,9 +1665,9 @@ function settingsSheet(){
   const sp=h("input",{type:"checkbox",checked:p.settings.shareProjects,onchange:()=>{p.settings.shareProjects=sp.checked;persist()}});
   body.append(h("div",{class:"lbl"},"Sharing"),h("label",{class:"check"},sp,"Let "+o.name+" see my projects"),h("p",{class:"hint"},o.name+" always sees your schedule, tasks and habits. Only you can change them."));
   body.appendChild(h("div",{class:"lbl"},"Notifications"));
-  const rows=[["morning","Morning plan","morningAt","Your day, top 3 and closest countdown"],["evening","Plan tomorrow","eveningAt","Pick tomorrow's top 3"],["countdown","Countdown alerts",null,"30, 14, 7, 3 and 1 day before, plus checkpoints"],["meeting","Before meetings",null,"10 minutes before, with the agenda"],["prayer","Prayer reminder","prayerAt","Gentle nudge if you haven't prayed yet"]];
+  const rows=[["morning","Morning plan","morningAt","Your day, top 3 and closest countdown"],["evening","Plan tomorrow","eveningAt","Pick tomorrow's top 3"],["countdown","Countdown alerts",null,"30, 14, 7, 3 and 1 day before, plus checkpoints"],["meeting","Before meetings",null,"10 minutes before, with the agenda"],["prayer","Prayer reminder","prayerAt","Gentle nudge if you haven't prayed yet"],["partner","From "+o.name,null,"Hearts, letters, photos, answers and games"]];
   rows.forEach(([k,label,tk,desc])=>{
-    const cb=h("input",{type:"checkbox",checked:nf[k],onchange:()=>{nf[k]=cb.checked;persist()}});
+    const cb=h("input",{type:"checkbox",checked:nf[k]===undefined?NOTIF[k]:nf[k],onchange:()=>{nf[k]=cb.checked;persist()}});
     const ti=tk?h("input",{type:"time",class:"inp",value:nf[tk],"aria-label":label+" time",onchange:()=>{nf[tk]=ti.value;persist()}}):null;
     body.appendChild(h("div",{class:"setrow"},h("label",{class:"check",style:"flex:1"},cb,h("span",null,label,h("br"),h("small",{style:"color:var(--muted);font-size:14px"},desc))),ti));
   });
@@ -1230,6 +1726,7 @@ setInterval(()=>{if(S.timer)renderTimer()},1000);
 /* ---------- shell ---------- */
 function go(tab){S.tab=tab;persist();render();window.scrollTo({top:0})}
 function render(){
+  if(S.tab==="us"&&S.viewAs!==ME)S.viewAs=ME;
   const pid=me(),p=P(pid),o=P(partnerOf(pid)),n=tzNow(p.tz);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.as===pid)));
   document.querySelectorAll(".tabbar button").forEach(b=>{if(b.dataset.tab===S.tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
@@ -1245,7 +1742,7 @@ function render(){
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
     sl.appendChild(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
-      onclick:()=>{if(ph||S.viewAs===id)return;S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
+      onclick:()=>{if(ph||S.viewAs===id)return;if(S.tab==="us"&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
       h("i",null,(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")))});
   const th=S.theme||"system";if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
   const main=el("main");main.innerHTML="";

@@ -172,6 +172,28 @@ async function fetchCalendar(urls, tz) {
 const shortUrl = u => u.replace(/^https?:\/\//, "").slice(0, 40) + "…";
 function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
 
+/* ---------- things one of you sent the other (Us tab) ---------- */
+async function socialEvents(db, cid, members, people, now) {
+  const lo = now - LOOKBACK_MIN * 60000, out = [];
+  const other = u => members.find(x => x !== u);
+  const name = u => (people[u] && people[u].name) || "Your partner";
+  const recent = async n => (await db.collection(`couples/${cid}/${n}`).where("at", ">", lo).get()).docs.map(d => ({ id: d.id, ...d.data() }));
+  for (const n of await recent("nudges")) if (other(n.from)) out.push({ to: other(n.from), key: "nudge:" + n.id, at: n.at, title: name(n.from) + " is thinking of you", body: "Open Our Days to send a heart back." });
+  for (const l of await recent("letters")) if (l.to) out.push({ to: l.to, key: "letter:" + l.id, at: l.at, title: "A letter from " + name(l.from), body: l.openWhen ? "Open when " + l.openWhen : "It's waiting in your letterbox." });
+  for (const m of await recent("moments")) if (other(m.from)) out.push({ to: other(m.from), key: "moment:" + m.id, at: m.at,
+    title: m.kind === "doodle" ? name(m.from) + " sent you a doodle" : m.kind === "daily" ? name(m.from) + " shared today's photo" : name(m.from) + " shared a moment",
+    body: m.kind === "daily" ? "Share yours to see it." : "It's in the frame in your room." });
+  for (const j of await recent("jar")) if (other(j.from)) out.push({ to: other(j.from), key: "jar:" + j.id, at: j.at, title: name(j.from) + " added a note to your jar", body: "Pull it out whenever you need it." });
+  const us = (await db.doc(`couples/${cid}/us/main`).get()).data() || {};
+  for (const [id, a] of Object.entries(us.answers || {})) for (const [u, v] of Object.entries(a || {})) {
+    const o = other(u); if (!o || !v || !(v.at > lo)) continue;
+    const both = !!a[o];
+    out.push({ to: o, key: "ans:" + id + ":" + u, at: v.at, title: both ? "Answers unlocked" : name(u) + " answered " + (id.startsWith("d:") ? "today's question" : "a question"),
+      body: both ? "You both answered. See what " + name(u) + " said." : "Answer too and you'll both see each other's." });
+  }
+  return out;
+}
+
 /* ---------- main ---------- */
 async function main() {
   const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || "{}");
@@ -189,6 +211,8 @@ async function main() {
     const shared = sharedSnap.exists ? sharedSnap.data() : {};
     const people = {};
     for (const uid of members) { const s = await db.doc(`couples/${cid}/people/${uid}`).get(); if (s.exists) people[uid] = s.data(); }
+    let social = [];
+    try { social = await socialEvents(db, cid, members, people, now); } catch (e) { console.warn("us events", e.message); }
     for (const uid of members) {
       const person = people[uid]; if (!person) continue;
       const tz = validTz(person.tz) ? person.tz : "America/Chicago";
@@ -216,6 +240,7 @@ async function main() {
       const days = {};
       for (const k of [addDays(today, -1), today, addDays(today, 1)]) { const s = await db.doc(`couples/${cid}/people/${uid}/days/${k}`).get(); if (s.exists) days[k] = s.data(); }
       const due = dueNotifications({ now, uid, person, partner, days, shared, cal });
+      if (((person.settings && person.settings.notif) || {}).partner !== false) due.push(...social.filter(n => n.to === uid));
       if (user.testPushAt && now - user.testPushAt < 60 * 60000) due.push({ key: "test:" + user.testPushAt, at: now, title: "Our Days", body: "Notifications are working on this device." });
       const logRef = db.doc(`users/${uid}/private/notifyLog`);
       const log = ((await logRef.get()).data() || {}).sent || {};
@@ -237,5 +262,5 @@ async function main() {
   console.log("done, notifications sent:", sent);
 }
 
-module.exports = { dueNotifications, fetchCalendar, wallToMs, parts };
+module.exports = { socialEvents, dueNotifications, fetchCalendar, wallToMs, parts };
 if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });

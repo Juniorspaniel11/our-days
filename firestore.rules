@@ -43,6 +43,20 @@ service cloud.firestore {
       match /shared/{doc} {
         allow read, write: if isMember(cid);
       }
+
+      // Us tab: dates, answers, games and topic choices. Both can read and change
+      match /us/{doc} {
+        allow read, write: if isMember(cid);
+      }
+      // Photos, doodles, jar notes and hearts: both can read, you can only add as yourself and delete your own
+      match /{col}/{id} {
+        allow read: if isMember(cid) && col in ['moments', 'jar', 'nudges', 'letters'];
+        allow create: if isMember(cid) && col in ['moments', 'jar', 'nudges', 'letters'] && request.resource.data.from == request.auth.uid;
+        allow delete: if isMember(cid) && col in ['moments', 'jar', 'nudges', 'letters'] && resource.data.from == request.auth.uid;
+        // the person a letter is for can mark it opened
+        allow update: if isMember(cid) && col == 'letters' && resource.data.to == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['openedAt']);
+      }
     }
   }
 }
