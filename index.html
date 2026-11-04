@@ -56,7 +56,9 @@ main.wrap>*,section{min-width:0}
 .seg button{border:0;background:none;padding:3px 14px;cursor:pointer;font-size:13px}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
 .pv .reset{margin-left:auto;background:none;border:0;text-decoration:underline;color:var(--muted);cursor:pointer;font-size:13px}
-header{display:flex;align-items:center;gap:16px}
+header{display:flex;align-items:center;gap:16px;position:relative}
+header .gear{position:absolute;top:0;right:0}
+header .eyebrow,header h1{padding-right:96px}
 .avatar{flex:none;width:96px;height:96px;border-radius:50%;padding:3px;cursor:pointer;border:0;
   background:conic-gradient(from 210deg,var(--accent),var(--calm),var(--accent));box-shadow:var(--shadow)}
 .avatar span,.avatar img{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;object-fit:cover;
@@ -470,7 +472,7 @@ body.tab-us #avatar{display:none}
 .ju .hside{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;min-width:0}
 .ju .hpic{position:relative;width:76px;height:76px;margin-bottom:4px}
 .ju .hpic>img,.ju .hpic>span{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--c);display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,var(--card));color:var(--c);font-family:var(--fun);font-weight:700;font-size:30px}
-.ju .hpic .pfile{left:0;top:0;width:76px;height:76px}.ju .hpic .padd{top:52px}.ju .hpic .odot{top:54px;right:2px}
+.ju .hpic .pfile{left:0;top:0;width:76px;height:76px}.ju .hpic .padd{top:52px}.ju .hpic .odot{top:2px;right:2px}
 .ju .hname{font-family:var(--fun);font-weight:700;font-size:20px;line-height:1.1;overflow-wrap:anywhere}
 .ju .hloc{font-size:12.5px;color:var(--muted);font-weight:600}
 .ju .hpres{font-size:12px;font-weight:700;color:var(--muted)}.ju .hpres.on{color:#1f9d55}.ju .hpres.me{color:#8b6ad1;font-weight:600}
@@ -502,6 +504,19 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .hsp .hse{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;flex:none}
 .hsp .hst{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
 .hsp .hsedit{color:#8b6ad1;flex:none}.hsp-pres{flex:none;color:var(--muted);font-weight:600;font-size:12px}.hsp-pres.on{color:#1f9d55}
+.tzs{flex-direction:column;align-items:stretch}
+@media (max-width:480px){.avatar{width:72px;height:72px}.avatar span,.avatar img{font-size:28px}header{gap:12px}}
+.tzrow .tz{gap:4px;padding:2px 8px 2px 2px;font-size:12px}.tzrow .tz b{font-size:12.5px}
+.tzst,.tzst .t{font-family:"DM Sans","Segoe UI",system-ui,sans-serif!important;letter-spacing:0}
+.tzrow{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;overflow:hidden}
+.tzrow .tz{flex:none}
+.tzon{width:10px;height:10px;border-radius:50%;background:#b3adbf;flex:none}
+.tzon.on{background:#2fbf71;box-shadow:0 0 0 3px rgba(47,191,113,.22)}
+@media (prefers-reduced-motion:no-preference){.tzon.on{animation:jupulse 2s infinite}}
+.tzst{flex:1 1 0;overflow:hidden;font-family:var(--body);display:flex;align-items:center;gap:4px;min-width:0;background:none;border:0;padding:0;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
+.tzst .e{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;flex:none}
+.tzst .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tzst .ed{color:#8b6ad1;flex:none}
 .ju .sechd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .ju .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ju .hscroll::-webkit-scrollbar{display:none}
@@ -1813,7 +1828,7 @@ function presenceBeat(state){if(!DB||!CID||!ME)return;DB.doc("couples/"+CID+"/pe
 setInterval(()=>{if(!document.hidden)presenceBeat("online")},60000);
 document.addEventListener("visibilitychange",()=>presenceBeat(document.hidden?"away":"online"));
 addEventListener("pagehide",()=>presenceBeat("away"));
-function presenceOf(u){const p=P(u)&&P(u).presence;if(!p||!p.at)return {on:false,text:""};
+function presenceOf(u){if(u===ME)return {on:!document.hidden,text:"Online now"};const p=P(u)&&P(u).presence;if(!p||!p.at)return {on:false,text:""};
   const age=Date.now()-p.at;if(p.state==="online"&&age<150000)return {on:true,text:"Online now"};
   const m=Math.round(age/60000);return {on:false,text:m<1?"Active just now":m<60?"Active "+m+" min ago":m<1440?"Active "+Math.round(m/60)+" h ago":m<2880?"Active yesterday":"Active "+Math.round(m/1440)+" days ago"}}
 
@@ -2355,13 +2370,13 @@ function viewUs(){
 }
 /* ---------- Us hero: you | countdown | partner ---------- */
 function heroSide(u){
-  const x=P(u),me=u===ME,c=me?"#8b6ad1":"#e2557c",ph=x&&x.avatar,pr=me?null:presenceOf(u),st=statusOf(u),n=tzNow(x.tz);
+  const x=P(u),me=u===ME,c=me?"#8b6ad1":"#e2557c",ph=x&&x.avatar,pr=presenceOf(u),st=statusOf(u),n=tzNow(x.tz);
   const pic=h("div",{class:"hpic",style:"--c:"+c},ph?h("img",{src:ph,alt:""}):h("span",null,(nm(u)[0]||"?")),
-    !me&&pr.on?h("i",{class:"odot","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
+    pr.on?h("i",{class:"odot","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
   if(me){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};pic.appendChild(f)}
   const stEl=h(me?"button":"div",{type:me?"button":null,class:"hstatus"+(me?" tap":""),onclick:me?statusSheet:null,"aria-label":me?"Set your status":null},emo(st.e,18,false),h("span",null,st.t),me?h("span",{class:"hedit","aria-hidden":"true"},"✎"):null);
   return h("div",{class:"hside"},pic,h("b",{class:"hname"},nm(u)),h("small",{class:"hloc"},x.city||""),h("small",{class:"htime"},fmt(n.min)),
-    !me?h("small",{class:"hpres"+(pr.on?" on":"")},pr.on?"● Online now":pr.text||"Offline"):null,stEl);
+    h("small",{class:"hpres"+(pr.on?" on":"")},pr.on?"● Online now":pr.text||"Offline"),stEl);
 }
 function coupleStrip(){
   const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
@@ -2507,17 +2522,18 @@ function render(){
   const sl=el("subline");sl.innerHTML="";
   const pidP=partnerOf(ME);
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
-    sl.appendChild(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
+    const chip=(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
       onclick:()=>{if(ph||S.viewAs===id)return;if(S.tab==="us"&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
-      h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")))});
-  let statusBar=null;
-  if(S.tab!=="us"&&P(pidP)&&!P(pidP).placeholder){const ms=statusOf(ME),ps=statusOf(pidP),pr=presenceOf(pidP);
-    statusBar=(h("div",{class:"hstat"},
-      h("button",{type:"button",class:"hsp mine",onclick:statusSheet,"aria-label":"Your status, tap to change"},h("i",null,(P(ME).name||"?")[0]),h("span",{class:"hse"},ms.e),h("span",{class:"hst"},ms.t),h("span",{class:"hsedit","aria-hidden":"true"},"✎")),
-      h("div",{class:"hsp"},h("i",{class:pr.on?"on":""},(P(pidP).name||"?")[0]),h("span",{class:"hse"},ps.e),h("span",{class:"hst"},ps.t),h("small",{class:"hsp-pres"+(pr.on?" on":"")},pr.on?"Online":(pr.text||"Offline").replace("Active ","")))))}
+      h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")));
+    const row=h("div",{class:"tzrow"},chip);
+    if(!ph&&S.tab!=="us"&&P(pidP)&&!P(pidP).placeholder){const st=statusOf(id),pr=presenceOf(id);
+      row.appendChild(h("span",{class:"tzon"+(pr.on?" on":""),title:pr.on?"Online":pr.text||"Offline","aria-label":pr.on?"Online":pr.text||"Offline"}));
+      row.appendChild(id===ME?h("button",{type:"button",class:"tzst mine",onclick:statusSheet,"aria-label":"Your status: "+st.t+". Tap to change",title:st.t},h("span",{class:"e"},st.e),h("span",{class:"t"},st.t),h("span",{class:"ed"},"✎"))
+        :h("button",{type:"button",class:"tzst",onclick:()=>toast(nm(id)+(pr.on?" is online":" · "+(pr.text||"offline")),st.e+" "+st.t),title:st.t},h("span",{class:"e"},st.e),h("span",{class:"t"},st.t)))}
+    sl.appendChild(row)});
   const th=S.theme||"system";if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
-  const main=el("main");main.innerHTML="";if(statusBar)main.appendChild(statusBar);
+  const main=el("main");main.innerHTML="";
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
     h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
   const v={today:viewToday,week:viewWeek,projects:viewProjects,us:viewUs}[S.tab]();
@@ -2531,7 +2547,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-b";
+const APP_VERSION="2026-11-04-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
