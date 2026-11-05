@@ -194,29 +194,30 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .streak{color:var(--accent);font-weight:600}
 
 /* projects */
-.papers .plist{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-.paper{border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--accent) 4%,var(--card))}
-.paper .ptop{display:flex;gap:12px;align-items:center}.paper .ptx{min-width:0;display:flex;flex-direction:column}.paper .ptx b{font-size:17px;line-height:1.25;overflow-wrap:anywhere}
-.pmeta{font-size:14px;color:var(--muted)}
+.papers .plist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.paper{border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--accent) 4%,var(--card))}
+.paper .ptop{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}.paper .ptx{flex:1}.pcaret{color:var(--muted);font-size:14px}.paper .pchip{margin-right:6px;padding:1px 8px;font-size:11.5px;vertical-align:1px}.paper .ptx{min-width:0;display:flex;flex-direction:column}.paper .ptx b{font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.pmeta{font-size:12.5px;color:var(--muted);margin-top:2px}
 .pbar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.pbar i{height:6px;border-radius:3px;background:var(--line)}.pbar i.on{background:color-mix(in srgb,var(--accent) 55%,var(--card))}.pbar i.cur{background:var(--accent)}
-.pstep{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;align-items:center;position:relative}
+.pstep{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;align-items:center;position:relative}
 .pstep::before{content:"";position:absolute;left:6%;right:6%;top:50%;height:3px;background:var(--line);border-radius:2px;z-index:0}
-.pst{position:relative;z-index:1;justify-self:center;width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;padding:0;cursor:pointer;filter:grayscale(1);opacity:.55;transition:transform .15s}
+.pst{position:relative;z-index:1;justify-self:center;width:31px;height:31px;border-radius:50%;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;padding:0;cursor:pointer;filter:grayscale(1);opacity:.55;transition:transform .15s}
 .pst.on{filter:none;opacity:.85;border-color:color-mix(in srgb,var(--accent) 45%,var(--card))}
-.pst.cur{filter:none;opacity:1;width:44px;height:44px;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+.pst.cur{filter:none;opacity:1;width:38px;height:38px;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
 .pst:not(:disabled):active{transform:scale(.9)}.pst:disabled{cursor:default}.pst img,.pst span{pointer-events:none}
 .parr{border:1px solid var(--line);background:var(--card);color:var(--ink);width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;padding:0}
 .prow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.pchip{background:var(--accent);color:#fff;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700}
 .pwhen{font-size:14px;color:var(--muted);font-weight:600}.pwhen.hot{color:var(--accent)}
 .pnext{font-size:15px}.pnext .lbl{margin-right:6px}
 .psum{display:flex;flex-direction:column;gap:8px}.psum>b{font-size:20px}
-.pcounts{display:flex;flex-wrap:wrap;gap:6px}.pc1{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 6px;font-size:14px;background:var(--card)}
+.pcounts{display:flex;flex-wrap:wrap;gap:6px}.pc1{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 5px;font-size:12.5px;background:var(--card)}
 .pedit{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:10px}
 .pubhead{display:flex;align-items:center;gap:8px;width:100%;margin-top:14px;padding:10px 0 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer;text-align:left}.pubhead b{flex:1}.pubhead span{color:var(--accent);font-weight:600;font-size:14px}
 .publist{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px}.publist li b{display:block}.publist li span{display:block;font-size:14px;color:var(--muted)}
 .projs{display:flex;flex-direction:column;gap:10px}
-.pj{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--pc);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-.pj.focus{box-shadow:0 0 0 2px color-mix(in srgb,var(--pc) 30%,transparent)}
+.pj{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 12px 10px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.pjband{margin:0 -12px 2px;padding:9px 12px;background:var(--pc);color:#fff}.pjband .pjp{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45);color:#fff}.pjband .pjp[aria-pressed="true"]{background:#fff;border-color:#fff;color:var(--pc)}
+.pj.focus{box-shadow:0 0 0 2px color-mix(in srgb,var(--pc) 35%,transparent)}
 .pjtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.pjtop b{flex:1 1 140px;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
 .pjp{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .pjp[aria-pressed="true"]{background:var(--pc);border-color:var(--pc);color:#fff}
@@ -1408,7 +1409,6 @@ function viewProjects(){
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
     papersSection(pid),
-    panel("Focus time this week",sum),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
       list)
   ];
@@ -1435,16 +1435,16 @@ function setStage(pid,x,st){if(x.stage===st)return;const p=P(pid),k=tzNow(p.tz).
 function paperCard(pid,x){
   const p=P(pid),k=tzNow(p.tz).key,s=pstage(x.stage),i=pidx(x.stage),nx=PSTAGES[i+1],w=paperWhen(x,k),fid="p:"+x.id,edit=ui.paperEdit===x.id;
   const ro=pid!==ME,pv=PSTAGES[i-1];
-  const bar=h("div",{class:"pstep",role:"group","aria-label":"Stage"},PSTAGES.map((z,j)=>h("button",{type:"button",class:"pst"+(j<i?" on":j===i?" cur":""),disabled:ro,"aria-pressed":String(j===i),"aria-label":z[1],title:z[1],onclick:()=>setStage(pid,x,z[0])},emo(z[2],j===i?26:20,false))));
-  const c=h("div",{class:"paper"},
-    h("div",{class:"ptop"},emo(s[2],40,false),h("div",{class:"ptx"},h("b",null,x.title||"Untitled paper"),
-      h("span",{class:"pmeta"},[x.journal||"Journal not chosen yet",x.role==="co"?"Coauthor":"First author"].join(" · ")))),
-    bar,
-    h("div",{class:"prow"},!ro&&pv?h("button",{type:"button",class:"parr","aria-label":"Back to "+pv[1],onclick:()=>setStage(pid,x,pv[0])},"‹"):null,h("span",{class:"pchip"},s[1]),!ro&&nx?h("button",{type:"button",class:"parr","aria-label":"On to "+nx[1],onclick:()=>setStage(pid,x,nx[0])},"›"):null,w?h("span",{class:"pwhen"+(w.hot?" hot":"")},w.t):null),
-    x.next?h("div",{class:"pnext"},h("span",{class:"lbl"},"Next"),x.next):null,
-    h("div",{class:"row"},
+  const bar=h("div",{class:"pstep",role:"group","aria-label":"Stage"},PSTAGES.map((z,j)=>h("button",{type:"button",class:"pst"+(j<i?" on":j===i?" cur":""),disabled:ro,"aria-pressed":String(j===i),"aria-label":z[1],title:z[1],onclick:()=>setStage(pid,x,z[0])},emo(z[2],j===i?22:17,false))));
+  const open=edit||ui.paperOpen===x.id;
+  const c=h("div",{class:"paper"+(open?" open":"")},
+    h("button",{type:"button",class:"ptop","aria-expanded":String(open),onclick:()=>{ui.paperOpen=open?null:x.id;if(open)ui.paperEdit=null;render()}},emo(s[2],30,false),h("div",{class:"ptx"},h("b",null,x.title||"Untitled paper"),
+      h("span",{class:"pmeta"},h("span",{class:"pchip"},s[1]),[w?w.t.replace(/^(Under review|Submitted) · /,""):"",x.journal,x.role==="co"?"Coauthor":"First author"].filter(Boolean).join(" · "))),h("span",{class:"pcaret"},open?"▴":"▾")));
+  if(open){c.appendChild(bar);
+    if(x.next)c.appendChild(h("div",{class:"pnext"},h("span",{class:"lbl"},"Next"),x.next));
+    c.appendChild(h("div",{class:"row"},
       pid===ME?focusBtn(fid,x.title||"Paper",focusMins(pid,fid)):null,
-      h("button",{type:"button",class:"link",onclick:()=>{ui.paperEdit=edit?null:x.id;render()}},edit?"Close":"Edit")));
+      h("button",{type:"button",class:"link",onclick:()=>{ui.paperEdit=edit?null:x.id;render()}},edit?"Close edit":"Edit")))}
   if(edit){
     const ti=h("input",{type:"text",class:"inp",value:x.title||"",placeholder:"Working title"}),jo=h("input",{type:"text",class:"inp",value:x.journal||"",placeholder:"e.g. Biofabrication"});
     const ro=h("select",{class:"inp"},h("option",{value:"first"},"First author"),h("option",{value:"co"},"Coauthor"));ro.value=x.role||"first";
@@ -1471,10 +1471,10 @@ function papersSection(pid){
   const p=P(pid);p.papers=p.papers||[];
   const live=p.papers.filter(x=>x.stage!=="published"),pub=p.papers.filter(x=>x.stage==="published").sort((a,b)=>(b.year||"").localeCompare(a.year||""));
   const counts=PSTAGES.slice(0,7).map(s=>[s,live.filter(x=>x.stage===s[0]).length]).filter(z=>z[1]);
-  const summary=live.length?h("div",{class:"psum"},h("b",null,live.length+" in the pipeline"),h("div",{class:"pcounts"},counts.map(([s,n])=>h("span",{class:"pc1"},emo(s[2],20,false),n+" "+s[1].toLowerCase())))):
+  const summary=live.length?h("div",{class:"pcounts"},counts.map(([s,n])=>h("span",{class:"pc1"},emo(s[2],18,false),n+" "+s[1].toLowerCase()))):
     h("p",{class:"empty"},"Add the papers you're working on or planning, first author or coauthor, so you can watch them move toward published.");
-  const add=h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;persist();render()}},"Add paper");
-  const out=h("section",{class:"panel papers"},h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"),add),summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
+  const add=h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;ui.paperOpen=id;persist();render()}},"+ Add");
+  const out=h("section",{class:"panel papers"},h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add),summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
   if(pub.length){const op=!!ui.pubOpen;out.appendChild(h("button",{type:"button",class:"pubhead",onclick:()=>{ui.pubOpen=!op;render()}},emo("📰",22,false),h("b",null,"Published ("+pub.length+")"),h("span",null,op?"Hide":"Show")));
     if(op)out.appendChild(h("ol",{class:"publist"},pub.map(x=>h("li",null,h("b",null,x.title),h("span",null,[x.journal,x.role==="co"?"Coauthor":"First author",x.year].filter(Boolean).join(" · ")),
       h("button",{type:"button",class:"link",onclick:()=>setStage(pid,x,"accepted")},"Move back")))))}
@@ -1486,7 +1486,7 @@ function projectCard(pid,x){
   const meta=[];if(x.target){const d=daysBetween(n.key,x.target);meta.push(h("span",{class:d<=7?"soon":""},shortDate(x.target)+(d<0?" · "+(-d)+" days overdue":d===0?" · today":" · in "+d+" days")))}
   if(x.steps&&x.steps.length)meta.push(h("span",null,x.steps.length+" step"+(x.steps.length>1?"s":"")+" done"));
   const fm=focusMins(pid,fid);if(fm)meta.push(h("span",null,hmShort(fm)+" focused"));
-  c.appendChild(h("div",{class:"pjtop"},kwEmoji(x.title)?emo(kwEmoji(x.title),26,false):null,h("b",null,x.title),
+  c.appendChild(h("div",{class:"pjtop pjband"},kwEmoji(x.title)?emo(kwEmoji(x.title),26,false):null,h("b",null,x.title),
     h("button",{type:"button",class:"pjp","aria-pressed":String(!!x.focus),title:"This week's focus",onclick:()=>{x.focus=!x.focus;persist();render()}},x.focus?"★ This week":"☆ This week"),
     h("button",{type:"button",class:"pjp","aria-pressed":String(!!x.pinned),title:"Show on Today",onclick:()=>{x.pinned=!x.pinned;if(x.pinned&&!x.since)x.since=n.key;persist();render()}},x.pinned?"📌 On Today":"Pin")));
   if(meta.length)c.appendChild(h("div",{class:"pjmeta"},meta.reduce((a,m,i)=>i?a.concat([" · ",m]):[m],[])));
@@ -2668,7 +2668,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-m";
+const APP_VERSION="2026-11-04-n";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
