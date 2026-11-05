@@ -212,6 +212,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .psum{display:flex;flex-direction:column;gap:8px}.psum>b{font-size:20px}
 .pcounts{display:flex;flex-wrap:wrap;gap:6px}.pc1{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 5px;font-size:12.5px;background:var(--card)}
 .pedit{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:10px}
+.pubrow{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.pubrow b{flex:1;font-size:16px}
 .pubhead{display:flex;align-items:center;gap:8px;width:100%;margin-top:14px;padding:10px 0 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer;text-align:left}.pubhead b{flex:1}.pubhead span{color:var(--accent);font-weight:600;font-size:14px}
 .publist{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px}.publist li b{display:block}.publist li span{display:block;font-size:14px;color:var(--muted)}
 .projs{display:flex;flex-direction:column;gap:10px}
@@ -832,10 +833,11 @@ const dayRef=(u,k)=>DB.doc("couples/"+CID+"/people/"+u+"/days/"+k);
 const extraRef=u=>DB.doc("couples/"+CID+"/people/"+u+"/extra/photo");
 const sharedRef=()=>DB.doc("couples/"+CID+"/shared/main");
 let syncT=null;
-function persist(){saveLocal();if(!ME||!CID)return;clearTimeout(syncT);syncT=setTimeout(flush,400)}
+let dirty=false;
+function persist(){saveLocal();if(!ME||!CID)return;dirty=true;clearTimeout(syncT);syncT=setTimeout(flush,400)}
 function hasContent(d){return d&&((d.tasks&&d.tasks.length)||(d.done&&d.done.length)||(d.skip&&d.skip.length)||(d.habits&&d.habits.length)||(d.checkin&&Object.keys(d.checkin).length))}
 function flush(){
-  if(!DB||!ME||!CID)return;const p=S.people[ME];if(!p||!p.loaded)return;
+  if(!DB||!ME||!CID)return;const p=S.people[ME];if(!p||!p.loaded)return;dirty=false;
   const cutoff=addDays(tzNow(p.tz).key,-120);
   if(p.focus)Object.keys(p.focus).forEach(k=>{if(k<cutoff)delete p.focus[k]});
   const {days,partner,photo,loaded,photoLoaded,daysLoaded,cal,...doc}=p;
@@ -865,6 +867,7 @@ function watchPerson(u,isMe){
   const list=isMe?unsubs:partnerUnsubs;
   list.push(personRef(u).onSnapshot(sn=>{
     if(sn.metadata.hasPendingWrites)return;
+    if(isMe&&dirty&&S.people[u]&&S.people[u].loaded)return;
     const cur=S.people[u]||{};
     if(!sn.exists){if(isMe&&cur)cur.loaded=true;return}
     const d=sn.data();
@@ -1430,7 +1433,7 @@ function setStage(pid,x,st){if(x.stage===st)return;const p=P(pid),k=tzNow(p.tz).
   if(st!=="accepted"&&st!=="published"&&PNEWS[x.id]){const n=PNEWS[x.id];delete PNEWS[x.id];if(Date.now()-n.at<4*60000&&n.ref)n.ref.delete().catch(()=>{})}
   if(st==="accepted"&&pid===ME){confetti(140);toast("Accepted! 🎉","Congratulations. "+nm(PARTNER)+" gets the news in a few minutes.");
     if(DB&&CID){const n={at:Date.now(),ref:null};PNEWS[x.id]=n;DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"paper",title:nm(ME)+"'s paper was accepted 🎉",body:x.title+(x.journal?" in "+x.journal:"")}).then(r=>{n.ref=r}).catch(syncErr)}}
-  else if(st==="published"&&pid===ME){confetti(90);toast("Published 📰","Moved to your publication list")}
+  else if(st==="published"&&pid===ME){confetti(90);toast("Published 📰","Added to your published count")}
   render()}
 function paperCard(pid,x){
   const p=P(pid),k=tzNow(p.tz).key,s=pstage(x.stage),i=pidx(x.stage),nx=PSTAGES[i+1],w=paperWhen(x,k),fid="p:"+x.id,edit=ui.paperEdit===x.id;
@@ -1453,16 +1456,15 @@ function paperCard(pid,x){
     const tl=h("select",{class:"inp"},["Target","Submit by","Revision due","Expected decision"].map(o=>h("option",null,o)));tl.value=x.tlabel||"Target";
     const dt=h("input",{type:"date",class:"inp",value:x.target||""});
     const sd=h("input",{type:"date",class:"inp",value:(x.at&&x.at.submitted)||""});
-    const yr=h("input",{type:"number",class:"inp",min:"1990",max:"2100",value:x.year||"",placeholder:k.slice(0,4)});
     c.appendChild(h("form",{class:"body pedit",onsubmit:e=>{e.preventDefault();
         const st=sg.value;if(st!==x.stage){x.at=x.at||{};x.at[st]=x.at[st]||k}
         Object.assign(x,{title:ti.value.trim()||"Untitled paper",journal:jo.value.trim(),role:ro.value,stage:st,next:ne.value.trim(),tlabel:tl.value,target:dt.value});
-        x.at=x.at||{};if(sd.value)x.at.submitted=sd.value;if(yr.value)x.year=String(yr.value);else if(st==="published"&&!x.year)x.year=k.slice(0,4);
+        x.at=x.at||{};if(sd.value)x.at.submitted=sd.value;if(st==="published"&&!x.year)x.year=k.slice(0,4);
         ui.paperEdit=null;persist();render()}},
       h("div",{class:"field"},h("label",null,"Title"),ti),
       h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 160px"},h("label",null,"Journal"),jo),h("div",{class:"field",style:"flex:1 1 130px"},h("label",null,"Your role"),ro)),
       h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Stage"),sg),h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Submitted on (optional)"),sd)),
-      h("div",{class:"row"},h("div",{class:"field",style:"flex:2 1 180px"},h("label",null,"Next step"),ne),h("div",{class:"field",style:"flex:1 1 90px"},h("label",null,"Year published"),yr)),
+      h("div",{class:"field"},h("label",null,"Next step"),ne),
       h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Date type"),tl),h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Date"),dt)),
       h("div",{class:"row"},h("button",{type:"submit",class:"primary"},"Save"),
         confirmBtn("Delete paper",()=>{p.papers=p.papers.filter(y=>y.id!==x.id);ui.paperEdit=null;persist();render()}))));
@@ -1476,9 +1478,10 @@ function papersSection(pid){
     h("p",{class:"empty"},"Add the papers you're working on or planning, first author or coauthor, so you can watch them move toward published.");
   const add=h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;ui.paperOpen=id;persist();render()}},"+ Add");
   const out=h("section",{class:"panel papers"},h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add),summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
-  if(pub.length){const op=!!ui.pubOpen;out.appendChild(h("button",{type:"button",class:"pubhead",onclick:()=>{ui.pubOpen=!op;render()}},emo("📰",22,false),h("b",null,"Published ("+pub.length+")"),h("span",null,op?"Hide":"Show")));
-    if(op)out.appendChild(h("ol",{class:"publist"},pub.map(x=>h("li",null,h("b",null,x.title),h("span",null,[x.journal,x.role==="co"?"Coauthor":"First author",x.year].filter(Boolean).join(" · ")),
-      h("button",{type:"button",class:"link",onclick:()=>setStage(pid,x,"accepted")},"Move back")))))}
+  const npub=(p.pubCount||0)+pub.length,ro=pid!==ME;
+  out.appendChild(h("div",{class:"pubrow"},emo("📰",24,false),h("b",null,npub+" published"),
+    !ro?h("button",{type:"button",class:"parr","aria-label":"One fewer",disabled:!npub,onclick:()=>{if(p.pubCount>0)p.pubCount--;else{const l=pub[pub.length-1];if(l){l.stage="accepted";}}persist();render()}},"−"):null,
+    !ro?h("button",{type:"button",class:"parr","aria-label":"One more",onclick:()=>{p.pubCount=(p.pubCount||0)+1;persist();render()}},"+"):null));
   return out}
 
 function projectCard(pid,x){
@@ -1569,7 +1572,8 @@ function usPartner(){
   if(o.settings&&o.settings.shareProjects&&o.projects&&o.projects.length){pc.appendChild(h("div",{class:"lbl"},"Projects"));
     pc.appendChild(h("ul",{class:"ro-list"},o.projects.map(x=>h("li",null,h("span",{class:"st"},x.focus?"★":"·"),h("span",null,h("b",null,x.title),x.next?" · next: "+x.next:"")))))}
   const opp=(o.settings&&o.settings.shareProjects&&o.papers||[]).filter(x=>x.stage!=="published");
-  if(opp.length){pc.appendChild(h("div",{class:"lbl"},"Papers in the pipeline"));
+  const onpub=o.settings&&o.settings.shareProjects?(o.pubCount||0)+(o.papers||[]).filter(x=>x.stage==="published").length:0;
+  if(opp.length||onpub){pc.appendChild(h("div",{class:"lbl"},"Papers"+(onpub?" · "+onpub+" published":"")));
     pc.appendChild(h("ul",{class:"ro-list"},opp.map(x=>{const w=paperWhen(x,on.key);return h("li",null,h("span",{class:"st"},emo(pstage(x.stage)[2],18,false)),h("span",null,h("b",null,x.title||"Untitled paper"),", "+(w?w.t:pstage(x.stage)[1])))})))}
   out.push(pc);
   }
@@ -2669,7 +2673,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-o";
+const APP_VERSION="2026-11-04-p";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
