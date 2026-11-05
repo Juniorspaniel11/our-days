@@ -178,7 +178,7 @@ async function socialEvents(db, cid, members, people, now) {
   const other = u => members.find(x => x !== u);
   const name = u => (people[u] && people[u].name) || "Your partner";
   const recent = async n => (await db.collection(`couples/${cid}/${n}`).where("at", ">", lo).get()).docs.map(d => ({ id: d.id, ...d.data() }));
-  for (const n of await recent("nudges")) if (other(n.from)) out.push({ to: other(n.from), key: "nudge:" + n.id, at: n.at, title: name(n.from) + " is thinking of you", body: "Open Our Days to send a heart back." });
+  for (const n of await recent("nudges")) if (other(n.from)) out.push({ to: other(n.from), key: "nudge:" + n.id, at: n.at, title: n.kind ? String(n.title || "News from " + name(n.from)) : name(n.from) + " is thinking of you", body: n.kind ? String(n.body || "") : "Open Our Days to send a heart back." });
   for (const l of await recent("letters")) if (l.to) out.push({ to: l.to, key: "letter:" + l.id, at: l.at, title: "A letter from " + name(l.from), body: l.openWhen ? "Open when " + l.openWhen : "It's waiting in your letterbox." });
   for (const m of await recent("moments")) if (other(m.from)) out.push({ to: other(m.from), key: "moment:" + m.id, at: m.at,
     title: m.kind === "doodle" ? name(m.from) + " sent you a doodle" : m.kind === "paint" ? name(m.from) + " saved your painting" : m.kind === "daily" ? name(m.from) + " shared today's photo" : name(m.from) + " shared a moment",
