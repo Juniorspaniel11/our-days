@@ -1453,15 +1453,16 @@ function paperCard(pid,x){
     const tl=h("select",{class:"inp"},["Target","Submit by","Revision due","Expected decision"].map(o=>h("option",null,o)));tl.value=x.tlabel||"Target";
     const dt=h("input",{type:"date",class:"inp",value:x.target||""});
     const sd=h("input",{type:"date",class:"inp",value:(x.at&&x.at.submitted)||""});
+    const yr=h("input",{type:"number",class:"inp",min:"1990",max:"2100",value:x.year||"",placeholder:k.slice(0,4)});
     c.appendChild(h("form",{class:"body pedit",onsubmit:e=>{e.preventDefault();
         const st=sg.value;if(st!==x.stage){x.at=x.at||{};x.at[st]=x.at[st]||k}
         Object.assign(x,{title:ti.value.trim()||"Untitled paper",journal:jo.value.trim(),role:ro.value,stage:st,next:ne.value.trim(),tlabel:tl.value,target:dt.value});
-        x.at=x.at||{};if(sd.value)x.at.submitted=sd.value;if(st==="published"&&!x.year)x.year=k.slice(0,4);
+        x.at=x.at||{};if(sd.value)x.at.submitted=sd.value;if(yr.value)x.year=String(yr.value);else if(st==="published"&&!x.year)x.year=k.slice(0,4);
         ui.paperEdit=null;persist();render()}},
       h("div",{class:"field"},h("label",null,"Title"),ti),
       h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 160px"},h("label",null,"Journal"),jo),h("div",{class:"field",style:"flex:1 1 130px"},h("label",null,"Your role"),ro)),
       h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Stage"),sg),h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Submitted on (optional)"),sd)),
-      h("div",{class:"field"},h("label",null,"Next step"),ne),
+      h("div",{class:"row"},h("div",{class:"field",style:"flex:2 1 180px"},h("label",null,"Next step"),ne),h("div",{class:"field",style:"flex:1 1 90px"},h("label",null,"Year published"),yr)),
       h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Date type"),tl),h("div",{class:"field",style:"flex:1 1 140px"},h("label",null,"Date"),dt)),
       h("div",{class:"row"},h("button",{type:"submit",class:"primary"},"Save"),
         confirmBtn("Delete paper",()=>{p.papers=p.papers.filter(y=>y.id!==x.id);ui.paperEdit=null;persist();render()}))));
@@ -2668,7 +2669,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-n";
+const APP_VERSION="2026-11-04-o";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
