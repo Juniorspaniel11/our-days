@@ -212,6 +212,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .psum{display:flex;flex-direction:column;gap:8px}.psum>b{font-size:20px}
 .pcounts{display:flex;flex-wrap:wrap;gap:6px}.pc1{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 5px;font-size:12.5px;background:var(--card)}
 .pedit{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:10px}
+.pubtile{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:10px;border-radius:14px;background:color-mix(in srgb,var(--accent) 9%,var(--card));border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line))}.pubtile .ptx{flex:1;min-width:0;display:flex;flex-direction:column}.pubtile .ptx b{font-size:16px}.pubtile .ptx span{font-size:12.5px;color:var(--muted)}
 .pubrow{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.pubrow b{flex:1;font-size:16px}
 .pubhead{display:flex;align-items:center;gap:8px;width:100%;margin-top:14px;padding:10px 0 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer;text-align:left}.pubhead b{flex:1}.pubhead span{color:var(--accent);font-weight:600;font-size:14px}
 .publist{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px}.publist li b{display:block}.publist li span{display:block;font-size:14px;color:var(--muted)}
@@ -1433,7 +1434,7 @@ function setStage(pid,x,st){if(x.stage===st)return;const p=P(pid),k=tzNow(p.tz).
   if(st!=="accepted"&&st!=="published"&&PNEWS[x.id]){const n=PNEWS[x.id];delete PNEWS[x.id];if(Date.now()-n.at<4*60000&&n.ref)n.ref.delete().catch(()=>{})}
   if(st==="accepted"&&pid===ME){confetti(140);toast("Accepted! 🎉","Congratulations. "+nm(PARTNER)+" gets the news in a few minutes.");
     if(DB&&CID){const n={at:Date.now(),ref:null};PNEWS[x.id]=n;DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"paper",title:nm(ME)+"'s paper was accepted 🎉",body:x.title+(x.journal?" in "+x.journal:"")}).then(r=>{n.ref=r}).catch(syncErr)}}
-  else if(st==="published"&&pid===ME){confetti(90);toast("Published 📰","Added to your published count")}
+  else if(st==="published"&&pid===ME){confetti(90);toast("Published 📰","Added to your publications")}
   render()}
 function paperCard(pid,x){
   const p=P(pid),k=tzNow(p.tz).key,s=pstage(x.stage),i=pidx(x.stage),nx=PSTAGES[i+1],w=paperWhen(x,k),fid="p:"+x.id,edit=ui.paperEdit===x.id;
@@ -1477,11 +1478,14 @@ function papersSection(pid){
   const summary=live.length?h("div",{class:"pcounts"},counts.map(([s,n])=>h("span",{class:"pc1"},emo(s[2],18,false),n+" "+s[1].toLowerCase()))):
     h("p",{class:"empty"},"Add the papers you're working on or planning, first author or coauthor, so you can watch them move toward published.");
   const add=h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;ui.paperOpen=id;persist();render()}},"+ Add");
-  const out=h("section",{class:"panel papers"},h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add),summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
-  const npub=(p.pubCount||0)+pub.length,ro=pid!==ME;
-  out.appendChild(h("div",{class:"pubrow"},emo("📰",24,false),h("b",null,npub+" published"),
-    !ro?h("button",{type:"button",class:"parr","aria-label":"One fewer",disabled:!npub,onclick:()=>{if(p.pubCount>0)p.pubCount--;else{const l=pub[pub.length-1];if(l){l.stage="accepted";}}persist();render()}},"−"):null,
-    !ro?h("button",{type:"button",class:"parr","aria-label":"One more",onclick:()=>{p.pubCount=(p.pubCount||0)+1;persist();render()}},"+"):null));
+  const npub=(p.pubCount||0)+pub.length,ro=pid!==ME,pe=!ro&&ui.pubEdit;
+  const pubTile=h("div",{class:"pubtile"},emo("📚",30,false),h("div",{class:"ptx"},h("b",null,npub?npub+" publication"+(npub===1?"":"s")+" so far":"No publications yet"),h("span",null,pe?"Tap − or +":"Papers already out")),
+    pe?h("div",{class:"row",style:"gap:6px;flex:none"},
+      h("button",{type:"button",class:"parr","aria-label":"One fewer",disabled:!npub,onclick:()=>{if(p.pubCount>0)p.pubCount--;else{const l=pub[pub.length-1];if(l)l.stage="accepted"}persist();render()}},"−"),
+      h("button",{type:"button",class:"parr","aria-label":"One more",onclick:()=>{p.pubCount=(p.pubCount||0)+1;persist();render()}},"+"),
+      h("button",{type:"button",class:"link",onclick:()=>{ui.pubEdit=false;render()}},"Done"))
+    :!ro?h("button",{type:"button",class:"link",onclick:()=>{ui.pubEdit=true;render()}},"Edit"):null);
+  const out=h("section",{class:"panel papers"},h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add),pubTile,summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
   return out}
 
 function projectCard(pid,x){
@@ -1573,7 +1577,7 @@ function usPartner(){
     pc.appendChild(h("ul",{class:"ro-list"},o.projects.map(x=>h("li",null,h("span",{class:"st"},x.focus?"★":"·"),h("span",null,h("b",null,x.title),x.next?" · next: "+x.next:"")))))}
   const opp=(o.settings&&o.settings.shareProjects&&o.papers||[]).filter(x=>x.stage!=="published");
   const onpub=o.settings&&o.settings.shareProjects?(o.pubCount||0)+(o.papers||[]).filter(x=>x.stage==="published").length:0;
-  if(opp.length||onpub){pc.appendChild(h("div",{class:"lbl"},"Papers"+(onpub?" · "+onpub+" published":"")));
+  if(opp.length||onpub){pc.appendChild(h("div",{class:"lbl"},"Papers"+(onpub?" · "+onpub+" publication"+(onpub===1?"":"s")+" so far":"")));
     pc.appendChild(h("ul",{class:"ro-list"},opp.map(x=>{const w=paperWhen(x,on.key);return h("li",null,h("span",{class:"st"},emo(pstage(x.stage)[2],18,false)),h("span",null,h("b",null,x.title||"Untitled paper"),", "+(w?w.t:pstage(x.stage)[1])))})))}
   out.push(pc);
   }
@@ -2673,7 +2677,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-p";
+const APP_VERSION="2026-11-04-q";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
