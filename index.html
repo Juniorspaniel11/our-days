@@ -2321,7 +2321,7 @@ function gameSheet(g){juSheet(g.name,()=>{
   if(mine.length<5){const i=mine.length,it=gItems(g)[set[i]];
     const pics=g.optPics(it),big=g.pic?g.pic(it):null;
     return [h("p",{class:"hint"},"Round "+(i+1)+" of 5. "+g.intro),big?h("div",{class:"bigemo"},emo(big,96,true)):null,h("p",{class:"q",style:big?"text-align:center":""},g.q(it)),
-      h("div",{class:"tot pics",style:"--c:"+g.c},g.opts(it).map((x,j)=>h("button",{type:"button",class:"tap",onclick:()=>{const nx=mine.concat([j]);saveUs({games:{[g.id]:{[key]:{[ME]:nx}}}});
+      h("div",{class:"tot pics",style:"--c:"+g.c},g.opts(it).map((x,j)=>h("button",{type:"button",class:"tap",onclick:()=>{const nx=mine.concat([j]);saveUs({games:{[g.id]:{[key]:nx.length===5?{[ME]:nx,done:{[ME]:Date.now()}}:{[ME]:nx}}}});
         if(nx.length===5&&theirs&&theirs.length===5){const m=nx.filter((v,n)=>v===theirs[n]).length;confetti(m>=4?160:60);toast(m+" of 5 match",m>=4?"You two are in sync":"Opposites attract")}}},
         pics?emo(pics[j],64,true):h("span",{class:"initial",style:"background:"+(j?"#e2557c":"#5b3b8c")},(x[0]||"?")),h("span",null,x))))]}
   if(!theirs||theirs.length<5)return [h("div",{class:"lockbox"},emo(g.e,40,true),h("div",null,h("b",null,"Done. Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"You'll see each other's picks once "+nm(o)+" plays.")))];
@@ -2677,7 +2677,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-04-q";
+const APP_VERSION="2026-11-05-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});

@@ -212,6 +212,18 @@ async function socialEvents(db, cid, members, people, now) {
     out.push({ to: o, key: "ans:" + id + ":" + u, at: v.at, title: both ? "Answers unlocked" : name(u) + " answered " + (id.startsWith("d:") ? "today's question" : "a question"),
       body: both ? "You both answered. See what " + name(u) + " said." : "Answer too and you'll both see each other's." });
   }
+  const GNAME = { likely: "Who's more likely to", wyr: "Would you rather", tot: "This or That", nhie: "Never have I ever", agree: "Agree or disagree", flirty: "Flirty picks" };
+  for (const [gid, G] of Object.entries(us.games || {})) for (const [k, d] of Object.entries(G || {})) {
+    if (k === "rounds" || !d || !d.done) continue;
+    for (const [u, at] of Object.entries(d.done)) {
+      const o = other(u); if (!o || !(at > lo)) continue;
+      const both = Array.isArray(d[o]) && d[o].length === 5, gn = GNAME[gid] || "a game";
+      if (both && (d.done[o] || 0) > at) continue;
+      let m = 0; if (both) (d[u] || []).forEach((v, n) => { if (v === d[o][n]) m++; });
+      out.push({ to: o, key: "game:" + gid + ":" + k + ":" + u, at, title: both ? "Results are in: " + m + " of 5 match" : name(u) + " played " + gn,
+        body: both ? name(u) + " finished " + gn + ". See each other's picks." : "Play your 5 and you'll both see each other's picks." });
+    }
+  }
   return out;
 }
 
