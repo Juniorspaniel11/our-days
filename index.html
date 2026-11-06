@@ -717,6 +717,26 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
   .sheet .pn{max-width:760px;max-height:88vh;border-radius:26px}
 }
 @media (min-width:1500px){main.wrap{column-count:3}}
+
+.ju .kmq{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid var(--line)}.ju .kmq>b{font-size:16px}
+.ju .kmrow{display:flex;flex-direction:column;gap:4px}.ju .kml{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ju .kmopts{display:flex;flex-wrap:wrap;gap:6px}.ju .kmo{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 11px;font:inherit;font-size:14px;cursor:pointer}
+.ju .kmo.on{background:#e2557c;border-color:#e2557c;color:#fff}
+.ju .tvopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ju .tvo{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:16px 10px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;min-height:68px}
+.ju .tvo:active{border-color:#1f7f78}
+.ju .dban{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px;border-radius:20px;background:linear-gradient(135deg,#5b3b8c,#e2557c);color:#fff;text-align:center}.ju .dban b{font-size:24px}.ju .dban.win{background:linear-gradient(135deg,#f6a65e,#e2557c)}
+.ju .sboard{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:20px;background:linear-gradient(135deg,#2a1f4e,#5b3b8c 55%,#e2557c);color:#fff;margin-bottom:12px}
+.ju .sbx{display:flex;flex-direction:column;gap:2px;min-width:0}.ju .sbx .k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.ju .sbs{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.ju .sbs b{font-size:22px}.ju .sbs span{opacity:.7;font-size:14px}.ju .sbx small{opacity:.8}
+.ju .c4top{display:flex;align-items:center;justify-content:space-between;gap:8px}.ju .c4me{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}.ju .c4me i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.ju .c4st{font-size:15px;text-align:center;flex:1}.ju .c4st.go{color:#e2557c}
+.ju .c4{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:8px;border-radius:18px;background:#3b4fb8;max-width:440px;width:100%;margin:6px auto}
+.ju .c4col{display:grid;grid-template-rows:repeat(6,1fr);gap:5px;border:0;background:none;padding:0;cursor:pointer;border-radius:12px}
+.ju .c4col:not(:disabled):hover{background:rgba(255,255,255,.12)}.ju .c4col:disabled{cursor:default}
+.ju .c4c{display:block;aspect-ratio:1;border-radius:50%;background:#f4f1fb;box-shadow:inset 0 2px 4px rgba(0,0,0,.25)}
+.ju .c4c.m{background:var(--me)}.ju .c4c.o{background:var(--op)}.ju .c4c.last{animation:c4drop .45s cubic-bezier(.3,1.4,.5,1)}
+.ju .c4c.win{box-shadow:0 0 0 3px #ffd27a,inset 0 2px 4px rgba(0,0,0,.25)}
+@keyframes c4drop{from{transform:translateY(calc(var(--r,3) * -110% - 110%))}to{transform:none}}
 </style>
 </head>
 
@@ -1969,11 +1989,13 @@ function evActs(){const a=[];
   a.push(["dq","Question of the day","❓"]);
   visibleGames().forEach(g=>a.push(["game:"+g.id,g.name,g.e]));
   enabledTopics().forEach(t=>a.push(["topic:"+t.id,"Ask: "+t.name,TOPIC_EMOJI[t.id]]));
+  a.push(["duel:know","Know me best","🧠"],["duel:trivia","Trivia duel","🎯"],["duel:c4","Connect Four","🔴"]);
   a.push(["prayer","Pray together","🙏"],["paint","Paint together","🎨"],["read","Read and discuss a chapter","📚"],["home","Build our dream home","🏡"],["letter","Write each other a letter","💌"],["plans","Plan the next visit","🗺️"],["checkin","Monthly check-in","🗓️"]);
   EV_EXTRA.forEach(([k,l,e])=>a.push(["x:"+k,l,e]));return a}
 function openAct(k){const [a,b]=k.split(":");
   if(a==="dq"){const d=usDay(),q=dailyQ(d);answerSheet("d:"+d,q.q,"Question of the day")}
   else if(a==="photo")photoSheet();else if(a==="game")gameSheet(gameById(b));else if(a==="topic"){const t=TOPICS.find(x=>x.id===b);if(t)topicSheet(t)}
+  else if(a==="duel"){if(b==="know")knowSheet();else if(b==="trivia")triviaSheet();else c4Sheet()}
   else if(a==="prayer")prayerSheet();else if(a==="paint")paintSheet();else if(a==="read")readSheet();else if(a==="home")homeSheet();else if(a==="letter")writeLetter();else if(a==="plans")plansSheet();else if(a==="checkin")checkinSheet();
   else if(a==="x"&&b==="call"){const tel=(P(PARTNER).phone||"").replace(/[^0-9+]/g,"");if(tel)location.href="facetime:"+tel;else toast("No number yet",nm(PARTNER)+" can add a phone number in Settings")}}
 const EVE=()=>US.evening||{};
@@ -2147,7 +2169,7 @@ function watchUs(){
   const col=n=>DB.collection("couples/"+CID+"/"+n);
   const list=(n,lim,key)=>unsubs.push(col(n).orderBy("at","desc").limit(lim).onSnapshot(q=>{US[key]=q.docs.map(d=>({id:d.id,...d.data()}));usRefresh()},e=>console.warn(e)));
   unsubs.push(usRef().onSnapshot(sn=>{US.main=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
-  ["home","prayer","visits","books","checkin","evening"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
+  ["home","prayer","visits","books","checkin","evening","duel"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
   list("moments",30,"moments");list("letters",200,"letters");list("jar",500,"jar");list("nudges",20,"nudges");
 }
 function usRefresh(){
@@ -2315,6 +2337,244 @@ function photoSheet(){let img=null;juSheet("Photo of the day",()=>{
   else if(!theirs)out.push(h("div",{class:"lockbox"},svgEl(ICON.lock("#1f7f78")),h("div",null,h("b",null,"Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"Yours is in. Both unlock when "+nm(o)+" shares."))));
   else out.push(h("div",{class:"answers reveal"},[ME,PARTNER].map(x=>h("div",{class:"ans"+(x!==ME?" f":"")},h("span",{class:"who"},x===ME?"You":nm(x)),d[x].img?h("img",{src:d[x].img,alt:""}):null,h("p",null,(d[x].note||"").split(": ").slice(1).join(": "))))));
   return out})}
+
+/* ---------- Game night: games with a winner ---------- */
+const KNOW_QS=[
+["Perfect Saturday morning",["Sleep in 😴","Workout 🏃","Church or devotion 🙏","Errands and chores 🧺"]],
+["Comfort food",["Jollof 🍛","Waakye 🍚","Fufu and light soup 🍲","Pizza 🍕"]],
+["Best way to unwind",["Music 🎧","A movie 🎬","A long call 📞","Sleep 😴"]],
+["Dream vacation",["Beach 🏖️","Big city 🏙️","Mountains 🏔️","Back home in Ghana 🇬🇭"]],
+["Morning drink",["Coffee ☕","Tea 🍵","Juice 🧃","Just water 💧"]],
+["When stressed I usually",["Pray 🙏","Talk it out 🗣️","Go quiet 🤐","Eat 🍫"]],
+["Favorite season",["Spring 🌸","Summer ☀️","Fall 🍂","Winter ❄️"]],
+["Night owl or early bird",["Night owl 🦉","Early bird 🐦","Depends on the day 🤷"]],
+["Love language I feel most",["Words 💬","Time together ⏳","Gifts 🎁","Acts of service 🧹","Touch 🤗"]],
+["Favorite snack",["Chips 🍟","Chocolate 🍫","Fruit 🍎","Plantain chips 🍌"]],
+["I'd rather watch",["Action 💥","Romance 💕","Comedy 😂","Documentary 🎥"]],
+["Dream car",["SUV 🚙","Sedan 🚗","Truck 🛻","Sports car 🏎️"]],
+["Biggest pet peeve",["Lateness ⏰","Loud chewing 😬","Messiness 🧦","Slow replies 📵"]],
+["Best date idea",["Fancy dinner 🍽️","Movie night 🍿","Long walk 🚶","Cooking together 🍳"]],
+["Cold or hot weather",["Cold 🥶","Hot 🥵","Mild please 🌤️"]],
+["Go to music",["Gospel 🎶","Afrobeats 🥁","Highlife 🎺","R&B 🎤"]],
+["After a long lab day I want",["Food first 🍔","A nap 😴","To vent 🗣️","Silence 🤫"]],
+["Sweet or savory",["Sweet 🍰","Savory 🧀","Both 😋"]],
+["Best part of the week",["Friday night 🌙","Saturday 🛋️","Sunday service ⛪","Monday fresh start 📅"]],
+["Spend a free $100 on",["Food 🍱","Clothes 👕","Save it 💰","A gift for you 🎁"]],
+["Ideal home",["City apartment 🏙️","House in the suburbs 🏡","Quiet countryside 🌾"]],
+["How I handle conflict",["Talk right away 🗣️","Need time first ⏳","Write it out ✍️"]],
+["Favorite time to talk",["Morning ☀️","Lunch break 🥪","Evening 🌆","Late night 🌙"]],
+["Superpower I'd pick",["Teleport to you ✨","Read minds 🧠","Stop time ⏸️","Fly 🕊️"]],
+["Favorite dessert",["Ice cream 🍨","Cake 🎂","Cookies 🍪","Puff puff 🍩"]],
+["When we fight I need",["A hug 🤗","An apology 🙇","Space 🌬️","A plan 📝"]],
+["My shopping style",["Plan and buy 📋","Browse for hours 🛍️","Online only 💻"]],
+["Favorite holiday",["Christmas 🎄","Easter 🐣","Thanksgiving 🦃","Birthdays 🎉"]],
+["Pick a pet",["Dog 🐶","Cat 🐱","Fish 🐟","No pets 🙅"]],
+["Ideal number of kids",["One 👶","Two 👧👦","Three or more 👨‍👩‍👧‍👦","Let's see 🤷"]],
+["Morning routine",["Phone first 📱","Prayer first 🙏","Shower first 🚿","Snooze button ⏰"]],
+["Rainy day plan",["Stay in bed 🛏️","Movie marathon 🎬","Work anyway 💻","Cook something warm 🍲"]],
+["Most used app",["WhatsApp 💬","Instagram 📸","YouTube ▶️","TikTok 🎵"]],
+["Best way to say sorry to me",["Say it clearly 💬","Do something kind 💐","Give me time ⏳"]],
+["Favorite fruit",["Mango 🥭","Pineapple 🍍","Watermelon 🍉","Banana 🍌"]],
+["I'd rather",["Cook 🍳","Clean 🧽","Do laundry 🧺","Wash dishes 🍽️"]],
+["Travel style",["Plan every detail 🗺️","Go with the flow 🌊","Mix of both ⚖️"]],
+["Party or quiet night",["Party 🎉","Quiet night 🕯️","Small hangout 👥"]],
+["Favorite drink at a restaurant",["Soda 🥤","Juice 🧃","Water 💧","Mocktail 🍹"]],
+["What makes me laugh most",["Memes 🤣","Silly voices 🗣️","Stories 📖","Your jokes 😄"]],
+["Spend a long weekend",["Road trip 🚗","Staycation 🏠","Visiting family 👨‍👩‍👧","Seeing each other ✈️"]],
+["I keep my phone",["Always on loud 🔔","Always on silent 🔕","Do not disturb at night 🌙"]],
+["Breakfast",["Never skip 🍳","Coffee counts ☕","What breakfast? 🤷"]],
+["Gift I'd love most",["Handwritten letter 💌","Surprise visit ✈️","Something I need 🎁","Flowers 💐"]],
+["Ideal Sunday afternoon",["Nap 😴","Football ⚽","Cooking 🍲","Long call with you 📞"]],
+["My workspace",["Neat and tidy 🗂️","Organized chaos 🌪️","Wherever I land 🛋️"]],
+["Best compliment for me",["You're smart 🧠","You're kind 💗","You look good 😍","I'm proud of you 🏅"]],
+["Celebrate a big win with",["A nice dinner 🍽️","Shopping 🛍️","A call home 📞","Quiet thanksgiving 🙏"]],
+["Favorite kind of weather for a date",["Sunny ☀️","Rainy ☔","Snowy ❄️","Cool evening 🌙"]],
+["When I'm sick I want",["To be left alone 🛏️","Lots of check-ins 📱","Soup and care 🍲"]]];
+
+const TRIVIA=[
+["How many books are in the Protestant Bible?",["66","73","39","27"],0],
+["Who led the Israelites out of Egypt?",["Moses","Abraham","Joshua","David"],0],
+["What is the shortest verse in the Bible (KJV)?",["Jesus wept","Pray without ceasing","God is love","Rejoice evermore"],0],
+["Who was swallowed by a great fish?",["Jonah","Elijah","Peter","Daniel"],0],
+["What was Jesus's first recorded miracle in John?",["Water into wine","Feeding 5,000","Walking on water","Healing a blind man"],0],
+["Who was thrown into the lions' den?",["Daniel","Shadrach","Jeremiah","Samuel"],0],
+["How many disciples did Jesus choose?",["12","10","7","70"],0],
+["Who built the ark?",["Noah","Moses","Abraham","Solomon"],0],
+["Which book comes right after Genesis?",["Exodus","Leviticus","Numbers","Deuteronomy"],0],
+["Who was the first king of Israel?",["Saul","David","Solomon","Samuel"],0],
+["Who denied Jesus three times?",["Peter","Judas","Thomas","John"],0],
+["Which Gospel was written by a doctor?",["Luke","Matthew","Mark","John"],0],
+["What is the longest book in the Bible?",["Psalms","Isaiah","Genesis","Jeremiah"],0],
+["Who killed Goliath?",["David","Saul","Jonathan","Samson"],0],
+["On which day did God rest in Genesis?",["The seventh","The sixth","The first","The third"],0],
+["What is the capital of Ghana?",["Accra","Kumasi","Tamale","Cape Coast"],0],
+["In what year did Ghana gain independence?",["1957","1960","1948","1966"],0],
+["Who was Ghana's first president?",["Kwame Nkrumah","Jerry Rawlings","John Kufuor","J. B. Danquah"],0],
+["What are the colors of Ghana's flag?",["Red, gold, green","Red, white, blue","Green, white, green","Black, red, gold"],0],
+["What is Ghana's currency?",["Cedi","Naira","Shilling","Rand"],0],
+["Which lake in Ghana is one of the largest man-made lakes?",["Lake Volta","Lake Bosomtwe","Lake Victoria","Lake Chad"],0],
+["What is the capital of Texas?",["Austin","Dallas","Houston","San Antonio"],0],
+["What is the capital of Nevada?",["Carson City","Las Vegas","Reno","Henderson"],0],
+["How many states are in the USA?",["50","48","52","51"],0],
+["Which is the largest US state by area?",["Alaska","Texas","California","Montana"],0],
+["Which ocean is the largest?",["Pacific","Atlantic","Indian","Arctic"],0],
+["What is the longest river in Africa?",["Nile","Congo","Niger","Zambezi"],0],
+["Which is the most populous country in Africa?",["Nigeria","Ethiopia","Egypt","DR Congo"],0],
+["What is the smallest continent by area?",["Australia","Europe","Antarctica","South America"],0],
+["What is the capital of Canada?",["Ottawa","Toronto","Vancouver","Montreal"],0],
+["What is the capital of Japan?",["Tokyo","Kyoto","Osaka","Seoul"],0],
+["Mount Kilimanjaro is in which country?",["Tanzania","Kenya","Uganda","Ethiopia"],0],
+["How many chambers does the human heart have?",["4","2","3","6"],0],
+["Which blood vessels carry blood away from the heart?",["Arteries","Veins","Capillaries","Venules"],0],
+["What is the powerhouse of the cell?",["Mitochondria","Nucleus","Ribosome","Golgi apparatus"],0],
+["What is the largest organ of the human body?",["Skin","Liver","Lungs","Brain"],0],
+["How many bones are in the adult human body?",["206","196","212","180"],0],
+["Which part of the heart starts each heartbeat?",["SA node","AV node","Aorta","Septum"],0],
+["Which mineral ion triggers heart muscle contraction?",["Calcium","Sodium","Iron","Zinc"],0],
+["What does DNA stand for?",["Deoxyribonucleic acid","Dinitrogen acid","Deoxyribose nitrate","Dual nucleic acid"],0],
+["What gas do plants take in for photosynthesis?",["Carbon dioxide","Oxygen","Nitrogen","Hydrogen"],0],
+["What is the chemical symbol for gold?",["Au","Ag","Gd","Go"],0],
+["What is H2O?",["Water","Hydrogen peroxide","Salt","Oxygen"],0],
+["What is the closest planet to the Sun?",["Mercury","Venus","Mars","Earth"],0],
+["Which planet is known as the Red Planet?",["Mars","Jupiter","Venus","Saturn"],0],
+["What is the largest planet in our solar system?",["Jupiter","Saturn","Neptune","Earth"],0],
+["What is the speed of light, roughly?",["300,000 km per second","3,000 km per second","30,000 km per second","3 million km per second"],0],
+["Who proposed the theory of relativity?",["Albert Einstein","Isaac Newton","Niels Bohr","Galileo"],0],
+["What is the freezing point of water in Fahrenheit?",["32°F","0°F","100°F","212°F"],0],
+["What is the boiling point of water in Celsius at sea level?",["100°C","90°C","212°C","110°C"],0],
+["Which organ produces insulin?",["Pancreas","Liver","Kidney","Stomach"],0],
+["What is normal human body temperature in Celsius, roughly?",["37°C","35°C","39°C","40°C"],0],
+["Which vitamin does sunlight help your body make?",["Vitamin D","Vitamin C","Vitamin A","Vitamin K"],0],
+["Red blood cells carry oxygen using which protein?",["Hemoglobin","Insulin","Collagen","Keratin"],0],
+["What is the main artery leaving the left ventricle?",["Aorta","Pulmonary artery","Carotid artery","Vena cava"],0],
+["How many minutes are in a day?",["1,440","1,240","1,140","2,400"],0],
+["How many sides does a hexagon have?",["6","5","7","8"],0],
+["What is 12 times 12?",["144","124","132","154"],0],
+["What is the square root of 81?",["9","8","7","11"],0],
+["What is 15% of 200?",["30","15","20","35"],0],
+["Who painted the Mona Lisa?",["Leonardo da Vinci","Michelangelo","Van Gogh","Picasso"],0],
+["Who wrote Romeo and Juliet?",["William Shakespeare","Charles Dickens","Jane Austen","Mark Twain"],0],
+["In which country were the Olympic Games born?",["Greece","Italy","Egypt","France"],0],
+["Which country has won the most FIFA World Cups?",["Brazil","Germany","Italy","Argentina"],0],
+["How many players does a soccer team have on the field?",["11","10","9","12"],0],
+["What is Ghana's national football team nickname?",["Black Stars","Super Eagles","Indomitable Lions","Elephants"],0],
+["What language has the most native speakers?",["Mandarin Chinese","English","Spanish","Hindi"],0],
+["Which company makes the iPhone?",["Apple","Samsung","Google","Microsoft"],0],
+["What does CPU stand for?",["Central processing unit","Computer power unit","Central program utility","Core processing unit"],0],
+["What year did the first iPhone come out?",["2007","2005","2009","2010"],0],
+["Which animal is the largest on Earth?",["Blue whale","African elephant","Giraffe","Great white shark"],0],
+["What is the fastest land animal?",["Cheetah","Lion","Pronghorn","Horse"],0],
+["How many legs does a spider have?",["8","6","10","12"],0],
+["Which bird is a symbol of peace?",["Dove","Eagle","Owl","Sparrow"],0],
+["Which is NOT a usual jollof ingredient?",["Mango","Tomato","Onion","Pepper"],0],
+["Kenkey is mainly made from what?",["Fermented corn","Cassava","Yam","Rice"],0],
+["Waakye is rice cooked with what?",["Beans","Corn","Peanuts","Plantain"],0],
+["Fufu is usually pounded from cassava and what?",["Plantain","Rice","Beans","Wheat"],0],
+["Which US city is called the Big Apple?",["New York","Chicago","Los Angeles","Boston"],0],
+["Las Vegas sits in which desert?",["Mojave","Sahara","Sonoran","Chihuahuan"],0],
+["Denton is in which Texas region?",["North Texas","West Texas","South Texas","East Texas"],0],
+["Which US state is the Grand Canyon in?",["Arizona","Nevada","Utah","Colorado"],0],
+["Who was the first US president?",["George Washington","Abraham Lincoln","Thomas Jefferson","John Adams"],0],
+["What do bees make?",["Honey","Wax only","Silk","Pollen"],0],
+["How many continents are there?",["7","6","5","8"],0],
+["What is the hardest natural substance?",["Diamond","Gold","Iron","Quartz"],0],
+["Which instrument has 88 keys?",["Piano","Organ","Accordion","Harp"],0],
+["How many strings does a standard guitar have?",["6","4","5","7"],0],
+["What color do you get mixing blue and yellow?",["Green","Purple","Orange","Brown"],0],
+["How many hours ahead is Texas from Nevada in winter?",["2","1","3","0"],0],
+["What is the main ingredient in guacamole?",["Avocado","Tomato","Peas","Cucumber"],0],
+["Which country gifted the Statue of Liberty to the USA?",["France","England","Spain","Italy"],0],
+["What does PhD stand for?",["Doctor of Philosophy","Professional Doctor","Philosophy Degree","Doctor of Physics"],0],
+["Which scientist discovered penicillin?",["Alexander Fleming","Louis Pasteur","Marie Curie","Robert Koch"],0],
+["Stem cells that can become almost any cell type in the body are called what?",["Pluripotent","Unipotent","Somatic","Differentiated"],0],
+["What does ECG measure?",["Heart's electrical activity","Blood sugar","Lung volume","Brain waves"],0],
+["Which chamber of the heart pumps blood to the body?",["Left ventricle","Right ventricle","Left atrium","Right atrium"],0],
+["What is the heart muscle tissue called?",["Myocardium","Endocardium","Pericardium","Epicardium"],0],
+["Which unit measures force?",["Newton","Joule","Watt","Pascal"],0],
+["What is the most abundant gas in Earth's air?",["Nitrogen","Oxygen","Carbon dioxide","Argon"],0]];
+
+const DU=()=>US.duel||{};
+const saveDuel=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/duel").set(o,{merge:true}).catch(syncErr)};
+function pick5(n,seed){const out=[],used=new Set();let s=hashN(seed,n);while(out.length<5){while(used.has(s))s=(s+1)%n;used.add(s);out.push(s);s=(s+17)%n}return out}
+function shuffled(arr,seed){const a=arr.map((x,i)=>[x,i]);for(let i=a.length-1;i>0;i--){const j=hashN(seed+":"+i,i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+/* who won a day of Know me or Trivia: returns {done,s:{u:score},w:uid|"tie"} */
+function knowResult(k){const d=(DU().know||{})[k]||{},a=d[ME],b=d[PARTNER];if(!a||!b||!a.at||!b.at)return {done:false};
+  const sc=(x,y)=>x.guess.filter((g,i)=>g===y.self[i]).length,s={[ME]:sc(a,b),[PARTNER]:sc(b,a)};return {done:true,s,w:s[ME]===s[PARTNER]?"tie":s[ME]>s[PARTNER]?ME:PARTNER}}
+function triviaResult(k){const d=(DU().trivia||{})[k]||{},a=d[ME],b=d[PARTNER];if(!a||!b||!a.at||!b.at)return {done:false};
+  const set=pick5(TRIVIA.length,k+"tv"),sc=x=>x.a.filter((v,i)=>v===TRIVIA[set[i]][2]).length,s={[ME]:sc(a),[PARTNER]:sc(b)};return {done:true,s,w:s[ME]===s[PARTNER]?"tie":s[ME]>s[PARTNER]?ME:PARTNER}}
+function scoreboard(){const t={[ME]:0,[PARTNER]:0,tie:0};
+  Object.keys(DU().know||{}).forEach(k=>{const r=knowResult(k);if(r.done)t[r.w]=(t[r.w]||0)+1});
+  Object.keys(DU().trivia||{}).forEach(k=>{const r=triviaResult(k);if(r.done)t[r.w]=(t[r.w]||0)+1});
+  (DU().c4hist||[]).forEach(x=>{const w=x.w==="tie"?"tie":x.w;if(w in t)t[w]++});return t}
+
+function knowSheet(){juSheet("Know me best",()=>{
+  const k=usDay(),set=pick5(KNOW_QS.length,k+"km"),d=(DU().know||{})[k]||{},mine=d[ME],theirs=d[PARTNER],o=PARTNER;
+  if(!mine||!mine.at){const dr=DR["km"+k]||(DR["km"+k]={self:[],guess:[]});
+    const intro=h("p",{class:"hint"},"For each one, pick your own answer, then guess "+nm(o)+"'s. You get a point for every guess you get right.");
+    const qs=set.map((qi,n)=>{const [q,opts]=KNOW_QS[qi];
+      const row=(key,label)=>h("div",{class:"kmrow"},h("span",{class:"kml"},label),h("div",{class:"kmopts"},opts.map((x,j)=>h("button",{type:"button",class:"kmo"+(dr[key][n]===j?" on":""),onclick:()=>{dr[key][n]=j;refreshSheet()}},x))));
+      return h("div",{class:"kmq"},h("b",null,(n+1)+". "+q),row("self","You"),row("guess","Guess "+nm(o)))});
+    const ready=[0,1,2,3,4].every(n=>dr.self[n]!=null&&dr.guess[n]!=null);
+    return [intro,qs,h("button",{type:"button",class:"btn",disabled:!ready,onclick:()=>{saveDuel({know:{[k]:{[ME]:{self:dr.self,guess:dr.guess,at:Date.now()}}}});delete DR["km"+k];
+      if(theirs&&theirs.at)setTimeout(()=>{const r=knowResult(k);if(r.done){confetti(r.w===ME?160:60);toast(r.w===ME?"You win 🏆":r.w==="tie"?"It's a tie 🤝":nm(o)+" wins this one",r.s[ME]+" to "+r.s[o])}},600);else toast("Locked in",nm(o)+" gets a nudge to play")}},ready?"Lock in my answers":"Answer all 5 to lock in")]}
+  if(!theirs||!theirs.at)return [h("div",{class:"lockbox"},emo("🧠",40,true),h("div",null,h("b",null,"Locked in. Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"Scores show once "+nm(o)+" plays today's Know me best.")))];
+  const r=knowResult(k);
+  return [duelBanner(r),h("div",{class:"totres"},set.map((qi,n)=>{const [q,opts]=KNOW_QS[qi];const gm=mine.guess[n]===theirs.self[n],gt=theirs.guess[n]===mine.self[n];
+    return h("div",{class:"rrow"+(gm&&gt?" m":"")},h("div",null,h("b",null,q),
+      h("span",null,nm(o)+": "+opts[theirs.self[n]]+" · you guessed "+opts[mine.guess[n]]+(gm?" ✅":" ❌")),
+      h("span",null,"You: "+opts[mine.self[n]]+" · "+nm(o)+" guessed "+opts[theirs.guess[n]]+(gt?" ✅":" ❌"))))})),h("p",{class:"hint",style:"text-align:center"},"New questions tomorrow")]})}
+
+function triviaSheet(){juSheet("Trivia duel",()=>{
+  const k=usDay(),set=pick5(TRIVIA.length,k+"tv"),d=(DU().trivia||{})[k]||{},mine=d[ME],theirs=d[PARTNER],o=PARTNER;
+  if(!mine||!mine.at){const dr=DR["tv"+k]||(DR["tv"+k]={a:[],shown:null});const i=dr.a.length;
+    if(dr.shown!=null){const [q,opts,c]=TRIVIA[set[i-1]],ok=dr.a[i-1]===c;
+      return [h("p",{class:"hint"},"Question "+i+" of 5"),h("div",{class:"bigemo"},emo(ok?"✅":"❌",72,true)),h("p",{class:"q",style:"text-align:center"},ok?"Correct!":"The answer was "+opts[c]),
+        h("button",{type:"button",class:"btn",onclick:()=>{dr.shown=null;if(dr.a.length===5){saveDuel({trivia:{[k]:{[ME]:{a:dr.a,at:Date.now()}}}});delete DR["tv"+k];
+          if(theirs&&theirs.at)setTimeout(()=>{const r=triviaResult(k);if(r.done){confetti(r.w===ME?160:60);toast(r.w===ME?"You win 🏆":r.w==="tie"?"It's a tie 🤝":nm(o)+" wins this one",r.s[ME]+" to "+r.s[o])}},600)}refreshSheet()}},i===5?"See my score":"Next question")]}
+    const [q,opts]=TRIVIA[set[i]];
+    return [h("p",{class:"hint"},"Question "+(i+1)+" of 5 · same questions for both of you"),h("p",{class:"q"},q),
+      h("div",{class:"tvopts"},shuffled(opts,k+q).map(([x,j])=>h("button",{type:"button",class:"tvo tap",onclick:()=>{dr.a.push(j);dr.shown=j;refreshSheet()}},x)))]}
+  const myS=mine.a.filter((v,n)=>v===TRIVIA[set[n]][2]).length;
+  if(!theirs||!theirs.at)return [h("div",{class:"lockbox"},emo("🎯",40,true),h("div",null,h("b",null,"You got "+myS+" of 5. Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"The winner shows once "+nm(o)+" plays today's trivia.")))];
+  const r=triviaResult(k);
+  return [duelBanner(r),h("div",{class:"totres"},set.map((s,n)=>{const [q,opts,c]=TRIVIA[s];return h("div",{class:"rrow"+(mine.a[n]===c&&theirs.a[n]===c?" m":"")},h("div",null,h("b",null,q),h("span",null,"Answer: "+opts[c]),
+      h("span",null,"You "+(mine.a[n]===c?"✅":"❌")+" · "+nm(o)+" "+(theirs.a[n]===c?"✅":"❌"))))})),h("p",{class:"hint",style:"text-align:center"},"New questions tomorrow")]})}
+
+function duelBanner(r){const o=PARTNER;return h("div",{class:"dban"+(r.w===ME?" win":"")},emo(r.w==="tie"?"🤝":"🏆",56,true),
+  h("b",null,r.w==="tie"?"It's a tie":r.w===ME?"You win!":nm(o)+" wins"),h("span",null,"You "+r.s[ME]+" · "+r.s[o]+" "+nm(o)))}
+
+/* Connect Four: board is 42 chars, row 0 at the top, "." empty, "a" first player, "b" second */
+function c4State(){return DU().c4||null}
+function c4Win(b,p){const at=(r,c)=>r>=0&&r<6&&c>=0&&c<7&&b[r*7+c]===p;for(let r=0;r<6;r++)for(let c=0;c<7;c++){if(!at(r,c))continue;for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]){let n=1;while(n<4&&at(r+dr*n,c+dc*n))n++;if(n===4)return [0,1,2,3].map(i=>(r+dr*i)*7+c+dc*i)}}return null}
+function c4New(first){saveDuel({c4:{id:uid(),board:".".repeat(42),a:first,b:first===ME?PARTNER:ME,turn:first,moves:0,last:-1,by:null,starter:ME,at:Date.now(),w:null}})}
+function c4Sheet(){juSheet("Connect Four",()=>{
+  const g=c4State(),o=PARTNER;
+  if(!g||!g.board)return [h("div",{class:"bigemo"},emo("🔴",72,true)),h("p",{class:"q",style:"text-align:center"},"Drop your discs and get four in a row before "+nm(o)+" does."),h("button",{type:"button",class:"btn",onclick:()=>{c4New(ME);refreshSheet()}},"Start a game, I go first")];
+  const me=g.a===ME?"a":"b",col={a:"#e2557c",b:"#5b3b8c"},mine=col[me],theirs=col[me==="a"?"b":"a"],line=g.w&&g.w!=="tie"?c4Win(g.board,g.a===g.w?"a":"b")||[]:[];
+  const myTurn=!g.w&&g.turn===ME;
+  const status=g.w?(g.w==="tie"?"Board full. It's a tie 🤝":g.w===ME?"You win! 🏆":nm(o)+" wins this one"):myTurn?"Your move. Tap a column.":"Waiting for "+nm(o)+"'s move";
+  const drop=c=>{if(!myTurn)return;let r=5;while(r>=0&&g.board[r*7+c]!==".")r--;if(r<0)return;const i=r*7+c,b=g.board.slice(0,i)+me+g.board.slice(i+1);
+    const won=c4Win(b,me),full=!b.includes("."),w=won?ME:full?"tie":null;
+    const upd={c4:{board:b,turn:o,moves:g.moves+1,last:i,by:ME,at:Date.now(),w}};if(w)upd.c4hist=firebase.firestore.FieldValue.arrayUnion({id:g.id,w,at:Date.now()});
+    saveDuel(upd);if(won){confetti(180);toast("You win 🏆","Four in a row")}};
+  const grid=h("div",{class:"c4",style:"--me:"+mine+";--op:"+theirs},[0,1,2,3,4,5,6].map(c=>h("button",{type:"button",class:"c4col",disabled:!myTurn||g.board[c]!==".","aria-label":"Drop in column "+(c+1),onclick:()=>drop(c)},
+    [0,1,2,3,4,5].map(r=>{const v=g.board[r*7+c],i=r*7+c;return h("i",{class:"c4c"+(v==="."?"":v===me?" m":" o")+(i===g.last?" last":"")+(line.includes(i)?" win":""),style:i===g.last?"--r:"+r:""})}))));
+  return [h("div",{class:"c4top"},h("span",{class:"c4me"},h("i",{style:"background:"+mine}),"You"),h("b",{class:"c4st"+(myTurn?" go":"")},status),h("span",{class:"c4me"},h("i",{style:"background:"+theirs}),nm(o))),grid,
+    g.w?h("button",{type:"button",class:"btn",onclick:()=>{c4New(g.w===ME?o:ME);refreshSheet()}},"Play again"+(g.w===ME?", "+nm(o)+" starts":g.w==="tie"?"":", you start")):
+      h("p",{class:"hint",style:"text-align:center"},myTurn?"":nm(o)+" gets a notification. You'll get one when it's your turn.")]})}
+
+function duelSection(){const k=usDay(),o=PARTNER,t=scoreboard(),kn=(DU().know||{})[k]||{},tv=(DU().trivia||{})[k]||{},g=c4State();
+  const sub=(a,b,done)=>done?"See who won":a?"Waiting for "+nm(o):b?nm(o)+" played. Your turn":"Play";
+  const kr=knowResult(k),tr=triviaResult(k);
+  const lead=t[ME]===t[o]?"All square":t[ME]>t[o]?"You're ahead":nm(o)+" is ahead";
+  const tile=(c,e,name,s,hot,fn)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},s));
+  const c4sub=!g||!g.board?"Start a game":g.w?(g.w==="tie"?"Tie · play again":g.w===ME?"You won · play again":nm(o)+" won · rematch"):g.turn===ME?"Your move":"Waiting for "+nm(o);
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Game night"),h("span",{class:"hint"},"Games with a winner")),
+    h("div",{class:"sboard"},emo("🏆",40,true),h("div",{class:"sbx"},h("span",{class:"k"},lead),h("div",{class:"sbs"},h("b",null,"You "+t[ME]),h("span",null,"vs"),h("b",null,t[o]+" "+nm(o))),t.tie?h("small",null,t.tie+" tie"+(t.tie===1?"":"s")):null)),
+    h("div",{class:"tgrid"},
+      tile("#e2557c","🧠","Know me best",sub(kn[ME]&&kn[ME].at,kn[o]&&kn[o].at,kr.done),!!(kn[o]&&kn[o].at&&!(kn[ME]&&kn[ME].at)),knowSheet),
+      tile("#1f7f78","🎯","Trivia duel",sub(tv[ME]&&tv[ME].at,tv[o]&&tv[o].at,tr.done),!!(tv[o]&&tv[o].at&&!(tv[ME]&&tv[ME].at)),triviaSheet),
+      tile("#5b3b8c","🔴","Connect Four",c4sub,!!(g&&!g.w&&g.turn===ME),c4Sheet)))}
 
 function gameSheet(g){juSheet(g.name,()=>{
   const k=usDay(),r=gameRound(g.id,k),key=gkey(k,r),set=dailySet(g.id,key),d=GM(g.id)[key]||{},o=PARTNER,mine=d[ME]||[],theirs=d[o],lab=g.lab||g.q;
@@ -2485,6 +2745,7 @@ function viewUs(){
   out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Play together"),h("span",{class:"hint"},"5 rounds a day")),
     sc(visibleGames().map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
       return tile(g.c,g.e,g.name,h("small",{class:"sub"},a&&b?"See matches":a?"Waiting for "+nm(oo):b?"Your turn":"Play"),b&&!a,()=>gameSheet(g))}))));
+  out.push(duelSection());
 
   const A=ANS(),tops=enabledTopics();
   const waitOn=[];tops.forEach(t=>t.qs.forEach((q,i)=>{const a=A[t.id+":"+i]||{};if(a[oo]&&!a[w])waitOn.push({t,i,q,at:a[oo].at||0})}));waitOn.sort((x,y)=>y.at-x.at);
@@ -2677,7 +2938,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-05-a";
+const APP_VERSION="2026-11-05-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});

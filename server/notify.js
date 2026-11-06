@@ -212,6 +212,20 @@ async function socialEvents(db, cid, members, people, now) {
     out.push({ to: o, key: "ans:" + id + ":" + u, at: v.at, title: both ? "Answers unlocked" : name(u) + " answered " + (id.startsWith("d:") ? "today's question" : "a question"),
       body: both ? "You both answered. See what " + name(u) + " said." : "Answer too and you'll both see each other's." });
   }
+  const du = (await db.doc(`couples/${cid}/us/duel`).get()).data() || {};
+  for (const [kind, label] of [["know", "Know me best"], ["trivia", "Trivia duel"]]) for (const [k, d] of Object.entries(du[kind] || {})) for (const [u, v] of Object.entries(d || {})) {
+    const o = other(u); if (!o || !v || !(v.at > lo)) continue;
+    const ov = d[o]; if (ov && ov.at > v.at) continue;
+    out.push({ to: o, key: "duel:" + kind + ":" + k + ":" + u, at: v.at, title: ov && ov.at ? "Results are in 🏆" : name(u) + " played " + label,
+      body: ov && ov.at ? name(u) + " finished " + label + ". See who won." : "Play today's " + label + " to see who wins." });
+  }
+  const c4 = du.c4;
+  if (c4 && c4.at > lo && c4.id) {
+    if (c4.by && other(c4.by)) out.push({ to: other(c4.by), key: "c4:" + c4.id + ":" + c4.moves, at: c4.at,
+      title: c4.w ? (c4.w === "tie" ? "Connect Four: it's a tie 🤝" : name(c4.w) + " won Connect Four 🏆") : "Your move in Connect Four 🔴",
+      body: c4.w ? "Open Our Days for a rematch." : name(c4.by) + " just dropped a disc." });
+    else if (!c4.by && c4.moves === 0 && c4.turn && c4.starter && c4.turn !== c4.starter) out.push({ to: c4.turn, key: "c4:" + c4.id + ":0", at: c4.at, title: "New Connect Four game 🔴", body: name(other(c4.turn)) + " started a game. You go first." });
+  }
   const GNAME = { likely: "Who's more likely to", wyr: "Would you rather", tot: "This or That", nhie: "Never have I ever", agree: "Agree or disagree", flirty: "Flirty picks" };
   for (const [gid, G] of Object.entries(us.games || {})) for (const [k, d] of Object.entries(G || {})) {
     if (k === "rounds" || !d || !d.done) continue;
