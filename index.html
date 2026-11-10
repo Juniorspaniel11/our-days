@@ -250,6 +250,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 
 /* week */
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wk2 .day{padding:6px 2px 4px;border-radius:12px}.wk2 .day .num{font-size:18px}.wk2 .dots{color:var(--accent);font-size:13px;line-height:1;height:12px;letter-spacing:1px}.wk2 .day.sel .dots{color:#fff}
+.wksec .sechead{margin-bottom:8px}
 .day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 2px;text-align:center;font-size:12.5px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:var(--shadow)}
 .day b{font-size:14px;color:var(--ink)}
 .day .num{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.1;color:var(--ink)}
@@ -737,6 +739,22 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .c4c.m{background:var(--me)}.ju .c4c.o{background:var(--op)}.ju .c4c.last{animation:c4drop .45s cubic-bezier(.3,1.4,.5,1)}
 .ju .c4c.win{box-shadow:0 0 0 3px #ffd27a,inset 0 2px 4px rgba(0,0,0,.25)}
 @keyframes c4drop{from{transform:translateY(calc(var(--r,3) * -110% - 110%))}to{transform:none}}
+
+.ju .savetot{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:20px;background:linear-gradient(135deg,#1f7f78,#3fb4a0);color:#fff;margin-bottom:10px}.ju .savetot .k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.85;display:block}.ju .savetot b{font-size:28px}
+.ju .goals{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.ju .goal{border:1px solid var(--line);border-radius:18px;padding:12px;background:var(--card);display:flex;flex-direction:column;gap:8px}
+.ju .gtop{display:flex;gap:12px;align-items:center}.ju .gjar{width:56px;height:56px;border-radius:16px;flex:none;display:grid;place-items:center;background:linear-gradient(to top,color-mix(in srgb,#3fb4a0 45%,transparent) var(--p),color-mix(in srgb,var(--accent) 6%,var(--card)) var(--p));border:2px solid color-mix(in srgb,#1f7f78 40%,var(--line))}
+.ju .gtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.ju .gtx b{font-size:16px}.ju .gamt{font-weight:700;color:#1f7f78;font-size:15px}.ju .gtx small{color:var(--muted);font-size:12.5px}
+.ju .gbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.ju .gbar i{display:block;height:100%;background:linear-gradient(90deg,#1f7f78,#3fb4a0);border-radius:4px;transition:width .6s}
+.ju .ghist{border-top:1px solid var(--line);padding-top:6px;display:flex;flex-direction:column;gap:2px}.ju .ghrow{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:3px 0}.ju .ghrow span{flex:1;color:var(--muted)}.ju .ghrow b{color:#1f7f78}.ju .ghrow b.neg{color:#c0394b}
+.ju .wcol{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}.ju .wcol h3{font-size:15px;margin:4px 0 0}
+.ju .wish{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--card)}.ju .wish .wtx{flex:1;min-width:0;display:flex;flex-direction:column}.ju .wish .wtx b{color:var(--ink);font-size:15px}.ju .wish .wtx small{color:var(--muted);font-size:12.5px}.ju .wish .gotit{color:#1f7f78!important;font-weight:700}
+.ju .wish.got{background:color-mix(in srgb,#3fb4a0 10%,var(--card))}
+.ju .wadd{display:flex;flex-wrap:wrap;gap:6px}
+.ju .bigday,.bigday{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:20px;background:linear-gradient(135deg,#fff3c4,#ffd27a);color:#4a3200;border:1px solid #f0c24a}
+.bigday .bdx{display:flex;flex-direction:column;gap:6px;min-width:0}.bigday .bdx b{display:block;font-size:16px}.bigday .bdx span{font-size:14px}.bigday .fbtn{background:#fff;border-color:#e4b13b;color:#4a3200}
+.ju .bprog{display:flex;flex-direction:column;gap:6px}.ju .bp{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;font-size:13px}.ju .bp small{white-space:nowrap}.ju .bp .gbar{background:color-mix(in srgb,var(--c) 22%,transparent);width:100%;justify-self:stretch;min-width:60px}.ju .bp .gbar i{background:linear-gradient(90deg,#8a5a2b,#d9a05b);min-width:6px}
+.ju a.fbtn{text-decoration:none;display:inline-block}
 </style>
 </head>
 
@@ -759,9 +777,9 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 
 <nav class="tabbar" aria-label="Sections">
   <button type="button" data-tab="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</button>
-  <button type="button" data-tab="week"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Week</button>
   <button type="button" data-tab="projects"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM9 7V5h6v2"/></svg>Projects</button>
   <button type="button" data-tab="us"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Us</button>
+  <button type="button" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>Home</button>
 </nav>
 
 <div class="sheet" id="sheet" hidden>
@@ -1113,7 +1131,7 @@ function nowBanner(pid){
   else if(next&&next.s-n.min<=60){lab="Up next";head=next.title;sub="At "+fmt(next.s)+", in "+(next.s-n.min)+" min";btns.push(agendaBtn(next))}
   else if((n.min>=22*60||n.min<120)&&!prayed){lab="Tonight";head="Prayer together";sub="10 minutes, whenever you are both ready";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>go("us")},"Open Us"))}
   else if(n.dow===0&&n.min>=17*60){lab="Sunday";head="Plan your week";sub="Pick this week's focus projects and update each next step";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>go("projects")},"Go to projects"))}
-  else if(n.min>=20*60){lab="Evening";head="Plan tomorrow";sub="Add tomorrow's tasks, then you're done for the day";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>{ui.sel=addDays(n.key,1);ui.weekOff=0;go("week")}},"Open tomorrow"))}
+  else if(n.min>=20*60){lab="Evening";head="Plan tomorrow";sub="Add tomorrow's tasks, then you're done for the day";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>{ui.sel=addDays(n.key,1);ui.weekOff=0;go("today")}},"Open tomorrow"))}
   else if(open.length){lab="Focus";head=open[0].t;sub=open.length+" task"+(open.length>1?"s":"")+" still open today"}
   else if(next){lab="Up next";head=next.title;sub="At "+fmt(next.s)}
   else{head="A clear stretch";sub="Add a task or start a focus session"}
@@ -1266,7 +1284,7 @@ function schedule(pid,k,opts){
     const acts=h("div",{class:"row"},
       isToday&&pid===me()?(it.d?(fm?h("span",{class:"tmin"},hmShort(fm)+" focused"):null):focusBtn(fid,it.t,fm)):null,
       it.c?h("span",{class:"carried",title:"Moved from an earlier day"},"carried over"):null,
-      h("button",{type:"button",class:"link",onclick:()=>{d.tasks=d.tasks.filter(y=>y.id!==it.id);if(S.timer&&S.timer.id===fid)stopTimer();persist();render()}},"Remove"));
+      h("button",{type:"button",class:"link",onclick:()=>{d.tasks=d.tasks.filter(y=>y.id!==it.id);if(P(pid).bigdays)delete P(pid).bigdays[it.id];if(S.timer&&S.timer.id===fid)stopTimer();persist();render()}},"Remove"));
     row.appendChild(h("div",{class:"evrow"},cb,h("div",{class:"t"},"Anytime"),h("div",{class:"what"},tx,acts)));tl.appendChild(row)});
   return tl;
 }
@@ -1282,12 +1300,15 @@ function itemSheet(pid,k,x){
   const repeat=h("input",{type:"checkbox",checked:x.kind==="rep"});
   const dows=dowPicker(x.days||[parseKey(k).getDay()]);
   const ag=h("input",{type:"checkbox",checked:!!x.agenda});
+  const big=h("input",{type:"checkbox",checked:!!(x.id&&(p.bigdays||{})[x.id])});
   const curCat=x.title?catOf(x):"personal";
   const catpick=h("div",{class:"catpick",role:"radiogroup","aria-label":"Category"},Object.keys(CAT).map(k=>h("label",null,h("input",{type:"radio",name:"cat",value:k,checked:k===curCat}),h("span",{style:"background:"+CAT[k][1]},CAT[k][0]))));
   const dateField=h("div",{class:"field"},h("label",null,"Date"),dt),dowField=h("div",{class:"field"},h("label",null,"Repeats every"),dows);
   const sync=()=>{dateField.hidden=repeat.checked;dowField.hidden=!repeat.checked};repeat.onchange=sync;sync();
   const form=h("form",{class:"body",onsubmit:e=>{e.preventDefault();if(!ti.value.trim())return;
-    if(!st.value&&!repeat.checked){p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);addTask(pid,dt.value||k,ti.value.trim());closeSheet();render();return}
+    p.bigdays=p.bigdays||{};if(x.id)delete p.bigdays[x.id];
+    if(!st.value&&!repeat.checked){p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);addTask(pid,dt.value||k,ti.value.trim());
+      if(big.checked){const ts=day(pid,dt.value||k).tasks,t=ts[ts.length-1];p.bigdays[t.id]={date:dt.value||k,title:ti.value.trim(),time:""};persist()}closeSheet();render();return}
     if(!st.value){st.focus();return}
     const ck=catpick.querySelector("input:checked");
     const base={title:ti.value.trim(),note:no.value.trim(),start:st.value,end:en.value,agenda:ag.checked,cat:ck?ck.value:"personal"};
@@ -1295,6 +1316,8 @@ function itemSheet(pid,k,x){
     const id=x.id||uid();
     if(repeat.checked){const days=[...dows.querySelectorAll("input:checked")].map(i=>+i.value);p.routine.push({id,...base,days:days.length?days:[parseKey(k).getDay()]})}
     else p.events.push({id,...base,date:dt.value||k});
+    if(big.checked&&!repeat.checked)p.bigdays[id]={date:dt.value||k,title:base.title,time:base.start};
+    Object.keys(p.bigdays).forEach(b=>{if(p.bigdays[b].date<addDays(tzNow(p.tz).key,-7))delete p.bigdays[b]});
     if(ag.checked&&!p.agenda[id])p.agenda[id]=[];
     persist();closeSheet()}},
     h("div",{class:"field"},h("label",null,"What"),ti),no,
@@ -1302,9 +1325,10 @@ function itemSheet(pid,k,x){
     h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 120px"},h("label",null,"Start (empty for anytime)"),st),h("div",{class:"field",style:"flex:1 1 120px"},h("label",null,"End"),en)),
     h("label",{class:"check"},repeat,"Repeat every week"),dateField,dowField,
     h("label",{class:"check"},ag,"Keep a meeting agenda for this"),
+    h("label",{class:"check"},big,"⭐ Big day, like an exam, presentation or deadline. "+nm(PARTNER)+" gets a heads up that morning"),
     h("div",{class:"row"},h("button",{type:"submit",class:"primary"},isNew?"Add":"Save"),
       !isNew&&x.kind==="rep"?h("button",{type:"button",class:"ghost",onclick:()=>{el("sheet").hidden=true;toggleIn(pid,k,"skip",x.id)}},"Cancel just this "+DAYS[parseKey(k).getDay()]):null),
-    isNew?null:confirmBtn(x.kind==="rep"?"Delete from every week":"Delete",()=>{p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);persist();closeSheet()}));
+    isNew?null:confirmBtn(x.kind==="rep"?"Delete from every week":"Delete",()=>{p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);if(p.bigdays)delete p.bigdays[x.id];persist();closeSheet()}));
   openSheet(isNew?"Add to "+(k===tzNow(p.tz).key?"today":longDate(k)):"Edit",form);
 }
 
@@ -1394,31 +1418,28 @@ function checkinCard(pid,k){
     h("div",{class:"ckrow"},h("span",{class:"ckl"},"Energy"),scale("energy",["1","2","3","4","5"])),
     h("div",{class:"ckrow"},h("span",{class:"ckl"},"Mood"),scale("mood",MOODS)));
 }
-function viewToday(){
-  const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
-  return [
-    countdownStrip(pid),
-    dayCard(pid,n.key,"Today"),
-    panel("Every day",habitsList(pid,n.key,true),h("button",{type:"button",class:"link",onclick:()=>{ui.habitEdit=!ui.habitEdit;render()}},ui.habitEdit?"Done":"Edit"))
-  ];
-}
-function viewWeek(){
-  const pid=me(),p=P(pid),n=tzNow(p.tz);
-  if(!ui.sel)ui.sel=n.key;
+function weekStrip(pid){
+  const p=P(pid),n=tzNow(p.tz);if(!ui.sel)ui.sel=n.key;
   const mon=addDays(n.key,-((n.dow+6)%7)+ui.weekOff*7);
   const label=ui.weekOff===0?"This week":ui.weekOff===1?"Next week":ui.weekOff===-1?"Last week":"Week of "+shortDate(mon);
-  const wk=h("div",{class:"week"});
-  for(let i=0;i<7;i++){const k=addDays(mon,i),its=itemsFor(pid,k).filter(x=>!x.skip),cnt=its.length;
-    wk.appendChild(h("button",{type:"button",class:"day"+(k===n.key?" today":"")+(k===ui.sel?" sel":""),"aria-pressed":String(k===ui.sel),onclick:()=>{ui.sel=k;render()}},
-      h("b",null,SH[parseKey(k).getDay()]),h("span",{class:"num"},String(parseKey(k).getDate())),h("span",null,cnt?cnt+" event"+(cnt>1?"s":""):"free")))}
-  const isT=ui.sel===n.key,lab=isT?"today":ui.sel===addDays(n.key,1)?"tomorrow":DAYS[parseKey(ui.sel).getDay()];
-  return [
-    h("section",null,h("div",{class:"sechead"},h("h2",null,label),h("div",{class:"nav"},
+  const wk=h("div",{class:"week wk2"});
+  for(let i=0;i<7;i++){const k=addDays(mon,i),cnt=itemsFor(pid,k).filter(x=>!x.skip&&!x.allDay).length+day(pid,k).tasks.filter(t=>t.t&&!t.d).length;
+    wk.appendChild(h("button",{type:"button",class:"day"+(k===n.key?" today":"")+(k===ui.sel?" sel":""),"aria-pressed":String(k===ui.sel),"aria-label":longDate(k)+", "+cnt+" planned",onclick:()=>{ui.sel=k;render()}},
+      h("b",null,SH[parseKey(k).getDay()]),h("span",{class:"num"},String(parseKey(k).getDate())),h("span",{class:"dots"},cnt?"•".repeat(Math.min(cnt,4)):"")))}
+  return h("section",{class:"wksec"},h("div",{class:"sechead"},h("h2",{style:"font-size:18px"},label),h("div",{class:"nav"},
       h("button",{type:"button","aria-label":"Previous week",onclick:()=>{ui.weekOff--;render()}},"‹"),
-      h("button",{type:"button",onclick:()=>{ui.weekOff=0;ui.sel=n.key;render()}},"Today"),
-      h("button",{type:"button","aria-label":"Next week",onclick:()=>{ui.weekOff++;render()}},"›"))),wk),
-    dayCard(pid,ui.sel,isT?"Today":lab==="tomorrow"?"Tomorrow":longDate(ui.sel))
-  ];
+      ui.weekOff!==0||ui.sel!==n.key?h("button",{type:"button",onclick:()=>{ui.weekOff=0;ui.sel=n.key;render()}},"Today"):null,
+      h("button",{type:"button","aria-label":"Next week",onclick:()=>{ui.weekOff++;render()}},"›"))),wk)}
+function viewToday(){
+  const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
+  if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
+  return [
+    pid===ME?bigBanner():null,
+    countdownStrip(pid),
+    weekStrip(pid),
+    dayCard(pid,sel,isT?"Today":sel===addDays(n.key,1)?"Tomorrow":longDate(sel)),
+    isT?panel("Every day",habitsList(pid,n.key,true),h("button",{type:"button",class:"link",onclick:()=>{ui.habitEdit=!ui.habitEdit;render()}},ui.habitEdit?"Done":"Edit")):null
+  ].filter(Boolean);
 }
 
 function viewProjects(){
@@ -2169,7 +2190,7 @@ function watchUs(){
   const col=n=>DB.collection("couples/"+CID+"/"+n);
   const list=(n,lim,key)=>unsubs.push(col(n).orderBy("at","desc").limit(lim).onSnapshot(q=>{US[key]=q.docs.map(d=>({id:d.id,...d.data()}));usRefresh()},e=>console.warn(e)));
   unsubs.push(usRef().onSnapshot(sn=>{US.main=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
-  ["home","prayer","visits","books","checkin","evening","duel"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
+  ["home","prayer","visits","books","checkin","evening","duel","money","wish","bible"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
   list("moments",30,"moments");list("letters",200,"letters");list("jar",500,"jar");list("nudges",20,"nudges");
 }
 function usRefresh(){
@@ -2337,6 +2358,137 @@ function photoSheet(){let img=null;juSheet("Photo of the day",()=>{
   else if(!theirs)out.push(h("div",{class:"lockbox"},svgEl(ICON.lock("#1f7f78")),h("div",null,h("b",null,"Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"Yours is in. Both unlock when "+nm(o)+" shares."))));
   else out.push(h("div",{class:"answers reveal"},[ME,PARTNER].map(x=>h("div",{class:"ans"+(x!==ME?" f":"")},h("span",{class:"who"},x===ME?"You":nm(x)),d[x].img?h("img",{src:d[x].img,alt:""}):null,h("p",null,(d[x].note||"").split(": ").slice(1).join(": "))))));
   return out})}
+
+/* ---------- Home tab: saving together, wish lists, home design ---------- */
+const MONEY=()=>US.money||{};
+const saveMoney=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/money").set(o,{merge:true}).catch(syncErr)};
+const WISH=()=>US.wish||{};
+const saveWish=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/wish").set(o,{merge:true}).catch(syncErr)};
+const DEL=()=>firebase.firestore.FieldValue.delete();
+const money=n=>"$"+Math.round(n).toLocaleString("en-US");
+const PRESET_GOALS=[["visit","Visit fund","✈️"],["wedding","Wedding","💍"],["emergency","Emergency fund","🛟"]];
+function goals(){const g=MONEY().goals||{};const out=PRESET_GOALS.map(([id,name,e],i)=>({id,name,e,order:i,...(g[id]||{})})).filter(x=>!x.removed);
+  Object.entries(g).forEach(([id,x])=>{if(!PRESET_GOALS.some(p=>p[0]===id)&&!x.removed)out.push({id,...x})});return out.sort((a,b)=>(a.order??9)-(b.order??9))}
+function goalAdds(gid){return Object.entries(MONEY().adds||{}).map(([id,a])=>({id,...a})).filter(a=>a.g===gid).sort((a,b)=>b.at-a.at)}
+const goalSaved=gid=>goalAdds(gid).reduce((s,a)=>s+(+a.amt||0),0);
+/* simple privacy lock for amounts on this phone */
+const pinKey="ourdays-pin";
+const pinHash=s=>{let x=5381;for(const c of "od:"+s)x=((x*33)^c.charCodeAt(0))>>>0;return x.toString(36)};
+const lockOn=()=>{try{return !!localStorage.getItem(pinKey)}catch(e){return false}};
+const unlocked=()=>{try{return !lockOn()||sessionStorage.getItem("ourdays-unlocked")==="1"}catch(e){return true}};
+function pinSheet(mode){juSheet(mode==="set"?"Lock savings with a PIN":"Unlock savings",()=>{
+  const inp=h("input",{type:"password",inputmode:"numeric",pattern:"[0-9]*",maxlength:"8",class:"inp",placeholder:"4 to 8 digits",autocomplete:"off"});
+  const msg=h("p",{class:"hint"},mode==="set"?"Amounts stay hidden on this phone until you enter the PIN. Each of you sets your own.":"Enter your PIN to see the amounts.");
+  return [msg,h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=inp.value.trim();if(!/^\d{4,8}$/.test(v)){msg.textContent="Use 4 to 8 digits";return}
+    try{if(mode==="set"){localStorage.setItem(pinKey,pinHash(v));sessionStorage.setItem("ourdays-unlocked","1");toast("Savings locked 🔒","Amounts hide when you close the app")}
+      else if(localStorage.getItem(pinKey)===pinHash(v)){sessionStorage.setItem("ourdays-unlocked","1")}else{msg.textContent="That PIN doesn't match";inp.value="";return}}catch(e){}
+    closeSheet();render()}},h("div",{style:"flex:1 1 160px"},inp),h("button",{type:"submit",class:"btn"},mode==="set"?"Set PIN":"Unlock")),
+    mode==="unlock"?h("button",{type:"button",class:"link",onclick:forgotPin},"Forgot the PIN?"):null]});
+  setTimeout(()=>{const i=document.querySelector("#sheet input[type=password]");if(i)i.focus()},50)}
+function forgotPin(){juSheet("Reset your savings PIN",()=>{const pw=h("input",{type:"password",class:"inp",placeholder:"Your Our Days account password",autocomplete:"current-password"}),msg=h("p",{class:"hint"},"Enter your account password to remove the PIN on this phone.");
+  return [msg,h("form",{class:"row",onsubmit:async e=>{e.preventDefault();try{const u=firebase.auth().currentUser;await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,pw.value));
+    localStorage.removeItem(pinKey);sessionStorage.removeItem("ourdays-unlocked");closeSheet();toast("PIN removed","Set a new one any time");render()}catch(er){msg.textContent="That password didn't work"}}},h("div",{style:"flex:1 1 180px"},pw),h("button",{type:"submit",class:"btn"},"Reset"))]})}
+function addMoneySheet(g,out){juSheet((out?"Take out of ":"Add to ")+g.name,()=>{
+  const amt=h("input",{type:"number",inputmode:"decimal",min:"1",step:"1",class:"inp",placeholder:"Amount in $"}),note=h("input",{type:"text",class:"inp",placeholder:out?"What for, e.g. Flight to Vegas":"Note (optional)"});
+  return [h("div",{class:"bigemo"},emo(g.e||"💰",64,true)),
+    h("form",{class:"body",onsubmit:e=>{e.preventDefault();const v=Math.round(parseFloat(amt.value)*100)/100;if(!(v>0))return;
+      const before=goalSaved(g.id),after=before+(out?-v:v),id=uid();
+      saveMoney({adds:{[id]:{g:g.id,amt:out?-v:v,by:ME,at:Date.now(),note:note.value.trim()}}});
+      let ms=null;if(!out&&g.target>0)[25,50,75,100].forEach(pc=>{if(before<g.target*pc/100&&after>=g.target*pc/100)ms=pc});
+      if(ms){confetti(ms===100?200:90);toast(ms===100?g.name+" reached 🎉":g.name+" is "+ms+"% there",money(after)+" of "+money(g.target))}else if(!out)hearts(document.querySelector(".tabbar"),8);
+      if(!out&&DB&&CID)DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"money",title:ms?(ms===100?g.e+" "+g.name+" is fully saved!":g.e+" "+g.name+" is "+ms+"% there"):nm(ME)+" saved toward "+g.name+" "+g.e,body:ms?"Together you've saved "+money(after)+".":"One step closer. Open Our Days to see it."}).catch(syncErr);
+      closeSheet()}},
+      h("div",{class:"field"},h("label",null,out?"Amount to take out":"Amount you're putting aside"),amt),note,
+      h("button",{type:"submit",class:"btn"},out?"Take out":"Add"))]});setTimeout(()=>{const i=document.querySelector("#sheet input[type=number]");if(i)i.focus()},50)}
+function goalEditSheet(g){juSheet(g?"Edit goal":"New goal",()=>{
+  g=g||{id:uid(),name:"",e:"🎯",target:0,date:"",order:goals().length};
+  const ti=h("input",{type:"text",class:"inp",value:g.name,placeholder:"e.g. Trip to Ghana"}),em=h("input",{type:"text",class:"inp",value:g.e||"🎯",style:"width:70px"});
+  const tg=h("input",{type:"number",inputmode:"decimal",min:"0",class:"inp",value:g.target||"",placeholder:"e.g. 1500"}),dt=h("input",{type:"date",class:"inp",value:g.date||""});
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();saveMoney({goals:{[g.id]:{name:ti.value.trim()||g.name||"Goal",e:em.value.trim()||"🎯",target:+tg.value||0,date:dt.value||"",order:g.order??9}}});closeSheet()}},
+    h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 180px"},h("label",null,"Name"),ti),h("div",{class:"field",style:"flex:0 0 80px"},h("label",null,"Emoji"),em)),
+    h("div",{class:"row"},h("div",{class:"field",style:"flex:1 1 130px"},h("label",null,"Target amount ($)"),tg),h("div",{class:"field",style:"flex:1 1 130px"},h("label",null,"Target date (optional)"),dt)),
+    h("div",{class:"row"},h("button",{type:"submit",class:"primary"},"Save"),confirmBtn("Remove goal",()=>{saveMoney({goals:{[g.id]:{removed:true}}});closeSheet()})))})}
+function goalCard(g){const sv=goalSaved(g.id),pc=g.target>0?Math.min(100,Math.round(sv/g.target*100)):null,show=unlocked(),open=ui.goalOpen===g.id;
+  let pace="";if(g.target>0&&sv<g.target&&g.date){const mo=Math.max(1,Math.round(daysBetween(tzNow(P(ME).tz).key,g.date)/30.4));pace=money((g.target-sv)/mo)+" a month to reach it by "+parseKey(g.date).toLocaleDateString("en-US",{month:"short",year:"numeric"})}
+  else if(g.target>0&&sv>=g.target)pace="Reached 🎉";else if(!g.target)pace="Tap Edit to set a target";
+  const c=h("div",{class:"goal"},
+    h("div",{class:"gtop"},h("div",{class:"gjar",style:"--p:"+(pc??0)+"%"},emo(g.e||"💰",34,false)),
+      h("div",{class:"gtx"},h("b",null,g.name),h("span",{class:"gamt"},show?money(sv)+(g.target?" of "+money(g.target):" saved"):"•••• hidden"),
+        g.target?h("div",{class:"gbar"},h("i",{style:"width:"+(show?pc:0)+"%"})):null,show&&pace?h("small",null,pace):null)),
+    h("div",{class:"row",style:"gap:6px"},h("button",{type:"button",class:"fbtn",onclick:()=>addMoneySheet(g,false)},"＋ Add money"),
+      h("button",{type:"button",class:"link",onclick:()=>{ui.goalOpen=open?null:g.id;render()}},open?"Hide":"History"),
+      h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(g)},"Edit")));
+  if(open){const ad=goalAdds(g.id);c.appendChild(h("div",{class:"ghist"},ad.length?ad.slice(0,30).map(a=>h("div",{class:"ghrow"},h("span",null,(a.by===ME?"You":nm(a.by))+" · "+new Date(a.at).toLocaleDateString("en-US",{month:"short",day:"numeric"})+(a.note?" · "+a.note:"")),
+      h("b",{class:a.amt<0?"neg":""},show?(a.amt<0?"−":"+")+money(Math.abs(a.amt)):"••••"),a.by===ME?h("button",{type:"button",class:"x","aria-label":"Remove entry",onclick:()=>saveMoney({adds:{[a.id]:DEL()}})},"×"):null)):h("p",{class:"hint"},"Nothing added yet."),
+      h("button",{type:"button",class:"link",onclick:()=>addMoneySheet(g,true)},"Take money out")))}
+  return c}
+function savingsSection(){const gs=goals(),tot=gs.reduce((s,g)=>s+goalSaved(g.id),0),show=unlocked();
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Saving together"),
+      h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Turn lock off":"🔒 Unlock"):"🔒 Lock")),
+    h("div",{class:"savetot"},emo("🫙",44,true),h("div",null,h("span",{class:"k"},"Saved together"),h("b",null,show?money(tot):"••••"))),
+    h("div",{class:"goals"},gs.map(goalCard)),
+    h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(null)},"+ New goal"))}
+
+function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x])=>({id,...x})).sort((a,b)=>a.at-b.at),mine=all.filter(x=>x.owner===ME),hers=all.filter(x=>x.owner===PARTNER);
+  const ti=h("input",{type:"text",class:"inp",placeholder:"Something you'd love"}),pr=h("input",{type:"text",class:"inp",inputmode:"decimal",placeholder:"Price"}),ln=h("input",{type:"url",class:"inp",placeholder:"Link (optional)"});
+  const pic=t=>emo("🎁",30,false);
+  const item=(x,theirs)=>h("div",{class:"wish"+(theirs&&x.got?" got":"")},pic(x.title),h("div",{class:"wtx"},h("b",null,x.title),h("small",null,[x.price?"$"+String(x.price).replace(/^\$/,""):"",x.link?"has a link":""].filter(Boolean).join(" · ")),
+      theirs&&x.got?h("small",{class:"gotit"},x.got===ME?"You're getting this 🤫":"Taken care of"):null),
+    x.link?h("a",{class:"link",href:x.link,target:"_blank",rel:"noopener"},"Open"):null,
+    theirs?(!x.got||x.got===ME?h("button",{type:"button",class:"fbtn"+(x.got===ME?" on":""),onclick:()=>saveWish({items:{[x.id]:{got:x.got===ME?null:ME,gotAt:Date.now()}}})},x.got===ME?"Undo":"I'll get it"):null)
+      :h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveWish({items:{[x.id]:DEL()}})},"×"));
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Wish lists"),h("span",{class:"hint"},"For birthdays and surprises")),
+    h("div",{class:"wcol"},h("h3",null,nm(PARTNER)+"'s wishes"),hers.length?hers.map(x=>item(x,true)):h("p",{class:"hint"},nm(PARTNER)+" hasn't added any yet."),
+      h("p",{class:"hint",style:"font-size:12.5px"},"Tap I'll get it and "+nm(PARTNER)+" will never see it was claimed.")),
+    h("div",{class:"wcol"},h("h3",null,"Your wishes"),mine.map(x=>item(x,false)),
+      h("form",{class:"wadd",onsubmit:e=>{e.preventDefault();if(!ti.value.trim())return;let l=ln.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;
+        saveWish({items:{[uid()]:{owner:ME,title:ti.value.trim(),price:pr.value.trim(),link:l,at:Date.now(),got:null}}});ti.value="";pr.value="";ln.value=""}},
+        h("div",{style:"flex:2 1 180px"},ti),h("div",{style:"flex:0 1 90px"},pr),h("div",{style:"flex:2 1 180px"},ln),h("button",{type:"submit",class:"ghost"},"Add"))))}
+
+function homeDesignSection(){const link=US.main.homeLink||"";
+  const inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared Planner 5D or Homestyler link"});
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our home design")),
+    h("div",{class:"pc",style:"--c:#1f7f78"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},link?"Your 3D home":"Design it in 3D"),
+        h("span",{class:"tx"},link?"Open it and keep building together":"Build your future home room by room, then walk through it in 3D")),emo("🏡",56,true)),
+      link?h("div",{class:"row"},h("a",{class:"btn",href:link,target:"_blank",rel:"noopener"},"Open our home"),h("button",{type:"button",class:"btn gh",onclick:homeSheet},"Quick sketch")):
+        h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler"),h("button",{type:"button",class:"btn gh",onclick:homeSheet},"Quick sketch"))),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});toast(l?"Home link saved":"Link removed",l?nm(PARTNER)+" can open it from here too":"")}},
+      h("div",{style:"flex:1 1 220px"},inp),h("button",{type:"submit",class:"ghost"},link?"Update":"Save link")),
+    !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
+
+function viewHome(){return [savingsSection(),wishSection(),homeDesignSection()]}
+
+/* ---------- Big day alerts ---------- */
+function bigToday(u){const p=P(u);if(!p||p.placeholder)return [];const k=tzNow(p.tz).key;return Object.entries(p.bigdays||{}).map(([id,x])=>({id,...x})).filter(x=>x.date===k)}
+function bigBanner(){const bs=bigToday(PARTNER),mine=bigToday(ME);if(!bs.length&&!mine.length)return null;
+  const line=(u,b)=>b.map(x=>x.title+(x.time?" at "+fmt(toMin(x.time)):"")).join(" · ");
+  return h("div",{class:"bigday"},emo("⭐",40,true),h("div",{class:"bdx"},
+    bs.length?h("div",null,h("b",null,nm(PARTNER)+"'s big day today"),h("span",null,line(PARTNER,bs)+(bs.some(x=>x.time)?" ("+nm(PARTNER)+"'s time)":""))):null,
+    mine.length?h("div",null,h("b",null,"Your big day today"),h("span",null,line(ME,mine)+". "+nm(PARTNER)+" knows.")):null,
+    bs.length?h("div",{class:"row",style:"gap:6px;margin-top:4px"},
+      h("button",{type:"button",class:"fbtn",onclick:ev=>{if(DB&&CID)DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"big",title:nm(ME)+" is praying for you 🙏",body:"You've got this today. ⭐"}).catch(syncErr);hearts(ev.currentTarget,12);toast("Sent 🙏",nm(PARTNER)+" will feel the love")}},"🙏 I'm praying for you"),
+      h("button",{type:"button",class:"fbtn",onclick:ev=>{if(DB&&CID)DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"big",title:"Good luck from "+nm(ME)+" ⭐",body:"Go shine today. I'm proud of you."}).catch(syncErr);hearts(ev.currentTarget,12);toast("Sent ⭐","Good luck is on the way")}},"⭐ Good luck")):null))}
+
+/* ---------- Bible reading plan together ---------- */
+const BPLANS=[["john","Gospel of John","JHN",21],["mark","Gospel of Mark","MRK",16],["proverbs","Proverbs","PRO",31],["psalms","Psalms 1 to 30","PSA",30],["romans","Romans","ROM",16],["acts","Acts","ACT",28],["philippians","Philippians to Colossians","PHP",4],["genesis","Genesis","GEN",50],["ruth","Ruth and Esther","RUT",4],["james","James","JAS",5]];
+const BIB=()=>US.bible||{};
+const saveBible=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/bible").set(o,{merge:true}).catch(syncErr)};
+function bplan(){const b=BIB();return b.plan?BPLANS.find(x=>x[0]===b.plan):null}
+const bRead=u=>Object.keys(((BIB().read||{})[BIB().plan]||{})[u]||{}).length;
+const bName=(pl,n)=>(pl[0]==="psalms"?"Psalm ":pl[1].replace(/^Gospel of /,"").replace(/ to .*| and .*/,"")+" ")+n;
+const bUrl=(pl,n)=>"https://www.bible.com/bible/111/"+pl[2]+"."+n+".NIV";
+function bibleStrip(){const pl=bplan(),o=PARTNER;
+  if(!pl)return h("button",{type:"button",class:"pc tap",style:"--c:#8a5a2b",onclick:bibleSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Read the Bible together"),h("span",{class:"tx"},"Pick a book. You each read a chapter a day")),emo("📖",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"John, Proverbs, Psalms and more"),h("span",{class:"go"},"Choose")));
+  const a=bRead(ME),b=bRead(o),next=Math.min(a+1,pl[3]),done=a>=pl[3];
+  const today=tzNow(P(ME).tz).key,readToday=Object.values(((BIB().read||{})[pl[0]]||{})[ME]||{}).includes(today);
+  return h("div",{class:"pc biblec",style:"--c:#8a5a2b"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Reading "+pl[1]+" together"),
+      h("span",{class:"tx"},done?"You finished "+pl[1]+" 🎉":readToday?"You read today ✓":"Today: "+bName(pl,next))),emo("📖",48,true)),
+    h("div",{class:"bprog"},[[ME,"You",a],[o,nm(o),b]].map(([u,l,n])=>h("div",{class:"bp"},h("span",null,l),h("div",{class:"gbar"},h("i",{style:"width:"+Math.round(n/pl[3]*100)+"%"})),h("small",null,n+" of "+pl[3])))),
+    h("div",{class:"row",style:"gap:6px"},!done?h("a",{class:"fbtn",href:bUrl(pl,next),target:"_blank",rel:"noopener"},"Open "+bName(pl,next)):null,
+      !done?h("button",{type:"button",class:"fbtn on",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[next]:today}}}});hearts(ev.currentTarget,8);if(next===pl[3])confetti(150)}},"✓ I read it"):null,
+      h("button",{type:"button",class:"link",onclick:bibleSheet},done?"Pick the next book":"Change book")))}
+function bibleSheet(){juSheet("Read the Bible together",()=>[h("p",{class:"hint"},"You both read the same book, one chapter a day at your own pace. Each chapter opens in the NIV on bible.com."),
+  h("div",{class:"actgrid"},BPLANS.map(pl=>h("button",{type:"button",class:"act tap",onclick:()=>{saveBible({plan:pl[0],startedBy:ME,at:Date.now()});closeSheet();toast("Reading "+pl[1],nm(PARTNER)+" sees it too")}},emo("📖",30,false),h("small",null,pl[1]+" · "+pl[3]+" days"))))])}
 
 /* ---------- Game night: games with a winner ---------- */
 const KNOW_QS=[
@@ -2715,6 +2867,7 @@ function viewUs(){
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(coupleStrip());
+  {const bb=bigBanner();if(bb)out.push(bb)}
   out.push(eveningCard());
   out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
@@ -2739,6 +2892,7 @@ function viewUs(){
 
   out.push(growSection());
   out.push(usPrayer());
+  out.push(h("section",{class:"ju"},bibleStrip()));
   const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);
 
@@ -2899,7 +3053,8 @@ setInterval(()=>{if(S.timer)renderTimer()},1000);
 /* ---------- shell ---------- */
 function go(tab){S.tab=tab;persist();render();window.scrollTo({top:0})}
 function render(){
-  if(S.tab==="us"&&S.viewAs!==ME)S.viewAs=ME;
+  if(S.tab==="week")S.tab="today";
+  if((S.tab==="us"||S.tab==="home")&&S.viewAs!==ME)S.viewAs=ME;
   const pid=me(),p=P(pid),o=P(partnerOf(pid)),n=tzNow(p.tz);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.as===pid)));
   document.querySelectorAll(".tabbar button").forEach(b=>{if(b.dataset.tab===S.tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
@@ -2908,14 +3063,14 @@ function render(){
   el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
   const greet=n.min<300?"Still up":n.min<720?"Good morning":n.min<1020?"Good afternoon":n.min<1320?"Good evening":"Good night";
   const RO=pid!==ME;document.body.classList.toggle("ro",RO);document.body.classList.toggle("tab-us",S.tab==="us");
-  el("title").textContent=RO?{today:p.name+"'s day",week:p.name+"'s week",projects:p.name+"'s projects",us:p.name+" & "+o.name}[S.tab]
-    :{today:greet+", "+p.name,week:"Plan the week",projects:"Your projects",us:p.name+" & "+o.name}[S.tab];
+  el("title").textContent=RO?{today:p.name+"'s day",projects:p.name+"'s projects",us:p.name+" & "+o.name,home:"Our home"}[S.tab]
+    :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home"}[S.tab];
   const sl=el("subline");sl.innerHTML="";
   const pidP=partnerOf(ME);
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
     const chip=(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
-      onclick:()=>{if(ph||S.viewAs===id)return;if(S.tab==="us"&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
+      onclick:()=>{if(ph||S.viewAs===id)return;if((S.tab==="us"||S.tab==="home")&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
       h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")));
     const row=h("div",{class:"tzrow"},chip);
     if(!ph&&S.tab!=="us"&&P(pidP)&&!P(pidP).placeholder){const st=statusOf(id),pr=presenceOf(id);
@@ -2927,7 +3082,7 @@ function render(){
   const main=el("main");main.innerHTML="";
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
     h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
-  const v={today:viewToday,week:viewWeek,projects:viewProjects,us:viewUs}[S.tab]();
+  const v={today:viewToday,projects:viewProjects,us:viewUs,home:viewHome}[S.tab]();
   v.forEach(x=>main.appendChild(x));
   renderTimer();
 }
@@ -2938,7 +3093,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-05-b";
+const APP_VERSION="2026-11-09-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});

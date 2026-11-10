@@ -84,6 +84,12 @@ function dueNotifications(ctx) {
         out.push({ key: "morning:" + k, at: t, title: "Good morning, " + (person.name || ""), body: bits.join(" · ") });
       }
     }
+    if (partner && partner.bigdays) {
+      const t = wallToMs(k, (toMin(nf.morningAt) ?? 450) + 2, tz);
+      const bs = Object.entries(partner.bigdays).filter(([, b]) => b && b.date === k);
+      if (inWin(t) && bs.length) out.push({ key: "bigday:" + k, at: t, title: "⭐ " + (partner.name || "Your partner") + "'s big day today",
+        body: bs.map(([, b]) => b.title + (b.time ? " at " + fmt(toMin(b.time)) + " their time" : "")).join(" · ") + ". Send some love and a prayer 🙏" });
+    }
     if (nf.countdown) {
       const t = wallToMs(k, (toMin(nf.morningAt) ?? 450) + 1, tz);
       if (inWin(t)) {
