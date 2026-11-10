@@ -2430,9 +2430,9 @@ function savingsSection(){const gs=goals(),tot=gs.reduce((s,g)=>s+goalSaved(g.id
     h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(null)},"+ New goal"))}
 
 function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x])=>({id,...x})).sort((a,b)=>a.at-b.at),mine=all.filter(x=>x.owner===ME),hers=all.filter(x=>x.owner===PARTNER);
-  const ti=h("input",{type:"text",class:"inp",placeholder:"Something you'd love"}),pr=h("input",{type:"text",class:"inp",inputmode:"decimal",placeholder:"Price"}),ln=h("input",{type:"url",class:"inp",placeholder:"Link (optional)"});
+  const ti=h("input",{type:"text",class:"inp",placeholder:"Something you'd love"}),ln=h("input",{type:"url",class:"inp",placeholder:"Link (optional)"});
   const pic=t=>emo("🎁",30,false);
-  const item=(x,theirs)=>h("div",{class:"wish"+(theirs&&x.got?" got":"")},pic(x.title),h("div",{class:"wtx"},h("b",null,x.title),h("small",null,[x.price?"$"+String(x.price).replace(/^\$/,""):"",x.link?"has a link":""].filter(Boolean).join(" · ")),
+  const item=(x,theirs)=>h("div",{class:"wish"+(theirs&&x.got?" got":"")},pic(x.title),h("div",{class:"wtx"},h("b",null,x.title),x.link?h("small",null,"Has a link"):null,
       theirs&&x.got?h("small",{class:"gotit"},x.got===ME?"You're getting this 🤫":"Taken care of"):null),
     x.link?h("a",{class:"link",href:x.link,target:"_blank",rel:"noopener"},"Open"):null,
     theirs?(!x.got||x.got===ME?h("button",{type:"button",class:"fbtn"+(x.got===ME?" on":""),onclick:()=>saveWish({items:{[x.id]:{got:x.got===ME?null:ME,gotAt:Date.now()}}})},x.got===ME?"Undo":"I'll get it"):null)
@@ -2442,16 +2442,16 @@ function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x
       h("p",{class:"hint",style:"font-size:12.5px"},"Tap I'll get it and "+nm(PARTNER)+" will never see it was claimed.")),
     h("div",{class:"wcol"},h("h3",null,"Your wishes"),mine.map(x=>item(x,false)),
       h("form",{class:"wadd",onsubmit:e=>{e.preventDefault();if(!ti.value.trim())return;let l=ln.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;
-        saveWish({items:{[uid()]:{owner:ME,title:ti.value.trim(),price:pr.value.trim(),link:l,at:Date.now(),got:null}}});ti.value="";pr.value="";ln.value=""}},
-        h("div",{style:"flex:2 1 180px"},ti),h("div",{style:"flex:0 1 90px"},pr),h("div",{style:"flex:2 1 180px"},ln),h("button",{type:"submit",class:"ghost"},"Add"))))}
+        saveWish({items:{[uid()]:{owner:ME,title:ti.value.trim(),link:l,at:Date.now(),got:null}}});ti.value="";ln.value=""}},
+        h("div",{style:"flex:2 1 180px"},ti),h("div",{style:"flex:2 1 180px"},ln),h("button",{type:"submit",class:"ghost"},"Add"))))}
 
 function homeDesignSection(){const link=US.main.homeLink||"";
   const inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared Planner 5D or Homestyler link"});
   return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our home design")),
     h("div",{class:"pc",style:"--c:#1f7f78"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},link?"Your 3D home":"Design it in 3D"),
         h("span",{class:"tx"},link?"Open it and keep building together":"Build your future home room by room, then walk through it in 3D")),emo("🏡",56,true)),
-      link?h("div",{class:"row"},h("a",{class:"btn",href:link,target:"_blank",rel:"noopener"},"Open our home"),h("button",{type:"button",class:"btn gh",onclick:homeSheet},"Quick sketch")):
-        h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler"),h("button",{type:"button",class:"btn gh",onclick:homeSheet},"Quick sketch"))),
+      link?h("div",{class:"row"},h("a",{class:"btn",href:link,target:"_blank",rel:"noopener"},"Open our home")):
+        h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler"))),
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});toast(l?"Home link saved":"Link removed",l?nm(PARTNER)+" can open it from here too":"")}},
       h("div",{style:"flex:1 1 220px"},inp),h("button",{type:"submit",class:"ghost"},link?"Update":"Save link")),
     !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
@@ -3093,7 +3093,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-09-a";
+const APP_VERSION="2026-11-09-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
