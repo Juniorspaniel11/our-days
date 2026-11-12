@@ -754,6 +754,13 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .swatches{display:flex;gap:8px;flex-wrap:wrap}
 .ju .swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer}
 .ju .swatches button[aria-pressed="true"]{border-color:var(--ink)}
+.ju .swgroups{display:flex;flex-direction:column;gap:8px}
+.ju .swgroup small{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px}
+.ju .swgroups .swatches{gap:7px}.ju .swgroups .swatches button{width:32px;height:32px}
+.ju .swcustom{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 14px 0 4px;border-radius:999px;border:3px solid transparent;cursor:pointer;background:conic-gradient(#ff5e5e,#ffd23f,#5fd068,#3fc5ff,#7a5cff,#ff5ec8,#ff5e5e);color:#fff;font-weight:700;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.ju .swcustom.on{border-color:var(--ink)}
+.ju .swcustom input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.ju .swcustom span{padding-left:22px}
 .ju .tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .ju .tog small{display:block;color:var(--muted);font-size:14px}
 .ju .sw{width:52px;height:30px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none}
@@ -2304,8 +2311,15 @@ function paintSheet(){
     ctx.strokeStyle=cur.c;ctx.lineWidth=cur.w;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(p[p.length-4],p[p.length-3]);ctx.lineTo(x,y);ctx.stroke();if(p.length>1000)end()});
   const end=()=>{if(!cur)return;const s=cur;cur=null;pg().draw(ctx);push(s)};
   ["pointerup","pointercancel"].forEach(t=>c.addEventListener(t,end));
-  const COLS=["#e2557c","#ff8fab","#ff9f43","#f2b84b","#ffe66d","#8bd17c","#3f8a4f","#5fd0c4","#2d6fb8","#9ec9ff","#5b3b8c","#c89bff","#8b5a36","#2a1a22","#ffffff"];
-  const sw=h("div",{class:"swatches"},COLS.map(x=>h("button",{type:"button",style:"background:"+x+(x==="#ffffff"?";box-shadow:inset 0 0 0 1px var(--line)":""),"aria-label":x==="#ffffff"?"White":"Colour","aria-pressed":String(x===col),onclick:e=>{col=x;sw.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}})));
+  const COLS=[["Pinks and reds",["#ffd1dc","#ff8fab","#e2557c","#d0393f","#a4161a","#6d0f1f"]],["Oranges and yellows",["#ffd8b0","#ff9f43","#e67e22","#fff3b0","#ffe66d","#f2b84b","#d4a017"]],
+    ["Greens",["#d6f5c9","#8bd17c","#4caf50","#3f8a4f","#1e5631","#a3b18a"]],["Blues and teals",["#c8f1ec","#5fd0c4","#1f7f78","#cfe4ff","#9ec9ff","#2d6fb8","#1b3a6b"]],
+    ["Purples",["#efe2ff","#c89bff","#8b6ad1","#5b3b8c","#d87bd3"]],["Skin tones",["#fde0c5","#f1c27d","#e0ac69","#c68642","#8d5524","#5c3a21"]],
+    ["Browns and greys",["#d2a679","#a0522d","#8b5a36","#4a2f1d","#ffffff","#d9d9d9","#9e9e9e","#555555","#2a1a22"]]];
+  const pick=x=>{col=x;sw.querySelectorAll(".swatches button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c===x)));cust.style.background=COLS.some(g=>g[1].includes(x))?"":x;cust.classList.toggle("on",!COLS.some(g=>g[1].includes(x)))};
+  const ci=h("input",{type:"color",value:"#e2557c","aria-label":"Pick any colour",oninput:()=>pick(ci.value)});
+  const cust=h("label",{class:"swcustom",title:"Any colour"},ci,h("span",null,"Any"));
+  const sw=h("div",{class:"swgroups"},COLS.map(([g,xs])=>h("div",{class:"swgroup"},h("small",null,g),h("div",{class:"swatches"},xs.map(x=>h("button",{type:"button","data-c":x,style:"background:"+x+(["#ffffff","#fff3b0","#efe2ff","#d6f5c9","#c8f1ec","#cfe4ff","#ffd1dc","#ffd8b0","#fde0c5"].includes(x)?";box-shadow:inset 0 0 0 1px var(--line)":""),"aria-label":"Colour "+x,"aria-pressed":String(x===col),onclick:()=>pick(x)}))))),
+    h("div",{class:"swgroup"},h("small",null,"Your own colour"),h("div",{class:"swatches"},cust)));
   const tools=h("div",{class:"chips"},[["fill","🪣 Fill"],["brush","🖌️ Brush"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===tool),onclick:e=>{tool=v;tools.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)));szRow.hidden=v!=="brush"}},l)));
   const szRow=h("div",{class:"chips",hidden:true},[[5,"Fine"],[10,"Medium"],[22,"Thick"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===size),onclick:e=>{size=v;szRow.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},l)));
   const pages=h("div",{class:"pages"},PAGES.map(x=>h("button",{type:"button",class:"pagebtn","aria-pressed":String(x.id===page),onclick:()=>{if(x.id===page)return;if(acts.length&&!confirm2(x))return;page=x.id;acts=[];paintRef().set({page,actions:[],at:Date.now(),by:ME}).catch(syncErr);markPages();full()}},emo(x.e,30,false),h("small",null,x.name))));
@@ -3268,7 +3282,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-11-d";
+const APP_VERSION="2026-11-11-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
