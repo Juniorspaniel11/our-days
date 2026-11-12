@@ -640,6 +640,22 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .jbar span{flex:1;height:7px;border-radius:99px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden;max-width:160px}
 .ju .jbar span i{display:block;height:100%;background:var(--c);border-radius:99px}
 .ju .jbar small{font-weight:700;color:var(--c);font-size:13px}
+.ju .votd{border-radius:22px;padding:14px 16px;background:linear-gradient(150deg,color-mix(in srgb,#5b3b8c 16%,var(--card)),var(--card));border:1px solid color-mix(in srgb,#5b3b8c 25%,transparent);display:flex;flex-direction:column;gap:6px}
+.ju .votd .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--plum)}
+.ju .votd p{margin:0;font-family:var(--fun);font-weight:500;font-size:18px;line-height:1.4}
+.ju .votd small{color:var(--muted);font-size:13.5px;font-weight:600}
+.ju .bver{color:var(--muted);font-size:13px;margin-top:2px}
+.ju .caught{display:flex;align-items:center;gap:14px;border-radius:22px;padding:14px 16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.ju .caught b{display:block;font-family:var(--fun);font-weight:600;font-size:19px}.ju .caught small{color:var(--muted);font-size:14px}
+.ju .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}.ju .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.ju .wkday{display:flex;flex-direction:column;gap:6px;border-radius:18px;padding:12px;background:var(--bg);border:1px solid var(--line)}
+.ju .wkday.now{border:2px solid var(--rose)}
+.ju .wkday>b{font-family:var(--fun);font-weight:600;font-size:17px}
+.ju .wkev{display:flex;flex-direction:column;border-left:4px solid var(--c);padding:4px 10px;border-radius:10px;background:color-mix(in srgb,var(--c) 10%,var(--card))}
+.ju .wkev .tx{font-weight:600;font-size:15px;overflow-wrap:anywhere}.ju .wkev small{color:var(--muted);font-size:13px}
+.ju .spj{display:flex;flex-direction:column;gap:6px;border-radius:20px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--ink);width:100%;background:linear-gradient(120deg,color-mix(in srgb,var(--c) 16%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.ju .spjtop{display:flex;align-items:center;gap:10px}.ju .spjtop b{font-family:var(--fun);font-weight:600;font-size:19px;overflow-wrap:anywhere}
+.ju .spjnext{color:var(--muted);font-size:13.5px}
 .ju .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .ju .stat{border-radius:24px;padding:16px;background:color-mix(in srgb,var(--c) 15%,var(--card));position:relative;overflow:hidden;min-height:132px;display:flex;flex-direction:column;justify-content:flex-end}
 .ju .stat svg{position:absolute;right:10px;top:10px;width:52px;height:52px}
@@ -1427,6 +1443,7 @@ function weekStrip(pid){
     wk.appendChild(h("button",{type:"button",class:"day"+(k===n.key?" today":"")+(k===ui.sel?" sel":""),"aria-pressed":String(k===ui.sel),"aria-label":longDate(k)+", "+cnt+" planned",onclick:()=>{ui.sel=k;render()}},
       h("b",null,SH[parseKey(k).getDay()]),h("span",{class:"num"},String(parseKey(k).getDate())),h("span",{class:"dots"},cnt?"•".repeat(Math.min(cnt,4)):"")))}
   return h("section",{class:"wksec"},h("div",{class:"sechead"},h("h2",{style:"font-size:18px"},label),h("div",{class:"nav"},
+      pid===ME&&PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?h("button",{type:"button",onclick:ourWeekSheet},"👫 Our week"):null,
       h("button",{type:"button","aria-label":"Previous week",onclick:()=>{ui.weekOff--;render()}},"‹"),
       ui.weekOff!==0||ui.sel!==n.key?h("button",{type:"button",onclick:()=>{ui.weekOff=0;ui.sel=n.key;render()}},"Today"):null,
       h("button",{type:"button","aria-label":"Next week",onclick:()=>{ui.weekOff++;render()}},"›"))),wk)}
@@ -1455,9 +1472,35 @@ function viewProjects(){
   return [
     papersSection(pid),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
-      list)
+      list),
+    sharedProjectsSection()
   ];
 }
+
+/* ---------- Shared projects: things you work on together ---------- */
+const SPC=["#8c2f55","#3557a8","#246a73","#5b45a8","#b9661c","#3f7d4e"];
+const SPJ=()=>Object.entries(((US.projects||{}).items)||{}).map(([id,x])=>({id,...x})).filter(x=>x&&x.name).sort((a,b)=>(a.at||0)-(b.at||0));
+const saveSpj=(id,o)=>saveDoc("projects",{items:{[id]:o}});
+function sharedProjectsSection(){if(S.viewAs!==ME||!PARTNER||!P(PARTNER)||P(PARTNER).placeholder)return null;
+  const list=SPJ(),ni=h("input",{type:"text",class:"inp",placeholder:"New shared project, e.g. Christmas plans","aria-label":"New shared project"});
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"With "+nm(PARTNER)),h("span",{class:"hint"},"You both see these")),
+    list.length?list.map(x=>{const ts=x.tasks||[],n=ts.filter(t=>t.d).length,N=ts.length,nx=ts.find(t=>!t.d);
+      return h("button",{type:"button",class:"spj tap",style:"--c:"+(x.c||SPC[0]),onclick:()=>spjSheet(x.id)},h("div",{class:"spjtop"},emo(kwEmoji(x.name)||"✨",30,false),h("b",null,x.name)),
+        h("div",{class:"jbar"},h("span",{style:"max-width:none"},h("i",{style:"width:"+(N?Math.round(n/N*100):0)+"%"})),h("small",null,N?n+" of "+N+" done":"No steps yet")),
+        h("small",{class:"spjnext"},nx?"Next: "+nx.t:N?"All done 🎉":"Tap to add the first step"))}):h("p",{class:"hint"},"Things you work on together, like saving for a trip, a book you both read, or planning Christmas. Each one gets a checklist you can both tick."),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const t=ni.value.trim();if(!t)return;ni.blur();const id=uid();saveSpj(id,{name:t,by:ME,at:Date.now(),c:SPC[list.length%SPC.length],tasks:[]});ni.value="";toast("Project added",nm(PARTNER)+" sees it too");setTimeout(()=>spjSheet(id),250)}},h("div",{style:"flex:1 1 200px"},ni),h("button",{type:"submit",class:"ghost"},"Create")))}
+function spjSheet(id){juSheet("Shared project",()=>{const x=SPJ().find(y=>y.id===id);if(!x)return [h("p",{class:"hint"},"This project was removed.")];
+  const tasks=x.tasks||[],n=tasks.filter(t=>t.d).length,ti=h("input",{type:"text",class:"inp",placeholder:"Add a step","aria-label":"New step"});
+  const setTasks=arr=>saveSpj(id,{tasks:arr});
+  return [h("div",{class:"vphead"},emo(kwEmoji(x.name)||"✨",52,true),h("div",null,h("b",null,x.name),h("small",null,(x.by===ME?"You":nm(x.by))+" started it · "+(tasks.length?n+" of "+tasks.length+" done":"no steps yet")))),
+    h("div",{class:"jbar",style:"--c:"+(x.c||SPC[0])},h("span",{style:"max-width:none"},h("i",{style:"width:"+(tasks.length?Math.round(n/tasks.length*100):0)+"%"}))),
+    ...tasks.map(t=>{const cb=h("input",{type:"checkbox",checked:!!t.d,"aria-label":"Done",onchange:()=>{cb.blur();const arr=tasks.map(y=>y.id===t.id?{...y,d:cb.checked?ME:null}:y);setTasks(arr);
+        if(cb.checked&&arr.every(y=>y.d)){confetti(160);toast("Project done 🎉","You finished "+x.name+" together")}else if(cb.checked)confetti(25)}});
+      return h("div",{class:"vpitem"+(t.d?" ok":"")},cb,h("div",{class:"tx"},h("span",null,t.t),h("small",null,t.d?"Done by "+(t.d===ME?"you":nm(t.d)):"Added by "+(t.by===ME?"you":nm(t.by)))),
+        h("button",{type:"button",class:"x","aria-label":"Remove step",onclick:()=>setTasks(tasks.filter(y=>y.id!==t.id))},"×"))}),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=ti.value.trim();if(!v)return;ti.value="";ti.blur();setTasks(tasks.concat([{id:uid(),t:v,by:ME,d:null}]))}},h("div",{style:"flex:1 1 200px"},ti),h("button",{type:"submit",class:"ghost"},"Add")),
+    h("div",{class:"row"},h("span",{class:"hint"},"Color"),...SPC.map(c=>h("button",{type:"button","aria-label":"Use this color","aria-pressed":String(c===x.c),style:"width:28px;height:28px;border-radius:50%;cursor:pointer;background:"+c+";border:"+(c===x.c?"3px solid var(--ink)":"0"),onclick:()=>saveSpj(id,{c})}))),
+    confirmBtn("Delete project",()=>{saveDoc("projects",{items:{[id]:firebase.firestore.FieldValue.delete()}});closeSheet()})]})}
 
 /* ---------- Papers in the pipeline ---------- */
 const PSTAGES=[["idea","Idea","💡"],["drafting","Drafting","✍️"],["coauthors","With coauthors","👥"],["submitted","Submitted","📤"],["review","Under review","🔍"],["revision","Revision","🛠️"],["accepted","Accepted","🎉"],["published","Published","📰"]];
@@ -1578,7 +1621,20 @@ function prayerFull(){
 
   return out[0];
 }
-function prayerSheet(){juSheet("Prayer together",()=>{const n=PP().filter(x=>!x.answered).length;return [prayerFull(),h("button",{type:"button",class:"btn alt",onclick:prayerPointsSheet},"🙏 Prayer points"+(n?" ("+n+")":""))]})}
+function prayerSheet(){juSheet("Pray and read tonight",()=>{const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
+  return [verseCard(),prayerFull(),h("h2",{style:"font-size:19px"},"Pray for"+(act.length?" ("+act.length+")":"")),
+    act.length?act.slice(0,4).map(ppMini):h("p",{class:"hint"},"No prayer points yet. Add what's on your hearts."),
+    h("button",{type:"button",class:"btn alt",onclick:prayerPointsSheet},act.length>4?"See all "+act.length+" prayer points":"🙏 Add or see prayer points"+(ans?" · "+ans+" answered":"")),
+    h("h2",{style:"font-size:19px"},"Tonight's reading"),bibleStrip()]})}
+function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
+  return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
+    h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
+function faithSection(){const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Pray and read tonight"),h("button",{type:"button",class:"lnk",onclick:prayerSheet},"Open all")),
+    verseCard(),usPrayer(),bibleStrip(),
+    h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:prayerPointsSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Prayer points"),
+        h("span",{class:"tx",style:"font-size:18px"},act.length?act.slice(0,2).map(x=>x.text).join(" · "):"What should we pray about?")),emo("🙏",48,true)),
+      h("div",{class:"foot"},h("span",{class:"hint"},act.length?act.length+" praying for"+(ans?" · "+ans+" answered":""):ans?ans+" answered so far":"Add one for tonight"),h("span",{class:"go"},act.length?"See all":"Add"))))}
 const CANDLE=c=>`<svg viewBox="0 0 32 32"><rect x="11" y="13" width="10" height="15" rx="2.5" fill="${c}"/><path d="M16 13v-2" stroke="${c}" stroke-width="2"/></svg>`;
 const CANDLE_LIT=`<svg viewBox="0 0 32 32"><rect x="11" y="13" width="10" height="15" rx="2.5" fill="#3a2430"/><path d="M16 13v-2" stroke="#3a2430" stroke-width="2"/><path d="M16 2c3.5 4 4.5 6.5 0 9.5c-4.5-3-3.5-5.5 0-9.5z" fill="#e2557c"/></svg>`;
 function usPrayer(){
@@ -1796,6 +1852,19 @@ function bestCallTimes(){
   if(hi-cur>=30)free.push([cur,hi]);
   return free.slice(0,3).map(([a,b])=>({a,b,pa:a-shift,pb:b-shift}));
 }
+function ourWeekSheet(){juSheet("Our week",()=>{
+  const mn=tzNow(P(ME).tz),on=tzNow(P(PARTNER).tz),shift=mn.off-on.off,v=nextVisit(),pn=nm(PARTNER),C={me:"#8b6ad1",them:"#e2557c",both:"#1f7f78"};
+  const out=[h("p",{class:"hint"},"Both your schedules for the next 7 days, in your time. "+pn+"'s own time is in brackets."),
+    h("div",{class:"legend"},h("span",null,h("i",{style:"background:"+C.me}),"You"),h("span",null,h("i",{style:"background:"+C.them}),pn),h("span",null,h("i",{style:"background:"+C.both}),"Together")),callLine()];
+  for(let i=0;i<7;i++){const k=addDays(mn.key,i),rows=[];
+    itemsFor(ME,k).filter(x=>!x.skip).forEach(x=>rows.push({s:x.s,c:C.me,who:"You",t:x.title,tm:x.allDay?"All day":fmt(x.s)+" to "+fmt(x.e)}));
+    itemsFor(PARTNER,k).filter(x=>!x.skip).forEach(x=>rows.push({s:x.allDay?-1:x.s+shift,c:C.them,who:pn,t:x.title,tm:x.allDay?"All day":fmt(x.s+shift)+" to "+fmt(x.e+shift)+(shift?" ("+fmt(x.s)+" for "+pn+")":"")}));
+    const ev=evPlanFor(k);if(ev)rows.push({s:toMin(ev.time)+(mn.off-(ev.off??mn.off)),c:C.both,who:"Together",t:"Our evening"+((ev.items||[]).length?": "+ev.items.slice(0,3).map(x=>x.label).join(", "):""),tm:evTimeText(ev)});
+    if(v&&v.date===k)rows.push({s:-2,c:C.both,who:"Together",t:"Visit day 💞",tm:v.time?fmt(toMin(v.time)):"Together at last"});
+    rows.sort((a,b)=>a.s-b.s);
+    out.push(h("div",{class:"wkday"+(i?"":" now")},h("b",null,(i===0?"Today":i===1?"Tomorrow":DAYS[parseKey(k).getDay()])+" · "+shortDate(k)),
+      rows.length?rows.map(r=>h("div",{class:"wkev",style:"--c:"+r.c},h("span",{class:"tx"},r.t),h("small",null,r.who+" · "+r.tm))):h("small",{class:"hint",style:"font-size:14px"},"Nothing planned")))}
+  return out})}
 function callLine(){
   const f=bestCallTimes();if(!f.length)return h("p",{class:"hint"},"No free time left today when you're both awake. Try tomorrow.");
   const x=f[0];return h("div",{class:"calltime"},emo("📞",28,false),h("div",null,h("b",null,"Best time to call: "+fmt(x.a)+" to "+fmt(x.b)),
@@ -1944,7 +2013,6 @@ function growSection(){
   return h("section",{class:"ju"},h("h2",null,"Do together"),h("div",{class:"tgrid"},
     T("#1f7f78",hm.e,"Our dream home",((H.pets||[]).length+(H.kids||[]).length+(H.garden||[]).length+(H.ride?1:0))?[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("")||"Keep building":"Start building",false,homeSheet),
     T("#c0398a","🎨","Paint together","One canvas",false,paintSheet),
-    T("#5b3b8c","🙏","Prayer points",pp?pp+" praying for":"Add one",false,prayerPointsSheet),
     T("#2d6fb8","🗺️","Plans",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" for the visit":"Plan the visit"):(S.shared.plans.length?S.shared.plans.filter(x=>!x.d).length+" ideas":"Add ideas"),false,plansSheet),
     T("#b9661c","📚","Read together",cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet),
     T("#3f8a4f","🗓️","Check-in",ck.mine&&ck.theirs?mon+" done ✓":ck.mine?"Waiting for "+nm(PARTNER):ck.theirs?nm(PARTNER)+" is done":mon,!!(ck.theirs&&!ck.mine),()=>checkinSheet())));
@@ -2190,11 +2258,11 @@ function watchUs(){
   const col=n=>DB.collection("couples/"+CID+"/"+n);
   const list=(n,lim,key)=>unsubs.push(col(n).orderBy("at","desc").limit(lim).onSnapshot(q=>{US[key]=q.docs.map(d=>({id:d.id,...d.data()}));usRefresh()},e=>console.warn(e)));
   unsubs.push(usRef().onSnapshot(sn=>{US.main=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e)));
-  ["home","prayer","visits","books","checkin","evening","duel","money","wish","bible"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
+  ["home","prayer","visits","books","checkin","evening","duel","money","wish","bible","projects"].forEach(n=>unsubs.push(DB.doc("couples/"+CID+"/us/"+n).onSnapshot(sn=>{US[n]=sn.exists?sn.data():{};usRefresh()},e=>console.warn(e))));
   list("moments",30,"moments");list("letters",200,"letters");list("jar",500,"jar");list("nudges",20,"nudges");
 }
 function usRefresh(){
-  if(el("sheet").hidden){if(S.tab==="us")softRender();return}
+  if(el("sheet").hidden){if(S.tab==="us"||S.tab==="projects")softRender();return}
   if(!sheetFn)return;const a=document.activeElement;
   if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName)&&el("sheet").contains(a))return;
   sheetFn();
@@ -2211,6 +2279,9 @@ const ago=ts=>{const s=Math.round((Date.now()-ts)/1000);if(s<60)return "just now
 const svgEl=s=>{const t=document.createElement("template");t.innerHTML=s.trim();return t.content.firstChild};
 const HEART='<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.4-9.3C1.2 8.2 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.9 1.4-1.8 3-2.9 5-2.9 3.6 0 5.8 3.7 4.4 7.2C19.5 16.4 12 21 12 21z"/></svg>';
 const ANS=()=>US.main.answers||{};
+let SEEN={};try{SEEN=JSON.parse(localStorage.getItem("ourdays-seen"))||{}}catch(e){}
+const seen=id=>!!SEEN[id];
+function markSeen(id){if(SEEN[id])return;SEEN[id]=Date.now();const ks=Object.keys(SEEN);if(ks.length>300)ks.sort((a,b)=>SEEN[a]-SEEN[b]).slice(0,ks.length-300).forEach(x=>delete SEEN[x]);try{localStorage.setItem("ourdays-seen",JSON.stringify(SEEN))}catch(e){}}
 const bothAnswered=id=>{const a=ANS()[id];return !!(a&&a[ME]&&a[PARTNER])};
 function enabledTopics(){const pr=US.main.prefs||{};return TOPICS.filter(t=>t.tag==="spicy"?spicyOn():!t.tag||pr[t.tag]!==false)}
 function dailyQ(k){const pool=[];enabledTopics().filter(t=>t.tag!=="spicy").forEach(t=>t.qs.forEach((q,i)=>pool.push({tid:t.id,i,q})));return pool[hashN(k+"q",pool.length)]}
@@ -2329,7 +2400,7 @@ function answerSheet(id,question,title,onBack){juSheet(title,()=>{
       if(theirs){confetti(140);toast("Answers unlocked","You both answered")}else toast("Locked in",nm(o)+" gets a nudge to answer");ta.blur()}},"Lock in my answer"),
       h("p",{class:"hint"},theirs?nm(o)+" already answered. Yours unlocks both.":"Answers stay hidden until you both reply."))}
   else if(!theirs)out.push(h("div",{class:"lockbox"},svgEl(ICON.lock("#5b3b8c")),h("div",null,h("b",null,"Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"Both answers unlock when "+nm(o)+" replies."))));
-  else out.push(h("div",{class:"answers reveal"},[ME,PARTNER].map(x=>h("div",{class:"ans"+(x!==ME?" f":"")},h("span",{class:"who"},x===ME?"You":nm(x)),h("p",null,a[x].text)))));
+  else{markSeen(id);out.push(h("div",{class:"answers reveal"},[ME,PARTNER].map(x=>h("div",{class:"ans"+(x!==ME?" f":"")},h("span",{class:"who"},x===ME?"You":nm(x)),h("p",null,a[x].text)))))}
   if(onBack)out.push(h("button",{type:"button",class:"btn gh",onclick:onBack},"Back"));
   return out})}
 
@@ -2476,7 +2547,55 @@ const saveBible=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/bible").set(o,{merge:t
 function bplan(){const b=BIB();return b.plan?BPLANS.find(x=>x[0]===b.plan):null}
 const bRead=u=>Object.keys(((BIB().read||{})[BIB().plan]||{})[u]||{}).length;
 const bName=(pl,n)=>(pl[0]==="psalms"?"Psalm ":pl[1].replace(/^Gospel of /,"").replace(/ to .*| and .*/,"")+" ")+n;
-const bUrl=(pl,n)=>"https://www.bible.com/bible/111/"+pl[2]+"."+n+".NIV";
+const BVERS=[["NIV",111],["KJV",1],["NKJV",114],["ESV",59],["NLT",116],["MSG",97],["AMP",1588],["CSB",1713]];
+const bVer=u=>(BIB().ver||{})[u]||"NIV";
+const bVid=v=>(BVERS.find(x=>x[0]===v)||BVERS[0])[1];
+const bUrl=(pl,n,v)=>{v=v||bVer(ME);return "https://www.bible.com/bible/"+bVid(v)+"/"+pl[2]+"."+n+"."+v};
+/* Verse of the day: King James text (public domain), the same verse for both of you each day */
+const VOTD=[
+["John 3:16","JHN",3,"16","For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."],
+["Jeremiah 29:11","JER",29,"11","For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end."],
+["Philippians 4:13","PHP",4,"13","I can do all things through Christ which strengtheneth me."],
+["Philippians 4:6","PHP",4,"6","Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God."],
+["Proverbs 3:5-6","PRO",3,"5-6","Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths."],
+["Psalm 23:1","PSA",23,"1","The LORD is my shepherd; I shall not want."],
+["Psalm 46:10","PSA",46,"10","Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth."],
+["Isaiah 40:31","ISA",40,"31","But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint."],
+["Romans 8:28","ROM",8,"28","And we know that all things work together for good to them that love God, to them who are the called according to his purpose."],
+["Joshua 1:9","JOS",1,"9","Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest."],
+["1 Corinthians 13:13","1CO",13,"13","And now abideth faith, hope, charity, these three; but the greatest of these is charity."],
+["Matthew 11:28","MAT",11,"28","Come unto me, all ye that labour and are heavy laden, and I will give you rest."],
+["Psalm 118:24","PSA",118,"24","This is the day which the LORD hath made; we will rejoice and be glad in it."],
+["Lamentations 3:22-23","LAM",3,"22-23","It is of the LORD’s mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness."],
+["Ephesians 4:32","EPH",4,"32","And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ’s sake hath forgiven you."],
+["Colossians 3:14","COL",3,"14","And above all these things put on charity, which is the bond of perfectness."],
+["1 John 4:19","1JN",4,"19","We love him, because he first loved us."],
+["Ecclesiastes 4:9","ECC",4,"9","Two are better than one; because they have a good reward for their labour."],
+["Psalm 37:4","PSA",37,"4","Delight thyself also in the LORD; and he shall give thee the desires of thine heart."],
+["Isaiah 41:10","ISA",41,"10","Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness."],
+["Matthew 6:33","MAT",6,"33","But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you."],
+["Hebrews 11:1","HEB",11,"1","Now faith is the substance of things hoped for, the evidence of things not seen."],
+["Psalm 119:105","PSA",119,"105","Thy word is a lamp unto my feet, and a light unto my path."],
+["Proverbs 17:17","PRO",17,"17","A friend loveth at all times, and a brother is born for adversity."],
+["Song of Solomon 8:7","SNG",8,"7","Many waters cannot quench love, neither can the floods drown it."],
+["1 Peter 4:8","1PE",4,"8","And above all things have fervent charity among yourselves: for charity shall cover the multitude of sins."],
+["Galatians 6:9","GAL",6,"9","And let us not be weary in well doing: for in due season we shall reap, if we faint not."],
+["Numbers 6:24-26","NUM",6,"24-26","The LORD bless thee, and keep thee: The LORD make his face shine upon thee, and be gracious unto thee: The LORD lift up his countenance upon thee, and give thee peace."],
+["Psalm 27:1","PSA",27,"1","The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?"],
+["Zephaniah 3:17","ZEP",3,"17","The LORD thy God in the midst of thee is mighty; he will save, he will rejoice over thee with joy; he will rest in his love, he will joy over thee with singing."],
+["2 Corinthians 5:7","2CO",5,"7","For we walk by faith, not by sight."],
+["Micah 6:8","MIC",6,"8","He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?"],
+["Romans 15:13","ROM",15,"13","Now the God of hope fill you with all joy and peace in believing, that ye may abound in hope, through the power of the Holy Ghost."],
+["1 Thessalonians 5:16-18","1TH",5,"16-18","Rejoice evermore. Pray without ceasing. In every thing give thanks: for this is the will of God in Christ Jesus concerning you."],
+["Proverbs 4:23","PRO",4,"23","Keep thy heart with all diligence; for out of it are the issues of life."],
+["Psalm 34:8","PSA",34,"8","O taste and see that the LORD is good: blessed is the man that trusteth in him."],
+["Psalm 121:1-2","PSA",121,"1-2","I will lift up mine eyes unto the hills, from whence cometh my help. My help cometh from the LORD, which made heaven and earth."],
+["John 14:27","JHN",14,"27","Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid."]
+].map(([r,c,ch,v,t])=>({r,c,ch,v,t}));
+const votd=()=>VOTD[hashN(usDay()+"votd",VOTD.length)];
+function verseCard(){const x=votd(),v=bVer(ME);
+  return h("div",{class:"votd"},h("span",{class:"k"},"Verse of the day"),h("p",null,"“"+x.t+"”"),
+    h("div",{class:"row",style:"justify-content:space-between"},h("small",null,x.r+" · KJV"),v!=="KJV"?h("a",{class:"fbtn",href:"https://www.bible.com/bible/"+bVid(v)+"/"+x.c+"."+x.ch+"."+x.v+"."+v,target:"_blank",rel:"noopener"},"Read in "+v):null))}
 function bibleStrip(){const pl=bplan(),o=PARTNER;
   if(!pl)return h("button",{type:"button",class:"pc tap",style:"--c:#8a5a2b",onclick:bibleSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Read the Bible together"),h("span",{class:"tx"},"Pick a book. You each read a chapter a day")),emo("📖",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"John, Proverbs, Psalms and more"),h("span",{class:"go"},"Choose")));
   const a=bRead(ME),b=bRead(o),next=Math.min(a+1,pl[3]),done=a>=pl[3];
@@ -2486,8 +2605,13 @@ function bibleStrip(){const pl=bplan(),o=PARTNER;
     h("div",{class:"bprog"},[[ME,"You",a],[o,nm(o),b]].map(([u,l,n])=>h("div",{class:"bp"},h("span",null,l),h("div",{class:"gbar"},h("i",{style:"width:"+Math.round(n/pl[3]*100)+"%"})),h("small",null,n+" of "+pl[3])))),
     h("div",{class:"row",style:"gap:6px"},!done?h("a",{class:"fbtn",href:bUrl(pl,next),target:"_blank",rel:"noopener"},"Open "+bName(pl,next)):null,
       !done?h("button",{type:"button",class:"fbtn on",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[next]:today}}}});hearts(ev.currentTarget,8);if(next===pl[3])confetti(150)}},"✓ I read it"):null,
-      h("button",{type:"button",class:"link",onclick:bibleSheet},done?"Pick the next book":"Change book")))}
-function bibleSheet(){juSheet("Read the Bible together",()=>[h("p",{class:"hint"},"You both read the same book, one chapter a day at your own pace. Each chapter opens in the NIV on bible.com."),
+      h("button",{type:"button",class:"link",onclick:bibleSheet},done?"Pick the next book":"Change book")),
+    h("small",{class:"bver"},"Opens in the "+bVer(ME)+(o&&P(o)&&!P(o).placeholder?" · "+nm(o)+" reads the "+bVer(o):"")+". Missed a day? Just pick up where you left off."))}
+function bibleSheet(){juSheet("Read the Bible together",()=>[h("p",{class:"hint"},"You both read the same book, one chapter a day at your own pace. Missing a day never resets anything."),
+  h("h2",{style:"font-size:19px"},"Your Bible version"),
+  h("div",{class:"chips"},BVERS.map(([x])=>h("button",{type:"button","aria-pressed":String(x===bVer(ME)),onclick:()=>{saveBible({ver:{[ME]:x}});toast("Reading in the "+x,"Chapters and the verse of the day open in the "+x)}},x))),
+  h("p",{class:"hint",style:"font-size:14px"},"Chapters open in your version on bible.com, or in the Bible app if you have it."+(PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?" "+nm(PARTNER)+" reads the "+bVer(PARTNER)+".":"")),
+  h("h2",{style:"font-size:19px"},"Choose a book"),
   h("div",{class:"actgrid"},BPLANS.map(pl=>h("button",{type:"button",class:"act tap",onclick:()=>{saveBible({plan:pl[0],startedBy:ME,at:Date.now()});closeSheet();toast("Reading "+pl[1],nm(PARTNER)+" sees it too")}},emo("📖",30,false),h("small",null,pl[1]+" · "+pl[3]+" days"))))])}
 
 /* ---------- Game night: games with a winner ---------- */
@@ -2737,7 +2861,7 @@ function gameSheet(g){juSheet(g.name,()=>{
         if(nx.length===5&&theirs&&theirs.length===5){const m=nx.filter((v,n)=>v===theirs[n]).length;confetti(m>=4?160:60);toast(m+" of 5 match",m>=4?"You two are in sync":"Opposites attract")}}},
         pics?emo(pics[j],64,true):h("span",{class:"initial",style:"background:"+(j?"#e2557c":"#5b3b8c")},(x[0]||"?")),h("span",null,x))))]}
   if(!theirs||theirs.length<5)return [h("div",{class:"lockbox"},emo(g.e,40,true),h("div",null,h("b",null,"Done. Waiting for "+nm(o)),h("p",{class:"hint",style:"font-size:14px"},"You'll see each other's picks once "+nm(o)+" plays.")))];
-  const m=mine.filter((v,n)=>v===theirs[n]).length;
+  const m=mine.filter((v,n)=>v===theirs[n]).length;markSeen("g:"+g.id+":"+key);
   return [h("p",{class:"q"},m+" of 5 match"),
     h("div",{class:"totres"},set.map((s,n)=>{const it=gItems(g)[s],op=g.opts(it);const pp=g.optPics(it),pe=pp?pp[mine[n]]+(mine[n]===theirs[n]?"":" "+pp[theirs[n]]):g.pic(it);
       return h("div",{class:"rrow"+(mine[n]===theirs[n]?" m":"")},emo(pe.split(" ")[0],34,false),h("div",null,h("b",null,lab(it)),h("span",null,"You: "+op[mine[n]]+" · "+nm(o)+": "+op[theirs[n]])))})),
@@ -2885,14 +3009,19 @@ function viewUs(){
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
   const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
-  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),
-    checkinDue()?h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))):null,
-    h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},stat(qa[w],qa[oo],"See answers","Answer")))),
-    h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},gItems(tg)[dailySet("tot",gkey(k,gameRound("tot",k)))[0]].map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},stat((tt[w]||[]).length===5,(tt[oo]||[]).length===5,"See matches","Play"))))));
-
+  const ttk=gkey(k,gameRound("tot",k)),tA=(tt[w]||[]).length===5,tB=(tt[oo]||[]).length===5,cards=[];let waitN=0;
+  US.letters.filter(l=>l.to===ME&&!l.openedAt).slice(0,2).forEach(l=>cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#2d6fb8",onclick:()=>openLetter(l)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Waiting for you"),h("span",{class:"tx"},"A letter from "+nm(l.from))),emo("💌",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},l.openWhen?"Open when "+l.openWhen:"Read anytime"),h("span",{class:"go"},"Open")))));
+  if(checkinDue())cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))));
+  if(!qa[w]||(qa[oo]&&!seen("d:"+k)))cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered. Your turn":"Answer"))));
+  else if(!qa[oo])waitN++;
+  if(!tA||(tB&&!seen("g:tot:"+ttk))){const first=gItems(tg)[dailySet("tot",ttk)[0]];
+    cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},first.map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},first.map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},tA?"See matches":tB?nm(oo)+" played. Your turn":"Play"))))}
+  else if(!tB)waitN++;
+  const wt=waitN?"Waiting on "+nm(oo)+" for "+waitN+(waitN===1?" thing":" things"):"";
+  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),cards.length?cards:h("div",{class:"caught"},emo("💞",48,true),h("div",null,h("b",null,"You two are all caught up"),h("small",null,wt?wt+".":"Nothing waiting today. Send a heart or plan the evening."))),
+    cards.length&&wt?h("p",{class:"hint"},wt+"."):null));
+  out.push(faithSection());
   out.push(growSection());
-  out.push(usPrayer());
-  out.push(h("section",{class:"ju"},bibleStrip()));
   const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);
 
@@ -3083,7 +3212,7 @@ function render(){
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
     h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
   const v={today:viewToday,projects:viewProjects,us:viewUs,home:viewHome}[S.tab]();
-  v.forEach(x=>main.appendChild(x));
+  v.filter(Boolean).forEach(x=>main.appendChild(x));
   renderTimer();
 }
 document.querySelectorAll(".tabbar button").forEach(b=>b.onclick=()=>go(b.dataset.tab));
@@ -3093,7 +3222,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-09-b";
+const APP_VERSION="2026-11-11-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
