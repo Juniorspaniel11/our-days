@@ -672,7 +672,10 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .fmid{flex:1;min-width:0;text-align:left;background:none;border:0;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:0}
 .ju .fmid b{font-family:var(--fun);font-weight:600;font-size:21px;line-height:1.15}
 .ju .fmid span{font-size:14px;opacity:.88}
-.ju .fdots{display:flex;gap:6px}.ju .fdots i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.22)}.ju .fdots i.on{background:#f2b84b;box-shadow:0 0 8px rgba(242,184,75,.7)}.ju .fdots i.cur{outline:1.5px solid rgba(255,255,255,.8);outline-offset:1.5px}
+.ju .fdots{display:flex;gap:2px;margin-left:-5px}.ju .fdots button{width:22px;height:24px;display:grid;place-items:center;background:none;border:0;padding:0;cursor:pointer}
+.ju .fttl{background:none;border:0;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:0;text-align:left}.ju .fttl b{font-family:var(--fun);font-weight:600;font-size:21px;line-height:1.15}.ju .fttl span{font-size:14px;opacity:.88}
+.ju .fhint{font-size:12px;opacity:.6}
+.ju .fdots i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.22)}.ju .fdots i.on{background:#f2b84b;box-shadow:0 0 8px rgba(242,184,75,.7)}.ju .fdots i.cur{outline:1.5px solid rgba(255,255,255,.8);outline-offset:1.5px}
 .ju .fread{display:flex;flex-direction:column;gap:8px;text-align:left;background:none;border:0;color:#fff;padding:0;width:100%}
 .ju button.fread{cursor:pointer}
 .ju .fch{font-family:var(--fun);font-weight:700;font-size:38px;line-height:1.05;color:#ffd98a;text-shadow:0 0 26px rgba(242,184,75,.5)}
@@ -1682,14 +1685,17 @@ function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
 function faithSection(){
   const p=P(ME),mn=tzNow(p.tz),nk=nightKey(p.tz),log=S.shared.prayer.log,done=!!log[nk],st=prayerStreak(),tonight=S.shared.prayer.tonight[nk];
   const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
-  const pd=h("div",{class:"fdots","aria-label":"This week"});for(let i=6;i>=0;i--){const k=addDays(nk,-i);pd.appendChild(h("i",{class:(log[k]?"on":"")+(i===0?" cur":"")}))}
+  const pd=h("div",{class:"fdots","aria-label":"Last 7 nights. Tap a night to fill in or undo"});for(let i=6;i>=0;i--){const k=addDays(nk,-i),on=!!log[k],lab=i===0?"Tonight":i===1?"Last night":DAYS[parseKey(k).getDay()]+" night";
+    pd.appendChild(h("button",{type:"button",title:lab,"aria-label":lab+(on?", prayed. Tap to undo":", not ticked. Tap if you prayed"),"aria-pressed":String(on),
+      onclick:()=>{if(on)delete log[k];else{log[k]={by:ME,at:Date.now(),late:i>0}}persist();render();if(i>0)toast(on?lab+" unticked":lab+" ticked ✓",on?"":"Your streak now counts it")}},h("i",{class:(on?"on":"")+(i===0?" cur":"")})))}
   const when=tonight?" · tonight at "+fmt(toMin(tonight.time)+(mn.off-tonight.off)):"";
   const candle=h("button",{type:"button",class:"fcandle tap"+(done?" on":""),"aria-pressed":String(done),"aria-label":done?"Prayed tonight. Tap to undo":"Tap after you pray",
     onclick:()=>{if(done)delete log[nk];else{log[nk]={by:ME,at:Date.now()};const n=prayerStreak();if([7,14,30,100,365].includes(n)){confetti(180);toast(n+" nights in a row","Your plant just grew")}else confetti(40)}persist();render()}},
     svgEl(done?CANDLE_LIT:CANDLE("#fff")));
-  const pray=h("div",{class:"frow"},candle,h("button",{type:"button",class:"fmid",onclick:prayerSheet},
+  const pray=h("div",{class:"frow"},candle,h("div",{class:"fmid"},h("button",{type:"button",class:"fttl",onclick:prayerSheet},
     h("b",null,done?"We prayed tonight ✓":"Pray together tonight"),
-    h("span",null,(st?st+(st===1?" night":" nights")+" in a row 🔥":done?"Your streak starts tonight":"Tap the candle after you pray")+when),pd));
+    h("span",null,(st?st+(st===1?" night":" nights")+" in a row 🔥":done?"Your streak starts tonight":"Tap the candle after you pray")+when)),pd,
+    h("small",{class:"fhint"},"Forgot to tick? Tap that night's dot")));
   const pl=bplan(),o=PARTNER;let read;
   if(!pl)read=h("button",{type:"button",class:"fread tap",onclick:bibleSheet},h("span",{class:"fk"},"📖 Read the Bible together"),h("b",{class:"fch"},"Pick a book"),h("span",{class:"fsub"},"John, Proverbs, Psalms and more. One chapter a day each, at your own pace."));
   else{const a=bRead(ME),b=bRead(o),N=pl[3],next=Math.min(a+1,N),fin=a>=N,today=mn.key,readToday=Object.values(((BIB().read||{})[pl[0]]||{})[ME]||{}).includes(today);
@@ -3255,7 +3261,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-11-b";
+const APP_VERSION="2026-11-11-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
