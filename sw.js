@@ -1,5 +1,5 @@
 /* Network first so updates show up right away, cached copy when offline. Also shows notifications. */
-const CACHE = "ourdays-v34";
+const CACHE = "ourdays-v35";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); });
 self.addEventListener("activate", e => e.waitUntil((async () => {

@@ -656,6 +656,54 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .spj{display:flex;flex-direction:column;gap:6px;border-radius:20px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--ink);width:100%;background:linear-gradient(120deg,color-mix(in srgb,var(--c) 16%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
 .ju .spjtop{display:flex;align-items:center;gap:10px}.ju .spjtop b{font-family:var(--fun);font-weight:600;font-size:19px;overflow-wrap:anywhere}
 .ju .spjnext{color:var(--muted);font-size:13.5px}
+/* Tonight with God */
+.ju .faith{position:relative;overflow:hidden;border-radius:30px;padding:18px 16px;color:#fff;display:flex;flex-direction:column;gap:14px;box-shadow:0 18px 40px rgba(30,20,70,.35);
+  background:radial-gradient(circle at 12% 18%,rgba(255,255,255,.6) 0 1px,transparent 2px),radial-gradient(circle at 78% 9%,rgba(255,255,255,.5) 0 1px,transparent 2px),radial-gradient(circle at 42% 64%,rgba(255,255,255,.35) 0 1px,transparent 2px),radial-gradient(circle at 92% 52%,rgba(255,255,255,.45) 0 1px,transparent 2px),radial-gradient(circle at 24% 88%,rgba(255,255,255,.35) 0 1px,transparent 2px),radial-gradient(120% 55% at 50% 118%,rgba(242,184,75,.38),transparent 62%),linear-gradient(165deg,#12153a,#2c1f5e 55%,#4b2763)}
+.ju .faith hr{border:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);margin:0;width:100%}
+.ju .fhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ju .faith h2{color:#fff;font-size:27px;margin:2px 0 0;line-height:1.1}
+.ju .fk{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#f6d38a}
+.ju .frow{display:flex;align-items:center;gap:14px}
+.ju .fcandle{width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.45);background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none;cursor:pointer;padding:0}
+.ju .fcandle svg{width:36px;height:36px}
+.ju .fcandle.on{background:#f2b84b;border-color:#f2b84b;box-shadow:0 0 32px rgba(242,184,75,.75)}
+@media (prefers-reduced-motion:no-preference){.ju .fcandle:not(.on){animation:fpulse 2.2s ease-in-out infinite}}
+@keyframes fpulse{50%{box-shadow:0 0 0 9px rgba(242,184,75,.2)}}
+.ju .fmid{flex:1;min-width:0;text-align:left;background:none;border:0;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:0}
+.ju .fmid b{font-family:var(--fun);font-weight:600;font-size:21px;line-height:1.15}
+.ju .fmid span{font-size:14px;opacity:.88}
+.ju .fdots{display:flex;gap:6px}.ju .fdots i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.22)}.ju .fdots i.on{background:#f2b84b;box-shadow:0 0 8px rgba(242,184,75,.7)}.ju .fdots i.cur{outline:1.5px solid rgba(255,255,255,.8);outline-offset:1.5px}
+.ju .fread{display:flex;flex-direction:column;gap:8px;text-align:left;background:none;border:0;color:#fff;padding:0;width:100%}
+.ju button.fread{cursor:pointer}
+.ju .fch{font-family:var(--fun);font-weight:700;font-size:38px;line-height:1.05;color:#ffd98a;text-shadow:0 0 26px rgba(242,184,75,.5)}
+.ju .fsub{font-size:14.5px;opacity:.88}
+.ju .fpath{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.ju .fpath i{width:14px;height:14px;border-radius:4px;background:rgba(255,255,255,.16)}
+.ju .fpath i.me{background:#b99cff}.ju .fpath i.them{background:#ff8fab}.ju .fpath i.both{background:#f2b84b;box-shadow:0 0 6px rgba(242,184,75,.6)}
+.ju .fpath i.cur{outline:2px solid #fff;outline-offset:1px}
+.ju .flegend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;opacity:.92}.ju .flegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}.ju .flegend i.me{background:#b99cff}.ju .flegend i.them{background:#ff8fab}.ju .flegend i.both{background:#f2b84b}
+.ju .fbig{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:11px 18px;font-weight:700;font-size:15px;cursor:pointer;background:#fff;color:#2c1f5e;text-decoration:none}
+.ju .fbig.gold{background:#f2b84b;color:#2a1a08;box-shadow:0 8px 20px rgba(242,184,75,.45)}
+.ju .flink{background:none;border:0;color:rgba(255,255,255,.82);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:13.5px;padding:0;align-self:flex-start;text-align:left}
+.ju .fpts{display:flex;flex-direction:column;gap:8px}
+.ju .fchips{display:flex;flex-wrap:wrap;gap:8px}
+.ju .fchip{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer;max-width:100%;text-align:left;overflow-wrap:anywhere}
+.ju .fchip.add{border-style:dashed;color:#f6d38a}
+/* For you two today */
+.ju .tdbox{border-radius:30px;padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(160deg,color-mix(in srgb,#f2b84b 20%,var(--card)),color-mix(in srgb,#e2557c 12%,var(--card)));border:1px solid color-mix(in srgb,#f2b84b 35%,transparent);box-shadow:0 14px 34px rgba(185,102,28,.14)}
+.ju .tdhead{display:flex;align-items:center;gap:10px}.ju .tdhead h2{flex:1;margin:0}
+.ju .tbadge{background:var(--rose);color:#fff;border-radius:999px;padding:4px 12px;font-weight:700;font-size:13.5px;white-space:nowrap}
+.ju .tbadge.ok{background:#3f8a4f}
+.ju h2.sh{display:flex;align-items:center;gap:8px}
+/* Our projects together */
+.ju .dbox{position:relative;overflow:hidden;border-radius:30px;padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(140deg,color-mix(in srgb,#e2557c 24%,var(--card)),color-mix(in srgb,#8b6ad1 22%,var(--card)));border:1px solid color-mix(in srgb,#e2557c 30%,transparent);box-shadow:0 14px 34px rgba(140,47,85,.18)}
+.ju .dbox::after{content:"\2665";position:absolute;right:-4px;bottom:-34px;font-size:130px;line-height:1;color:#e2557c;opacity:.09;pointer-events:none}
+.ju .dhead{display:flex;align-items:center;gap:12px}.ju .dhead h2{margin:2px 0 0;font-size:23px;line-height:1.1}
+.ju .dk{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#c0398a}
+.ju .dav{display:flex;flex:none}.ju .dav span{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--c);border:3px solid var(--card);overflow:hidden;font-size:16px}.ju .dav span+span{margin-left:-12px}.ju .dav img{width:100%;height:100%;object-fit:cover}
+.ju .dbox .spj{background:var(--card);border:0;border-left:6px solid var(--c);box-shadow:var(--shadow);position:relative;z-index:1}
+.ju .dbox form{position:relative;z-index:1}
+.nav button.owk{background:linear-gradient(135deg,#e2557c,#8b6ad1);color:#fff;border:0;font-weight:700}
 .ju .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .ju .stat{border-radius:24px;padding:16px;background:color-mix(in srgb,var(--c) 15%,var(--card));position:relative;overflow:hidden;min-height:132px;display:flex;flex-direction:column;justify-content:flex-end}
 .ju .stat svg{position:absolute;right:10px;top:10px;width:52px;height:52px}
@@ -1443,7 +1491,7 @@ function weekStrip(pid){
     wk.appendChild(h("button",{type:"button",class:"day"+(k===n.key?" today":"")+(k===ui.sel?" sel":""),"aria-pressed":String(k===ui.sel),"aria-label":longDate(k)+", "+cnt+" planned",onclick:()=>{ui.sel=k;render()}},
       h("b",null,SH[parseKey(k).getDay()]),h("span",{class:"num"},String(parseKey(k).getDate())),h("span",{class:"dots"},cnt?"•".repeat(Math.min(cnt,4)):"")))}
   return h("section",{class:"wksec"},h("div",{class:"sechead"},h("h2",{style:"font-size:18px"},label),h("div",{class:"nav"},
-      pid===ME&&PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?h("button",{type:"button",onclick:ourWeekSheet},"👫 Our week"):null,
+      pid===ME&&PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?h("button",{type:"button",class:"owk",onclick:ourWeekSheet},"👫 Our week"):null,
       h("button",{type:"button","aria-label":"Previous week",onclick:()=>{ui.weekOff--;render()}},"‹"),
       ui.weekOff!==0||ui.sel!==n.key?h("button",{type:"button",onclick:()=>{ui.weekOff=0;ui.sel=n.key;render()}},"Today"):null,
       h("button",{type:"button","aria-label":"Next week",onclick:()=>{ui.weekOff++;render()}},"›"))),wk)}
@@ -1470,10 +1518,10 @@ function viewProjects(){
   const list=h("div",{class:"projs"});
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
+    sharedProjectsSection(),
     papersSection(pid),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
-      list),
-    sharedProjectsSection()
+      list)
   ];
 }
 
@@ -1483,12 +1531,14 @@ const SPJ=()=>Object.entries(((US.projects||{}).items)||{}).map(([id,x])=>({id,.
 const saveSpj=(id,o)=>saveDoc("projects",{items:{[id]:o}});
 function sharedProjectsSection(){if(S.viewAs!==ME||!PARTNER||!P(PARTNER)||P(PARTNER).placeholder)return null;
   const list=SPJ(),ni=h("input",{type:"text",class:"inp",placeholder:"New shared project, e.g. Christmas plans","aria-label":"New shared project"});
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"With "+nm(PARTNER)),h("span",{class:"hint"},"You both see these")),
+  const bub=u=>{const x=P(u),ph=x&&x.avatar;return h("span",{style:"--c:"+(u===ME?"#8b6ad1":"#e2557c")},ph?h("img",{src:ph,alt:""}):(nm(u)[0]||"?"))};
+  return h("section",{class:"ju"},h("div",{class:"dbox"},h("div",{class:"dhead"},h("div",{class:"dav"},bub(ME),bub(PARTNER)),h("div",{style:"flex:1;min-width:0"},h("span",{class:"dk"},"Just us two"),h("h2",null,"Our projects together")),emo("💞",46,true)),
+    list.length?h("p",{class:"hint",style:"position:relative;z-index:1"},nm(PARTNER)+" sees these too. Either of you can add steps and tick them off."):null,
     list.length?list.map(x=>{const ts=x.tasks||[],n=ts.filter(t=>t.d).length,N=ts.length,nx=ts.find(t=>!t.d);
       return h("button",{type:"button",class:"spj tap",style:"--c:"+(x.c||SPC[0]),onclick:()=>spjSheet(x.id)},h("div",{class:"spjtop"},emo(kwEmoji(x.name)||"✨",30,false),h("b",null,x.name)),
         h("div",{class:"jbar"},h("span",{style:"max-width:none"},h("i",{style:"width:"+(N?Math.round(n/N*100):0)+"%"})),h("small",null,N?n+" of "+N+" done":"No steps yet")),
         h("small",{class:"spjnext"},nx?"Next: "+nx.t:N?"All done 🎉":"Tap to add the first step"))}):h("p",{class:"hint"},"Things you work on together, like saving for a trip, a book you both read, or planning Christmas. Each one gets a checklist you can both tick."),
-    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const t=ni.value.trim();if(!t)return;ni.blur();const id=uid();saveSpj(id,{name:t,by:ME,at:Date.now(),c:SPC[list.length%SPC.length],tasks:[]});ni.value="";toast("Project added",nm(PARTNER)+" sees it too");setTimeout(()=>spjSheet(id),250)}},h("div",{style:"flex:1 1 200px"},ni),h("button",{type:"submit",class:"ghost"},"Create")))}
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const t=ni.value.trim();if(!t)return;ni.blur();const id=uid();saveSpj(id,{name:t,by:ME,at:Date.now(),c:SPC[list.length%SPC.length],tasks:[]});ni.value="";toast("Project added",nm(PARTNER)+" sees it too");setTimeout(()=>spjSheet(id),250)}},h("div",{style:"flex:1 1 200px"},ni),h("button",{type:"submit",class:"ghost"},"Create"))))}
 function spjSheet(id){juSheet("Shared project",()=>{const x=SPJ().find(y=>y.id===id);if(!x)return [h("p",{class:"hint"},"This project was removed.")];
   const tasks=x.tasks||[],n=tasks.filter(t=>t.d).length,ti=h("input",{type:"text",class:"inp",placeholder:"Add a step","aria-label":"New step"});
   const setTasks=arr=>saveSpj(id,{tasks:arr});
@@ -1622,19 +1672,45 @@ function prayerFull(){
   return out[0];
 }
 function prayerSheet(){juSheet("Pray and read tonight",()=>{const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
-  return [verseCard(),prayerFull(),h("h2",{style:"font-size:19px"},"Pray for"+(act.length?" ("+act.length+")":"")),
+  return [prayerFull(),h("h2",{style:"font-size:19px"},"Pray for"+(act.length?" ("+act.length+")":"")),
     act.length?act.slice(0,4).map(ppMini):h("p",{class:"hint"},"No prayer points yet. Add what's on your hearts."),
     h("button",{type:"button",class:"btn alt",onclick:prayerPointsSheet},act.length>4?"See all "+act.length+" prayer points":"🙏 Add or see prayer points"+(ans?" · "+ans+" answered":"")),
     h("h2",{style:"font-size:19px"},"Tonight's reading"),bibleStrip()]})}
 function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
   return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
     h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
-function faithSection(){const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Pray and read tonight"),h("button",{type:"button",class:"lnk",onclick:prayerSheet},"Open all")),
-    verseCard(),usPrayer(),bibleStrip(),
-    h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:prayerPointsSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Prayer points"),
-        h("span",{class:"tx",style:"font-size:18px"},act.length?act.slice(0,2).map(x=>x.text).join(" · "):"What should we pray about?")),emo("🙏",48,true)),
-      h("div",{class:"foot"},h("span",{class:"hint"},act.length?act.length+" praying for"+(ans?" · "+ans+" answered":""):ans?ans+" answered so far":"Add one for tonight"),h("span",{class:"go"},act.length?"See all":"Add"))))}
+function faithSection(){
+  const p=P(ME),mn=tzNow(p.tz),nk=nightKey(p.tz),log=S.shared.prayer.log,done=!!log[nk],st=prayerStreak(),tonight=S.shared.prayer.tonight[nk];
+  const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
+  const pd=h("div",{class:"fdots","aria-label":"This week"});for(let i=6;i>=0;i--){const k=addDays(nk,-i);pd.appendChild(h("i",{class:(log[k]?"on":"")+(i===0?" cur":"")}))}
+  const when=tonight?" · tonight at "+fmt(toMin(tonight.time)+(mn.off-tonight.off)):"";
+  const candle=h("button",{type:"button",class:"fcandle tap"+(done?" on":""),"aria-pressed":String(done),"aria-label":done?"Prayed tonight. Tap to undo":"Tap after you pray",
+    onclick:()=>{if(done)delete log[nk];else{log[nk]={by:ME,at:Date.now()};const n=prayerStreak();if([7,14,30,100,365].includes(n)){confetti(180);toast(n+" nights in a row","Your plant just grew")}else confetti(40)}persist();render()}},
+    svgEl(done?CANDLE_LIT:CANDLE("#fff")));
+  const pray=h("div",{class:"frow"},candle,h("button",{type:"button",class:"fmid",onclick:prayerSheet},
+    h("b",null,done?"We prayed tonight ✓":"Pray together tonight"),
+    h("span",null,(st?st+(st===1?" night":" nights")+" in a row 🔥":done?"Your streak starts tonight":"Tap the candle after you pray")+when),pd));
+  const pl=bplan(),o=PARTNER;let read;
+  if(!pl)read=h("button",{type:"button",class:"fread tap",onclick:bibleSheet},h("span",{class:"fk"},"📖 Read the Bible together"),h("b",{class:"fch"},"Pick a book"),h("span",{class:"fsub"},"John, Proverbs, Psalms and more. One chapter a day each, at your own pace."));
+  else{const a=bRead(ME),b=bRead(o),N=pl[3],next=Math.min(a+1,N),fin=a>=N,today=mn.key,readToday=Object.values(((BIB().read||{})[pl[0]]||{})[ME]||{}).includes(today);
+    const path=h("div",{class:"fpath","aria-label":"You have read "+a+" of "+N+", "+nm(o)+" "+b+" of "+N});
+    for(let i=1;i<=N;i++)path.appendChild(h("i",{class:(i<=a&&i<=b?"both":i<=a?"me":i<=b?"them":"")+(i===next&&!fin?" cur":""),title:bName(pl,i)}));
+    read=h("div",{class:"fread"},h("span",{class:"fk"},"📖 "+pl[1]),
+      h("b",{class:"fch"},fin?"Finished 🎉":readToday?"Read today ✓":bName(pl,next)),
+      h("span",{class:"fsub"},fin?"You read all of "+pl[1]+". Pick the next book together.":readToday?"Next up tomorrow: "+bName(pl,next):"Tonight's chapter · about 5 minutes"),
+      path,
+      h("div",{class:"flegend"},h("span",null,h("i",{class:"me"}),"You "+a),h("span",null,h("i",{class:"them"}),nm(o)+" "+b),h("span",null,h("i",{class:"both"}),"Both read"),h("span",null,"of "+N)),
+      h("div",{class:"row",style:"gap:8px"},
+        fin?h("button",{type:"button",class:"fbig gold",onclick:bibleSheet},"Pick the next book"):h("a",{class:"fbig",href:bUrl(pl,next),target:"_blank",rel:"noopener"},"Open "+bName(pl,next)+" · "+bVer(ME)),
+        !fin&&!readToday?h("button",{type:"button",class:"fbig gold",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[next]:today}}}});hearts(ev.currentTarget,8);confetti(next===N?160:40);toast(next===N?"You finished "+pl[1]+" 🎉":"Chapter done ✓",b>=next?nm(o)+" read it too":nm(o)+" sees your progress")}},"✓ I read it"):null),
+      h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(o&&P(o)&&!P(o).placeholder?" · "+nm(o)+" reads the "+bVer(o):"")))}
+  const pts=h("div",{class:"fpts"},h("span",{class:"fk"},"🙏 Praying for"),
+    h("div",{class:"fchips"},act.slice(0,4).map(x=>h("button",{type:"button",class:"fchip tap",onclick:prayerPointsSheet},x.text)),
+      act.length>4?h("button",{type:"button",class:"fchip tap",onclick:prayerPointsSheet},"+"+(act.length-4)+" more"):null,
+      h("button",{type:"button",class:"fchip add tap",onclick:prayerPointsSheet},act.length?"+ Add":"+ Add a prayer point")),
+    ans?h("button",{type:"button",class:"flink",onclick:prayerPointsSheet},"🙌 "+ans+(ans===1?" answered prayer":" answered prayers")+" so far"):null);
+  return h("section",{class:"ju"},h("div",{class:"faith"},h("div",{class:"fhead"},h("div",null,h("span",{class:"fk"},"Every night, together"),h("h2",null,"Tonight with God")),emo("🕊️",54,true)),pray,h("hr"),read,h("hr"),pts));
+}
 const CANDLE=c=>`<svg viewBox="0 0 32 32"><rect x="11" y="13" width="10" height="15" rx="2.5" fill="${c}"/><path d="M16 13v-2" stroke="${c}" stroke-width="2"/></svg>`;
 const CANDLE_LIT=`<svg viewBox="0 0 32 32"><rect x="11" y="13" width="10" height="15" rx="2.5" fill="#3a2430"/><path d="M16 13v-2" stroke="#3a2430" stroke-width="2"/><path d="M16 2c3.5 4 4.5 6.5 0 9.5c-4.5-3-3.5-5.5 0-9.5z" fill="#e2557c"/></svg>`;
 function usPrayer(){
@@ -2010,7 +2086,7 @@ function growSection(){
   const H=US.home||{},hm=SHOPITEM[H.home||"apt"],v=nextVisit(),vi=v?VP(v.id):[],cur=SHELF().find(x=>x.id===BK().current&&x.status==="reading")||SHELF().find(x=>x.status==="reading");
   const ck=checkinState(monthKey()),pp=PP().filter(x=>!x.answered).length,mon=monthName(monthKey()).split(" ")[0];
   const T=(c,e,name,sub,hot,fn,anim)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,!!anim),h("b",null,name),h("small",{class:"sub"},sub));
-  return h("section",{class:"ju"},h("h2",null,"Do together"),h("div",{class:"tgrid"},
+  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎯",30,false),"Do together"),h("div",{class:"tgrid"},
     T("#1f7f78",hm.e,"Our dream home",((H.pets||[]).length+(H.kids||[]).length+(H.garden||[]).length+(H.ride?1:0))?[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("")||"Keep building":"Start building",false,homeSheet),
     T("#c0398a","🎨","Paint together","One canvas",false,paintSheet),
     T("#2d6fb8","🗺️","Plans",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" for the visit":"Plan the visit"):(S.shared.plans.length?S.shared.plans.filter(x=>!x.d).length+" ideas":"Add ideas"),false,plansSheet),
@@ -2551,51 +2627,6 @@ const BVERS=[["NIV",111],["KJV",1],["NKJV",114],["ESV",59],["NLT",116],["MSG",97
 const bVer=u=>(BIB().ver||{})[u]||"NIV";
 const bVid=v=>(BVERS.find(x=>x[0]===v)||BVERS[0])[1];
 const bUrl=(pl,n,v)=>{v=v||bVer(ME);return "https://www.bible.com/bible/"+bVid(v)+"/"+pl[2]+"."+n+"."+v};
-/* Verse of the day: King James text (public domain), the same verse for both of you each day */
-const VOTD=[
-["John 3:16","JHN",3,"16","For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."],
-["Jeremiah 29:11","JER",29,"11","For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end."],
-["Philippians 4:13","PHP",4,"13","I can do all things through Christ which strengtheneth me."],
-["Philippians 4:6","PHP",4,"6","Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God."],
-["Proverbs 3:5-6","PRO",3,"5-6","Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths."],
-["Psalm 23:1","PSA",23,"1","The LORD is my shepherd; I shall not want."],
-["Psalm 46:10","PSA",46,"10","Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth."],
-["Isaiah 40:31","ISA",40,"31","But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint."],
-["Romans 8:28","ROM",8,"28","And we know that all things work together for good to them that love God, to them who are the called according to his purpose."],
-["Joshua 1:9","JOS",1,"9","Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest."],
-["1 Corinthians 13:13","1CO",13,"13","And now abideth faith, hope, charity, these three; but the greatest of these is charity."],
-["Matthew 11:28","MAT",11,"28","Come unto me, all ye that labour and are heavy laden, and I will give you rest."],
-["Psalm 118:24","PSA",118,"24","This is the day which the LORD hath made; we will rejoice and be glad in it."],
-["Lamentations 3:22-23","LAM",3,"22-23","It is of the LORD’s mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness."],
-["Ephesians 4:32","EPH",4,"32","And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ’s sake hath forgiven you."],
-["Colossians 3:14","COL",3,"14","And above all these things put on charity, which is the bond of perfectness."],
-["1 John 4:19","1JN",4,"19","We love him, because he first loved us."],
-["Ecclesiastes 4:9","ECC",4,"9","Two are better than one; because they have a good reward for their labour."],
-["Psalm 37:4","PSA",37,"4","Delight thyself also in the LORD; and he shall give thee the desires of thine heart."],
-["Isaiah 41:10","ISA",41,"10","Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness."],
-["Matthew 6:33","MAT",6,"33","But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you."],
-["Hebrews 11:1","HEB",11,"1","Now faith is the substance of things hoped for, the evidence of things not seen."],
-["Psalm 119:105","PSA",119,"105","Thy word is a lamp unto my feet, and a light unto my path."],
-["Proverbs 17:17","PRO",17,"17","A friend loveth at all times, and a brother is born for adversity."],
-["Song of Solomon 8:7","SNG",8,"7","Many waters cannot quench love, neither can the floods drown it."],
-["1 Peter 4:8","1PE",4,"8","And above all things have fervent charity among yourselves: for charity shall cover the multitude of sins."],
-["Galatians 6:9","GAL",6,"9","And let us not be weary in well doing: for in due season we shall reap, if we faint not."],
-["Numbers 6:24-26","NUM",6,"24-26","The LORD bless thee, and keep thee: The LORD make his face shine upon thee, and be gracious unto thee: The LORD lift up his countenance upon thee, and give thee peace."],
-["Psalm 27:1","PSA",27,"1","The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?"],
-["Zephaniah 3:17","ZEP",3,"17","The LORD thy God in the midst of thee is mighty; he will save, he will rejoice over thee with joy; he will rest in his love, he will joy over thee with singing."],
-["2 Corinthians 5:7","2CO",5,"7","For we walk by faith, not by sight."],
-["Micah 6:8","MIC",6,"8","He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?"],
-["Romans 15:13","ROM",15,"13","Now the God of hope fill you with all joy and peace in believing, that ye may abound in hope, through the power of the Holy Ghost."],
-["1 Thessalonians 5:16-18","1TH",5,"16-18","Rejoice evermore. Pray without ceasing. In every thing give thanks: for this is the will of God in Christ Jesus concerning you."],
-["Proverbs 4:23","PRO",4,"23","Keep thy heart with all diligence; for out of it are the issues of life."],
-["Psalm 34:8","PSA",34,"8","O taste and see that the LORD is good: blessed is the man that trusteth in him."],
-["Psalm 121:1-2","PSA",121,"1-2","I will lift up mine eyes unto the hills, from whence cometh my help. My help cometh from the LORD, which made heaven and earth."],
-["John 14:27","JHN",14,"27","Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid."]
-].map(([r,c,ch,v,t])=>({r,c,ch,v,t}));
-const votd=()=>VOTD[hashN(usDay()+"votd",VOTD.length)];
-function verseCard(){const x=votd(),v=bVer(ME);
-  return h("div",{class:"votd"},h("span",{class:"k"},"Verse of the day"),h("p",null,"“"+x.t+"”"),
-    h("div",{class:"row",style:"justify-content:space-between"},h("small",null,x.r+" · KJV"),v!=="KJV"?h("a",{class:"fbtn",href:"https://www.bible.com/bible/"+bVid(v)+"/"+x.c+"."+x.ch+"."+x.v+"."+v,target:"_blank",rel:"noopener"},"Read in "+v):null))}
 function bibleStrip(){const pl=bplan(),o=PARTNER;
   if(!pl)return h("button",{type:"button",class:"pc tap",style:"--c:#8a5a2b",onclick:bibleSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Read the Bible together"),h("span",{class:"tx"},"Pick a book. You each read a chapter a day")),emo("📖",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"John, Proverbs, Psalms and more"),h("span",{class:"go"},"Choose")));
   const a=bRead(ME),b=bRead(o),next=Math.min(a+1,pl[3]),done=a>=pl[3];
@@ -2609,7 +2640,7 @@ function bibleStrip(){const pl=bplan(),o=PARTNER;
     h("small",{class:"bver"},"Opens in the "+bVer(ME)+(o&&P(o)&&!P(o).placeholder?" · "+nm(o)+" reads the "+bVer(o):"")+". Missed a day? Just pick up where you left off."))}
 function bibleSheet(){juSheet("Read the Bible together",()=>[h("p",{class:"hint"},"You both read the same book, one chapter a day at your own pace. Missing a day never resets anything."),
   h("h2",{style:"font-size:19px"},"Your Bible version"),
-  h("div",{class:"chips"},BVERS.map(([x])=>h("button",{type:"button","aria-pressed":String(x===bVer(ME)),onclick:()=>{saveBible({ver:{[ME]:x}});toast("Reading in the "+x,"Chapters and the verse of the day open in the "+x)}},x))),
+  h("div",{class:"chips"},BVERS.map(([x])=>h("button",{type:"button","aria-pressed":String(x===bVer(ME)),onclick:()=>{saveBible({ver:{[ME]:x}});toast("Reading in the "+x,"Chapters open in the "+x)}},x))),
   h("p",{class:"hint",style:"font-size:14px"},"Chapters open in your version on bible.com, or in the Bible app if you have it."+(PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?" "+nm(PARTNER)+" reads the "+bVer(PARTNER)+".":"")),
   h("h2",{style:"font-size:19px"},"Choose a book"),
   h("div",{class:"actgrid"},BPLANS.map(pl=>h("button",{type:"button",class:"act tap",onclick:()=>{saveBible({plan:pl[0],startedBy:ME,at:Date.now()});closeSheet();toast("Reading "+pl[1],nm(PARTNER)+" sees it too")}},emo("📖",30,false),h("small",null,pl[1]+" · "+pl[3]+" days"))))])}
@@ -2845,7 +2876,7 @@ function duelSection(){const k=usDay(),o=PARTNER,t=scoreboard(),kn=(DU().know||{
   const lead=t[ME]===t[o]?"All square":t[ME]>t[o]?"You're ahead":nm(o)+" is ahead";
   const tile=(c,e,name,s,hot,fn)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},s));
   const c4sub=!g||!g.board?"Start a game":g.w?(g.w==="tie"?"Tie · play again":g.w===ME?"You won · play again":nm(o)+" won · rematch"):g.turn===ME?"Your move":"Waiting for "+nm(o);
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Game night"),h("span",{class:"hint"},"Games with a winner")),
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("🏆",30,false),"Game night"),h("span",{class:"hint"},"Games with a winner")),
     h("div",{class:"sboard"},emo("🏆",40,true),h("div",{class:"sbx"},h("span",{class:"k"},lead),h("div",{class:"sbs"},h("b",null,"You "+t[ME]),h("span",null,"vs"),h("b",null,t[o]+" "+nm(o))),t.tie?h("small",null,t.tie+" tie"+(t.tie===1?"":"s")):null)),
     h("div",{class:"tgrid"},
       tile("#e2557c","🧠","Know me best",sub(kn[ME]&&kn[ME].at,kn[o]&&kn[o].at,kr.done),!!(kn[o]&&kn[o].at&&!(kn[ME]&&kn[ME].at)),knowSheet),
@@ -2992,19 +3023,17 @@ function viewUs(){
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(coupleStrip());
   {const bb=bigBanner();if(bb)out.push(bb)}
-  out.push(eveningCard());
-  out.push(h("div",{class:"ju"},h("div",{class:"jpills"},
+  const pillsEl=h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
-    h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days"))));
+    h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days")));
   const room=h("div",{class:"room"});room.innerHTML=roomSVG();room.appendChild(h("span",{class:"roomcap"},"Tap anything in your room"));
   room.querySelectorAll("[data-obj]").forEach(g=>{const go=()=>OBJ[g.dataset.obj]();g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
-  const top=h("div",{class:"ju"},room);
+  const top=h("div",{class:"ju"},room);let gotEl=null;
   const got=US.nudges.find(n=>n.from===PARTNER&&!n.kind);
   const heartBtn=h("button",{type:"button",class:"bigbtn heart tap","aria-label":"Send thinking of you"},svgEl(HEART.replace("currentColor","#fff")),"Thinking of you");
   heartBtn.onclick=()=>{addTo("nudges",{from:ME,at:Date.now()});saveUs({counts:{hearts:INC(1)}});setSeenNudge();hearts(heartBtn);toast("Sent to "+nm(PARTNER),nm(PARTNER)+" gets: "+nm(ME)+" is thinking of you")};
-  if(got&&got.at>usSeenNudge()&&Date.now()-got.at<2*864e5)top.appendChild(h("button",{type:"button",class:"got tap",onclick:()=>heartBtn.click()},svgEl(HEART),h("div",null,h("b",null,nm(PARTNER)+" is thinking of you"),h("span",null,ago(got.at)+" · tap to send one back"))));
+  if(got&&got.at>usSeenNudge()&&Date.now()-got.at<2*864e5)gotEl=(h("button",{type:"button",class:"got tap",onclick:()=>heartBtn.click()},svgEl(HEART),h("div",null,h("b",null,nm(PARTNER)+" is thinking of you"),h("span",null,ago(got.at)+" · tap to send one back"))));
   top.appendChild(h("div",{class:"actions"},heartBtn,h("button",{type:"button",class:"bigbtn doodle tap",onclick:doodleSheet},svgEl(ICON.spark("#5b3b8c")),"Doodle")));
-  out.push(top);
 
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
@@ -3018,14 +3047,18 @@ function viewUs(){
     cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},first.map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},first.map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},tA?"See matches":tB?nm(oo)+" played. Your turn":"Play"))))}
   else if(!tB)waitN++;
   const wt=waitN?"Waiting on "+nm(oo)+" for "+waitN+(waitN===1?" thing":" things"):"";
-  out.push(h("section",{class:"ju"},h("h2",null,"For you two today"),cards.length?cards:h("div",{class:"caught"},emo("💞",48,true),h("div",null,h("b",null,"You two are all caught up"),h("small",null,wt?wt+".":"Nothing waiting today. Send a heart or plan the evening."))),
-    cards.length&&wt?h("p",{class:"hint"},wt+"."):null));
+  if(gotEl)out.push(h("div",{class:"ju"},gotEl));
+  out.push(h("section",{class:"ju"},h("div",{class:"tdbox"},h("div",{class:"tdhead"},emo("✨",30,true),h("h2",null,"For you two today"),h("span",{class:"tbadge"+(cards.length?"":" ok")},cards.length?cards.length+" for you":"All done ✓")),cards.length?cards:h("div",{class:"caught"},emo("💞",48,true),h("div",null,h("b",null,"You two are all caught up"),h("small",null,wt?wt+".":"Nothing waiting today. Send a heart or plan the evening."))),
+    cards.length&&wt?h("p",{class:"hint"},wt+"."):null)));
   out.push(faithSection());
+  out.push(eveningCard());
+  out.push(pillsEl);
+  out.push(top);
   out.push(growSection());
   const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);
 
-  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Play together"),h("span",{class:"hint"},"5 rounds a day")),
+  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("🎲",30,false),"Play together"),h("span",{class:"hint"},"5 rounds a day")),
     sc(visibleGames().map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
       return tile(g.c,g.e,g.name,h("small",{class:"sub"},a&&b?"See matches":a?"Waiting for "+nm(oo):b?"Your turn":"Play"),b&&!a,()=>gameSheet(g))}))));
   out.push(duelSection());
@@ -3033,7 +3066,7 @@ function viewUs(){
   const A=ANS(),tops=enabledTopics();
   const waitOn=[];tops.forEach(t=>t.qs.forEach((q,i)=>{const a=A[t.id+":"+i]||{};if(a[oo]&&!a[w])waitOn.push({t,i,q,at:a[oo].at||0})}));waitOn.sort((x,y)=>y.at-x.at);
   const wq=waitOn[0];
-  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Ask each other"),h("button",{type:"button",class:"lnk",onclick:topicsSettingsSheet},"Choose topics")),
+  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("💬",30,false),"Ask each other"),h("button",{type:"button",class:"lnk",onclick:topicsSettingsSheet},"Choose topics")),
     wq?h("button",{type:"button",class:"pc tap",style:"--c:"+wq.t.c,onclick:()=>answerSheet(wq.t.id+":"+wq.i,wq.q,wq.t.name)},h("span",{class:"k"},nm(oo)+" is waiting on you"+(waitOn.length>1?" · "+waitOn.length+" questions":"")),h("span",{class:"tx"},wq.q),h("div",{class:"foot"},h("span",{class:"hint"},TOPIC_EMOJI[wq.t.id]+" "+wq.t.name),h("span",{class:"go"},"Answer"))):null,
     sc(tops.map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
       return tile(t.c,TOPIC_EMOJI[t.id],t.name,wt?h("small",{class:"sub"},wt+" for you"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"}))),wt>0,()=>topicSheet(t))})),
@@ -3222,7 +3255,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-11-a";
+const APP_VERSION="2026-11-11-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
