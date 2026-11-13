@@ -299,18 +299,18 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .papers.ms{position:relative;background:#fffefa;color:#22212b;border:1px solid #e4dfd2;border-radius:6px;padding:18px 18px 16px 22px;font-family:"Crimson Pro",Georgia,"Times New Roman",serif;
   box-shadow:4px 4px 0 -1px #fffefa,4px 4px 0 0 #e4dfd2,8px 8px 0 -1px #fffefa,8px 8px 0 0 #e4dfd2,0 14px 30px rgba(60,50,30,.14);margin-right:8px}
 .papers.ms .mshead{border-bottom:2px solid #22212b;padding-bottom:6px;margin-bottom:12px}
-.papers.ms .mskick{display:block;font-family:"Courier Prime","Courier New",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7a7364}
+.papers.ms .mskick{display:block;font-family:"Courier Prime","Courier New",monospace;font-size:13.5px;letter-spacing:.14em;text-transform:uppercase;color:#7a7364}
 .papers.ms .sechead{margin:0}.papers.ms h2{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:25px;color:#22212b;letter-spacing:-.01em}
 .papers.ms .link{color:#a3302a;font-family:"Courier Prime","Courier New",monospace;font-weight:700}
 .papers.ms .pubtile{background:none;border:0;border-bottom:1px dashed #d6cfbd;border-radius:0;padding:4px 0 10px}
-.papers.ms .pubtile b{font-family:"Crimson Pro",Georgia,serif;font-size:19px;font-style:italic;color:#22212b}.papers.ms .pubtile span{color:#7a7364}
+.papers.ms .pubtile b{font-family:"Crimson Pro",Georgia,serif;font-size:20px;font-style:italic;color:#22212b}.papers.ms .pubtile span{color:#7a7364;font-size:15px}
 .papers.ms .empty,.papers.ms .hint{color:#5b5648;font-size:16px;font-style:italic}
 .papers.ms .paper{background:#fff;border:1px solid #e4dfd2;border-left:3px solid #22212b;border-radius:3px;padding:10px 12px;box-shadow:0 2px 6px rgba(60,50,30,.08)}
 .papers.ms .paper .ptx b{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:18.5px;line-height:1.2;color:#22212b}
-.papers.ms .pmeta{font-family:"Courier Prime","Courier New",monospace;font-size:12px;color:#6b6556}
-.papers.ms .pchip{display:inline-block;background:none;border:2px solid var(--stc,#a3302a);color:var(--stc,#a3302a);border-radius:4px;padding:0 6px;margin-right:6px;font-family:"Courier Prime","Courier New",monospace;font-weight:700;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;transform:rotate(-4deg)}
-.papers.ms .pcounts .pc1{background:#fff;border-color:#d6cfbd;color:#3b372e;font-family:"Courier Prime","Courier New",monospace}
-.papers.ms .pnext{font-style:italic;color:#3b372e}
+.papers.ms .pmeta{font-family:"Courier Prime","Courier New",monospace;font-size:14.5px;line-height:1.5;color:#5b5648}
+.papers.ms .pchip{display:inline-block;background:none;border:2px solid var(--stc,#a3302a);color:var(--stc,#a3302a);border-radius:4px;padding:0 6px;margin-right:6px;font-family:"Courier Prime","Courier New",monospace;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transform:rotate(-4deg)}
+.papers.ms .pcounts .pc1{background:#fff;border-color:#d6cfbd;color:#3b372e;font-family:"Courier Prime","Courier New",monospace;font-size:14px;padding:3px 10px 3px 6px}
+.papers.ms .pnext{font-style:italic;color:#3b372e;font-size:17px}
 .papers.ms input,.papers.ms select{color:var(--ink)}
 .paper{border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--accent) 4%,var(--card))}
 .paper .ptop{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}.paper .ptx{flex:1}.pcaret{color:var(--muted);font-size:14px}.paper .pchip{margin-right:6px;padding:1px 8px;font-size:11.5px;vertical-align:1px}.paper .ptx{min-width:0;display:flex;flex-direction:column}.paper .ptx b{font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -3566,7 +3566,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-s";
+const APP_VERSION="2026-11-13-t";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
