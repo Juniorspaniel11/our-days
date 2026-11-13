@@ -1487,7 +1487,7 @@ function addCountdownSheet(pid,existing,src){
   openSheet(existing?"Edit countdown":"New countdown",body);
 }
 
-const DPAL=["#1f9e8f","#4a4fb3","#2f9e5b","#2d7fd3","#7a55c9","#0f7c9c","#3f5fbf","#5f7d2a"];
+const DPAL=["#1f9e8f","#4a4fb3","#2f9e5b","#2d7fd3","#7a55c9","#b5487a","#0f7c9c","#5f7d2a","#a14fb5","#3b4a6b"];
 function todayHero(pid){
   const ro=pid!==ME,p=P(pid),n=tzNow(p.tz),k=n.key,d=day(pid,k),all=itemsFor(pid,k),it=all.filter(x=>!x.skip),ts=d.tasks.filter(x=>x.t);
   const FAITHH=/\b(pray|prayer|prayers|word|bible|devotion|devotions|scripture)\b/i;
@@ -1511,8 +1511,9 @@ function todayHero(pid){
       if(!o.isDone)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>{toggleIn(pid,k,"skip",o.x.id);closeSheet();toast("Skipped for today",o.t)}},"⏭ Skip for today"));
       if(o.x.agenda)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>agendaSheet(pid,o.x)},"📝 Agenda"))}
     box.appendChild(h("small",{class:"hint"},o.sub));openSheet(o.t,box)};
-  const MAX=20;
-  const tile=o=>{const col=o.st==="miss"?"#d9822b":DPAL[hashN(o.id||o.t,DPAL.length)],e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
+  const MAX=20,used=new Map(),taken=new Set();
+  list.forEach(o=>{if(o.st==="miss")return;let i=hashN(o.id||o.t,DPAL.length),n=0;while(taken.has(i)&&n<DPAL.length){i=(i+1)%DPAL.length;n++}if(taken.size>=DPAL.length)taken.clear();taken.add(i);used.set(o,DPAL[i])});
+  const tile=o=>{const col=o.st==="miss"?"#d9822b":used.get(o),e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
     return h("div",{class:"dt"+(o.wide?" wide":"")+(o.st==="cur"?" cur":"")+(o.st==="miss"?" miss":"")+(o.one&&!o.isDone?" one":"")+(o.isDone?" isdone":"")+(o.st==="skip"?" skipped":""),style:"--tc:"+col},
       h("button",{type:"button",class:"dtick",disabled:ro,"aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.st==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(ro)return;if(!o.isDone)cheer(ev);o.done()}},o.st==="skip"?"↺":"✓"),
       h("button",{type:"button",class:"dtx","aria-label":o.t+(ro?"":". More options"),onclick:()=>{if(!ro)menu(o)}},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),
@@ -3566,7 +3567,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-t";
+const APP_VERSION="2026-11-13-u";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
