@@ -675,6 +675,18 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .fdots{display:flex;gap:2px;margin-left:-5px}.ju .fdots button{width:22px;height:24px;display:grid;place-items:center;background:none;border:0;padding:0;cursor:pointer}
 .ju .fttl{background:none;border:0;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:0;text-align:left}.ju .fttl b{font-family:var(--fun);font-weight:600;font-size:21px;line-height:1.15}.ju .fttl span{font-size:14px;opacity:.88}
 .ju .fhint{font-size:12.5px;opacity:.7}
+.ju .fcalbtn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.ju .pcal{gap:12px}
+.ju .pcstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.ju .pcstats b{display:block;font-family:var(--fun);font-weight:700;font-size:30px;color:#ffd98a;line-height:1.1}.ju .pcstats small{font-size:12.5px;opacity:.85}
+.ju .pchead{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:center}.ju .pchead b{display:block;font-family:var(--fun);font-weight:600;font-size:20px}.ju .pchead small{font-size:13px;opacity:.8}
+.ju .pcnav{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;font-size:22px;cursor:pointer}.ju .pcnav:disabled{opacity:.3;cursor:default}
+.ju .pcgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.ju .pcwd{text-align:center;font-size:12px;font-weight:700;opacity:.7}
+.ju .pcday{display:grid;place-items:center;aspect-ratio:1/1;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;font-weight:700;font-size:15px;padding:0}
+.ju button.pcday{cursor:pointer;border-style:dashed;border-color:rgba(255,255,255,.45)}
+.ju .pcday.on{background:#f2b84b;border:1px solid #f2b84b;color:#2a1a08;box-shadow:0 0 10px rgba(242,184,75,.5)}
+.ju .pcday.cur{outline:2px solid #fff;outline-offset:1px}
+.ju .pcday.fut{opacity:.3}
 .ju .fdaywrap{display:flex;flex-direction:column;gap:6px}
 .ju .fdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .ju .fday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:#fff;cursor:pointer;min-height:52px}
@@ -1692,6 +1704,28 @@ function prayerSheet(){juSheet("Pray and read tonight",()=>{const act=PP().filte
     act.length?act.slice(0,4).map(ppMini):h("p",{class:"hint"},"No prayer points yet. Add what's on your hearts."),
     h("button",{type:"button",class:"btn alt",onclick:prayerPointsSheet},act.length>4?"See all "+act.length+" prayer points":"🙏 Add or see prayer points"+(ans?" · "+ans+" answered":"")),
     h("h2",{style:"font-size:19px"},"Tonight's reading"),bibleStrip()]})}
+function prayerCalSheet(){juSheet("Our prayer nights",()=>{
+  const log=S.shared.prayer.log,nk=nightKey(P(ME).tz),ks=Object.keys(log).sort(),first=ks[0]||nk;
+  let best=0,run=0,prev=null;ks.forEach(k=>{run=prev&&addDays(prev,1)===k?run+1:1;best=Math.max(best,run);prev=k});
+  const now=parseKey(nk),off=ui.pcalOff||0,y=now.getFullYear(),m=now.getMonth()+off,d0=new Date(y,m,1),yy=d0.getFullYear(),mm=d0.getMonth();
+  const fd=parseKey(first),minOff=(fd.getFullYear()-now.getFullYear())*12+fd.getMonth()-now.getMonth();
+  const inMonth=ks.filter(k=>{const d=parseKey(k);return d.getFullYear()===yy&&d.getMonth()===mm}).length;
+  const grid=h("div",{class:"pcgrid"},["S","M","T","W","T","F","S"].map(x=>h("small",{class:"pcwd"},x)));
+  for(let i=0;i<d0.getDay();i++)grid.appendChild(h("span"));
+  const dim=new Date(yy,mm+1,0).getDate();
+  for(let dd=1;dd<=dim;dd++){const k=dkey(new Date(yy,mm,dd)),on=!!log[k],fut=k>nk,back=daysBetween(k,nk),edit=!fut&&back<=6;
+    const lab=shortDate(k)+(on?", prayed":", not ticked")+(edit?(on?". Tap to untick":". Tap if you prayed"):"");
+    grid.appendChild(edit?h("button",{type:"button",class:"pcday"+(on?" on":"")+(k===nk?" cur":""),"aria-label":lab,"aria-pressed":String(on),
+        onclick:()=>{if(on)delete log[k];else log[k]={by:ME,at:Date.now(),late:k!==nk};persist();render();toast(on?shortDate(k)+" unticked":shortDate(k)+" ticked \u2713","")}},String(dd))
+      :h("span",{class:"pcday"+(on?" on":"")+(fut?" fut":""),"aria-label":lab},String(dd)))}
+  return [h("div",{class:"ju"},h("div",{class:"faith pcal"},
+    h("div",{class:"pcstats"},h("div",null,h("b",null,String(ks.length)),h("small",null,"nights prayed")),h("div",null,h("b",null,String(prayerStreak())),h("small",null,"in a row now")),h("div",null,h("b",null,String(best)),h("small",null,"longest run"))),
+    h("hr"),
+    h("div",{class:"pchead"},h("button",{type:"button",class:"pcnav","aria-label":"Previous month",disabled:off<=minOff,onclick:()=>{ui.pcalOff=off-1;prayerCalSheet()}},"\u2039"),
+      h("div",null,h("b",null,d0.toLocaleDateString("en-US",{month:"long",year:"numeric"})),h("small",null,inMonth+(inMonth===1?" night":" nights")+" this month")),
+      h("button",{type:"button",class:"pcnav","aria-label":"Next month",disabled:off>=0,onclick:()=>{ui.pcalOff=off+1;prayerCalSheet()}},"\u203a")),
+    grid,
+    h("small",{class:"fhint"},"Gold nights are the ones you prayed. You can tick or untick the last 7 nights here.")))]})}
 function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
   return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
     h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
@@ -1709,7 +1743,7 @@ function faithSection(){
   const pray=h("div",{class:"frow"},candle,h("div",{class:"fmid"},h("button",{type:"button",class:"fttl",onclick:prayerSheet},
     h("b",null,done?"We prayed tonight ✓":"Pray together tonight"),
     h("span",null,(st?st+(st===1?" night":" nights")+" in a row 🔥":done?"Your streak starts tonight":"Tap the candle after you pray")+when))));
-  const days=h("div",{class:"fdaywrap"},pd,h("small",{class:"fhint"},"Forgot to tick a night? Tap its day above. Tap again to untick."));
+  const days=h("div",{class:"fdaywrap"},pd,h("div",{class:"row",style:"justify-content:space-between;gap:8px"},h("small",{class:"fhint"},"Forgot one? Tap its day."),h("button",{type:"button",class:"fcalbtn tap",onclick:()=>{ui.pcalOff=0;prayerCalSheet()}},"📅 See all our nights")));
   const pl=bplan(),o=PARTNER;let read;
   if(!pl)read=h("button",{type:"button",class:"fread tap",onclick:bibleSheet},h("span",{class:"fk"},"📖 Read the Bible together"),h("b",{class:"fch"},"Pick a book"),h("span",{class:"fsub"},"John, Proverbs, Psalms and more. One chapter a day each, at your own pace."));
   else{const a=bRead(ME),b=bRead(o),N=pl[3],next=Math.min(a+1,N),fin=a>=N,today=mn.key,readToday=Object.values(((BIB().read||{})[pl[0]]||{})[ME]||{}).includes(today);
@@ -3282,7 +3316,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-b";
+const APP_VERSION="2026-11-13-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
