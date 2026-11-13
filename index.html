@@ -135,7 +135,9 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:10px}
 .dt{display:flex;align-items:flex-start;gap:10px;border-radius:18px;padding:12px;min-height:96px;background:var(--tc);color:#fff;min-width:0;box-shadow:0 8px 18px rgba(0,0,0,.2)}
 .dt.wide{grid-column:1/-1}
-.dt.cur{background:linear-gradient(135deg,#1f9e8f,#4a4fb3);padding:15px;box-shadow:0 0 0 2px rgba(255,255,255,.55),0 12px 28px rgba(31,158,143,.45)}
+.dt.miss{box-shadow:0 0 0 3px #ffb347,0 8px 18px rgba(0,0,0,.2)}
+.dt.miss .dtx small{display:inline-block;align-self:flex-start;max-width:calc(100% - 30px);background:#ffb347;color:#3a2200;border-radius:6px;padding:1px 6px;opacity:1}
+.dt.cur{background:linear-gradient(135deg,var(--tc),color-mix(in srgb,var(--tc) 55%,#1b2450));padding:15px;box-shadow:0 0 0 2px rgba(255,255,255,.6),0 12px 28px color-mix(in srgb,var(--tc) 45%,transparent)}
 .dt.cur .dtx b{font-size:22px}
 .dt.one{box-shadow:0 0 0 2px #ffd36b,0 8px 18px rgba(0,0,0,.2)}
 .dtick{width:34px;height:34px;border-radius:50%;border:2.5px solid rgba(255,255,255,.9);background:rgba(255,255,255,.14);color:rgba(255,255,255,.35);font-weight:900;font-size:17px;flex:none;cursor:pointer;display:grid;place-items:center;padding:0}
@@ -205,7 +207,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .fullsch[open]>summary{margin-bottom:10px}
 .dadd{display:flex;gap:8px}.daddrow>input{flex:1;min-width:0;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;padding:10px 14px;font-size:16px}.daddrow>input::placeholder{color:rgba(255,255,255,.65)}.daddrow>button{border:0;border-radius:999px;background:#5fe0a8;color:#0d2b22;font-weight:800;padding:0 16px;cursor:pointer;font-size:15px}
 @media (prefers-reduced-motion:no-preference){.dt.cur{animation:dglow 2.6s ease-in-out infinite}}
-@keyframes dglow{50%{box-shadow:0 0 0 2px rgba(255,255,255,.85),0 12px 36px rgba(31,158,143,.7)}}
+@keyframes dglow{50%{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 12px 36px color-mix(in srgb,var(--tc) 70%,transparent)}}
 .nownext{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
 .nn{border-radius:18px;padding:12px 14px;background:var(--calm-soft);color:var(--ink);display:flex;flex-direction:column;gap:2px;min-width:0}
 .nn.cur{background:linear-gradient(135deg,var(--accent),#7a55c9);color:#fff;box-shadow:0 10px 24px color-mix(in srgb,var(--accent) 30%,transparent)}
@@ -1512,8 +1514,8 @@ function todayHero(pid){
       if(o.x.agenda)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>agendaSheet(pid,o.x)},"📝 Agenda"))}
     box.appendChild(h("small",{class:"hint"},o.sub));openSheet(o.t,box)};
   const MAX=20,used=new Map(),taken=new Set();
-  list.forEach(o=>{if(o.st==="miss")return;let i=hashN(o.id||o.t,DPAL.length),n=0;while(taken.has(i)&&n<DPAL.length){i=(i+1)%DPAL.length;n++}if(taken.size>=DPAL.length)taken.clear();taken.add(i);used.set(o,DPAL[i])});
-  const tile=o=>{const col=o.st==="miss"?"#d9822b":used.get(o),e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
+  list.forEach(o=>{let i=hashN(o.id||o.t,DPAL.length),n=0;while(taken.has(i)&&n<DPAL.length){i=(i+1)%DPAL.length;n++}if(taken.size>=DPAL.length)taken.clear();taken.add(i);used.set(o,DPAL[i])});
+  const tile=o=>{const col=used.get(o),e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
     return h("div",{class:"dt"+(o.wide?" wide":"")+(o.st==="cur"?" cur":"")+(o.st==="miss"?" miss":"")+(o.one&&!o.isDone?" one":"")+(o.isDone?" isdone":"")+(o.st==="skip"?" skipped":""),style:"--tc:"+col},
       h("button",{type:"button",class:"dtick",disabled:ro,"aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.st==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(ro)return;if(!o.isDone)cheer(ev);o.done()}},o.st==="skip"?"↺":"✓"),
       h("button",{type:"button",class:"dtx","aria-label":o.t+(ro?"":". More options"),onclick:()=>{if(!ro)menu(o)}},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),
@@ -3567,7 +3569,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-u";
+const APP_VERSION="2026-11-13-v";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
