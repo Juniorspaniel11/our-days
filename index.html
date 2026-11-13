@@ -145,6 +145,25 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dtx b{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.2;overflow-wrap:break-word;word-break:normal;hyphens:auto}
 @media (max-width:400px){.dtx b{font-size:16px}.dtx small{font-size:10.5px!important}.dt{padding:11px 10px;gap:8px}}
 .dmore{font-size:13.5px;opacity:.85}
+.garden{border-radius:28px;padding:16px;display:flex;flex-direction:column;gap:12px;background:radial-gradient(90% 60% at 100% 100%,color-mix(in srgb,#f2d27a 30%,transparent),transparent 70%),linear-gradient(165deg,color-mix(in srgb,#7cc98f 26%,var(--card)),color-mix(in srgb,#e9f5e4 40%,var(--card)));border:1.5px solid color-mix(in srgb,#3f8a4f 35%,transparent);box-shadow:0 12px 30px rgba(47,120,70,.14)}
+.ghead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.ghead h2{margin:0;font-family:var(--display);font-weight:800;font-size:23px;color:color-mix(in srgb,#2f6f42 75%,var(--ink))}
+.ghead small{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.gedit{border:1.5px solid color-mix(in srgb,#3f8a4f 55%,transparent);background:var(--card);color:color-mix(in srgb,#2f6f42 80%,var(--ink));border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
+.gplants{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+.gplant{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;border-radius:22px;padding:12px 8px 10px;background:var(--card);border:2px solid transparent;color:var(--ink);cursor:pointer;box-shadow:0 4px 12px rgba(47,90,60,.1);min-width:0}
+.gpot{font-size:40px;line-height:1.1;position:relative;padding-bottom:8px}
+.gpot::after{content:"";position:absolute;left:50%;bottom:0;width:44px;height:9px;margin-left:-22px;border-radius:50%;background:color-mix(in srgb,#8b5a36 45%,transparent)}
+.gpot.seed{filter:grayscale(.7);opacity:.55}
+.gplant b{font-size:14px;font-weight:800;line-height:1.2;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gplant small{font-size:12px;color:var(--muted);font-weight:600}
+.gplant.on{border-color:#3f9e5f;background:color-mix(in srgb,#5fbf7f 18%,var(--card))}
+.gplant.on small{color:#2f7f4a;font-weight:800}
+@media (prefers-reduced-motion:no-preference){.gplant.on .gpot{animation:gsway 3s ease-in-out infinite;transform-origin:50% 90%}}
+@keyframes gsway{50%{transform:rotate(-5deg)}}
+.gplant.edit{cursor:default;border:2px dashed color-mix(in srgb,#3f8a4f 45%,transparent)}
+.gx{margin-top:4px;border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
+.gempty{border:2px dashed color-mix(in srgb,#3f8a4f 45%,transparent);background:var(--card);color:color-mix(in srgb,#2f6f42 80%,var(--ink));border-radius:18px;padding:14px;font-weight:700;cursor:pointer;text-align:left;font-size:15px}
 .grow{display:flex;flex-direction:column;gap:9px;border-radius:20px;padding:12px;background:rgba(95,224,168,.08);border:1px solid rgba(95,224,168,.35)}
 .growhd{display:flex;justify-content:space-between;align-items:center;gap:8px}.growhd b{font-family:var(--display);font-weight:800;font-size:16px;color:#c4f7e0}
 .dlink.mint{color:#5fe0a8}
@@ -1477,16 +1496,6 @@ function todayHero(pid){
         o.isDone?h("span",{class:"dstamp"},o.st==="skip"?"SKIPPED":"DONE ✓"):null,h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
   const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(tile));
   /* daily habits, editable right here */
-  const he=!!ui.habitEdit,hn=h("input",{type:"text",placeholder:"e.g. Read a book, learn a skill","aria-label":"New growth item"}),hg=h("input",{type:"number",min:"0",placeholder:"Min","aria-label":"Daily goal in minutes (optional)"});
-  const wk=hid=>{let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c};
-  const habs=h("div",{class:"grow"},h("div",{class:"growhd"},h("b",null,"🌱 Growing me"+(hb.length?" · "+hdn+" today":"")),
-      h("button",{type:"button",class:"dlink mint",onclick:()=>{ui.habitEdit=!he;render()}},he?"Done":hb.length?"+ Add or edit":"+ Add")),
-    hb.length?h("div",{class:"gpills"},hb.map(x=>{const on=d.habits.includes(x.id),e=kwEmoji(x.title)||"🌱",w=wk(x.id);
-      const inner=[h("span",{class:"gpe"},emo(e,24,false)),h("span",{class:"gpt"},h("b",null,x.title),h("small",null,on?"Done today ✓":w?w+"× this week":"Not yet this week"))];
-      if(he)return h("div",{class:"gp edit"},...inner,h("button",{type:"button",class:"gpx","aria-label":"Remove "+x.title,onclick:()=>{p.habits=p.habits.filter(y=>y.id!==x.id);persist();render()}},"×"));
-      return h("button",{type:"button",class:"gp"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),onclick:ev=>{if(!on){hearts(ev.currentTarget,6);confetti(25)}toggleIn(pid,k,"habits",x.id)}},...inner,h("span",{class:"gpck"},"✓"))})):
-      (he?null:h("button",{type:"button",class:"gpempty",onclick:()=>{ui.habitEdit=true;render()}},"Things you'd love to keep doing: read a book, learn the American accent, learn a skill")),
-    he?h("form",{class:"daddrow",onsubmit:e=>{e.preventDefault();const v=hn.value.trim();if(!v){hn.focus();return}p.habits.push({id:uid(),title:v,goal:0});persist();render();toast("Added to Growing me 🌱",v)}},hn,h("button",{type:"submit"},"+ Add")):null);
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
     h("div",{class:"dhtop"},h("div",null,h("small",null,"Your day · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
@@ -1498,8 +1507,23 @@ function todayHero(pid){
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
       else{addTask(pid,k,v);render();toast("Added for today ✓",v)}}},
       h("div",{class:"daddrow"},ai,h("label",{class:"dtime"},h("span",null,"⏰"),at),h("button",{type:"submit"},"+ Add")),
-      h("button",{type:"button",class:"dlink",onclick:()=>itemSheet(pid,k,null)},"More options: repeat, end time, another day")),
-    habs);
+      h("button",{type:"button",class:"dlink",onclick:()=>itemSheet(pid,k,null)},"More options: repeat, end time, another day")));
+}
+function growMe(pid){
+  const p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[],he=!!ui.habitEdit,hdn=hb.filter(x=>d.habits.includes(x.id)).length;
+  const wk=hid=>{let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c};
+  const stage=w=>w>=6?"🌻":w>=4?"🪴":w>=2?"🌿":"🌱";
+  const hn=h("input",{type:"text",class:"inp",placeholder:"e.g. Read a book, learn a skill","aria-label":"New thing to grow"});
+  return h("section",{class:"garden"},
+    h("div",{class:"ghead"},h("div",null,h("h2",null,"🌱 Growing me"),h("small",null,hb.length?(hdn?"Watered "+hdn+" today. ":"")+"Each time you do one, it grows.":"Your little garden of things you'd love to keep doing.")),
+      h("button",{type:"button",class:"gedit",onclick:()=>{ui.habitEdit=!he;render()}},he?"Done":hb.length?"Edit":"+ Add")),
+    hb.length?h("div",{class:"gplants"},hb.map(x=>{const on=d.habits.includes(x.id),w=wk(x.id),e=kwEmoji(x.title);
+      const inner=[h("span",{class:"gpot"+(w?"":" seed")},stage(w)),h("b",null,e?h("span",{class:"inemo"},emo(e,16,false)):null,x.title),h("small",null,on?"💧 Watered today":w?w+"× this week":"Not yet this week")];
+      if(he)return h("div",{class:"gplant edit"},...inner,h("button",{type:"button",class:"gx","aria-label":"Remove "+x.title,onclick:()=>{p.habits=p.habits.filter(y=>y.id!==x.id);persist();render()}},"Remove"));
+      return h("button",{type:"button",class:"gplant"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", watered today. Tap to undo":", tap when you did it today"),
+        onclick:ev=>{if(!on){hearts(ev.currentTarget,6);toast("💧 Watered",x.title+(w+1>=6?" is in full bloom 🌻":w+1>=4?" is growing strong 🪴":" is growing"))}toggleIn(pid,k,"habits",x.id)}},...inner)})):null,
+    !hb.length&&!he?h("button",{type:"button",class:"gempty",onclick:()=>{ui.habitEdit=true;render()}},"🌰 Plant your first one: read a book, learn the American accent, learn a skill"):null,
+    he?h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=hn.value.trim();if(!v){hn.focus();return}p.habits.push({id:uid(),title:v,goal:0});persist();render();toast("Planted 🌱",v)}},h("div",{style:"flex:1 1 200px"},hn),h("button",{type:"submit",class:"ghost"},"Plant it")):null);
 }
 function repLabel(ds){const d=(ds||[]).slice().sort((a,b)=>((a+6)%7)-((b+6)%7)),j=d.join();
   return d.length===7?"Daily":j==="1,2,3,4,5"?"Weekdays":j==="6,0"?"Weekends":d.map(x=>SH[x]).join(" ")}
@@ -1708,6 +1732,7 @@ function viewToday(){
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
     pid===ME&&isT?todayHero(pid):null,
+    pid===ME&&isT?growMe(pid):null,
     pid===ME?bigBanner():null,
     countdownStrip(pid),
     weekStrip(pid),
@@ -3509,7 +3534,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-n";
+const APP_VERSION="2026-11-13-o";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
