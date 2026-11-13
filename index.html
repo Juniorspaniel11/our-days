@@ -688,13 +688,14 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .pcday.cur{outline:2px solid #fff;outline-offset:1px}
 .ju .pcday.fut{opacity:.3}
 .ju .flane{display:flex;flex-direction:column;gap:7px;border-radius:16px;padding:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16)}
-.ju .flane.them{border-color:rgba(255,143,171,.35)}
 .ju .flhead{display:flex;align-items:baseline;gap:8px}.ju .flhead b{font-family:var(--fun);font-weight:600;font-size:16px}.ju .flhead span{flex:1;font-size:13.5px;opacity:.88;min-width:0}.ju .flhead small{font-weight:700;font-size:13px;opacity:.9;white-space:nowrap}
 .ju .flsq{display:flex;flex-wrap:wrap;gap:5px}
 .ju .fsq{width:16px;height:16px;border-radius:5px;background:rgba(255,255,255,.16)}
 .ju .flsq.mine .fsq{width:30px;height:30px;border-radius:8px;border:0;display:grid;place-items:center;color:rgba(255,255,255,.75);font-size:12px;font-weight:700;padding:0;cursor:pointer}
-.ju .flane.me .fsq.on{background:#f2b84b;color:#2a1a08;box-shadow:0 0 6px rgba(242,184,75,.5)}
-.ju .flane.them .fsq.on{background:#ff8fab}
+.ju .flane .fsq.on{background:var(--lc);color:var(--lt);box-shadow:0 0 6px color-mix(in srgb,var(--lc) 60%,transparent)}
+.ju .flane{border-color:color-mix(in srgb,var(--lc) 40%,transparent)!important}
+.ju .fch.mine{color:var(--mc);text-shadow:0 0 26px color-mix(in srgb,var(--mc) 50%,transparent)}
+.ju .fbig.mine{background:var(--mc);color:var(--mt);box-shadow:0 8px 20px color-mix(in srgb,var(--mc) 40%,transparent)}
 .ju .fsq.cur{outline:2px solid #fff;outline-offset:1px}
 .ju .fcheer{align-self:flex-start;border:1px solid rgba(255,143,171,.6);background:rgba(255,143,171,.16);color:#fff;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700;cursor:pointer}
 .ju .fdaywrap{display:flex;flex-direction:column;gap:6px}
@@ -1052,7 +1053,7 @@ function start(profile){
     S.shared.prayer=S.shared.prayer||{};S.shared.prayer.log=S.shared.prayer.log||{};S.shared.prayer.tonight=S.shared.prayer.tonight||{};
     S.shared.countdowns=S.shared.countdowns||[];S.shared.plans=S.shared.plans||[];
     S.sharedLoaded=true;softRender()},e=>console.warn(e)));
-  unsubs.push(coupleRef().onSnapshot(sn=>{if(!sn.exists)return;const other=(sn.data().members||[]).find(x=>x!==ME)||null;
+  unsubs.push(coupleRef().onSnapshot(sn=>{if(!sn.exists)return;MEMBERS=sn.data().members||[];const other=MEMBERS.find(x=>x!==ME)||null;
     if(other!==PARTNER){partnerUnsubs.forEach(f=>f());partnerUnsubs=[];PARTNER=other;if(other){delete S.people._p;watchPerson(other,false)}link();softRender()}},e=>console.warn(e)));
   el("gate").hidden=true;render();
 }
@@ -1736,6 +1737,9 @@ function prayerCalSheet(){juSheet("Our prayer nights",()=>{
       h("button",{type:"button",class:"pcnav","aria-label":"Next month",disabled:off>=0,onclick:()=>{ui.pcalOff=off+1;prayerCalSheet()}},"\u203a")),
     grid,
     h("small",{class:"fhint"},"Gold nights are the ones you prayed. You can tick or untick the last 7 nights here.")))]})}
+let MEMBERS=[];
+/* reading colours per person: the couple's first member is aqua, the second pink, the same on both phones */
+const PCOL=u=>((MEMBERS.length?MEMBERS[0]===u:u===ME)?["#4fd8c8","#062b28"]:["#ff8fab","#3a0d1c"]);
 function bNext(pl,u){const m=(((BIB().read||{})[pl[0]]||{})[u])||{};for(let i=1;i<=pl[3];i++)if(!m[i])return i;return 0}
 function readingBlock(){
   const pl=bplan(),o=PARTNER,mn=tzNow(P(ME).tz);
@@ -1746,15 +1750,15 @@ function readingBlock(){
     for(let i=1;i<=N;i++){const on=!!m[i],cls="fsq"+(on?" on":"")+(i===nx?" cur":"");
       sq.appendChild(mine?h("button",{type:"button",class:cls,"aria-label":bName(pl,i)+(on?", read. Tap to untick":", not read. Tap to tick"),"aria-pressed":String(on),
         onclick:()=>{saveBible({read:{[pl[0]]:{[ME]:{[i]:on?firebase.firestore.FieldValue.delete():mn.key}}}});if(!on)confetti(25);toast(on?bName(pl,i)+" unticked":bName(pl,i)+" ticked ✓","")}},String(i)):h("i",{class:cls,title:bName(pl,i)}))}
-    return h("div",{class:"flane"+(mine?" me":" them")},
+    return h("div",{class:"flane"+(mine?" me":" them"),style:"--lc:"+PCOL(u)[0]+";--lt:"+PCOL(u)[1]},
       h("div",{class:"flhead"},h("b",null,mine?"You":nm(u)),h("span",null,nx?(rt?"Read today ✓":"Up next: "+bName(pl,nx)):"Finished 🎉"),h("small",null,n+" of "+N)),sq,
       !mine&&real?h("button",{type:"button",class:"fcheer tap",onclick:ev=>{if(DB&&CID)DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"big",title:nm(ME)+" is cheering on your Bible reading 👏",body:nx?(rt?"You read today. Keep it going!":"Next up: "+bName(pl,nx)+". You've got this!"):"You finished "+pl[1]+"! So proud of you."}).catch(syncErr);hearts(ev.currentTarget,10);toast("Cheer sent 👏",nm(u)+" gets a little boost")}},"👏 Cheer "+nm(u)+" on"):null)};
   const nx=bNext(pl,ME),rt=Object.values(R[ME]||{}).includes(mn.key);
-  return h("div",{class:"fread"},h("span",{class:"fk"},"📖 "+pl[1]+" · one chapter a day each"),
-    h("b",{class:"fch"},!nx?"Finished 🎉":rt?"Read today ✓":bName(pl,nx)),
+  return h("div",{class:"fread",style:"--mc:"+PCOL(ME)[0]+";--mt:"+PCOL(ME)[1]},h("span",{class:"fk"},"📖 "+pl[1]+" · one chapter a day each"),
+    h("b",{class:"fch mine"},!nx?"Finished 🎉":rt?"Read today ✓":bName(pl,nx)),
     h("span",{class:"fsub"},!nx?"You read all of "+pl[1]+". Pick the next book together.":rt?"Next up tomorrow: "+bName(pl,nx):"Your chapter tonight · about 5 minutes"),
     h("div",{class:"row",style:"gap:8px"},!nx?h("button",{type:"button",class:"fbig gold",onclick:bibleSheet},"Pick the next book"):h("a",{class:"fbig",href:bUrl(pl,nx),target:"_blank",rel:"noopener"},"Open "+bName(pl,nx)+" · "+bVer(ME)),
-      nx&&!rt?h("button",{type:"button",class:"fbig gold",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[nx]:mn.key}}}});hearts(ev.currentTarget,8);confetti(nx===N?160:40);toast(nx===N?"You finished "+pl[1]+" 🎉":"Chapter done ✓",real?nm(o)+" sees your progress":"")}},"✓ I read it"):null),
+      nx&&!rt?h("button",{type:"button",class:"fbig mine",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[nx]:mn.key}}}});hearts(ev.currentTarget,8);confetti(nx===N?160:40);toast(nx===N?"You finished "+pl[1]+" 🎉":"Chapter done ✓",real?nm(o)+" sees your progress":"")}},"✓ I read it"):null),
     lane(ME),real?lane(o):null,
     h("small",{class:"fhint"},"Tap any of your squares to tick or untick that chapter."),
     h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(real?" · "+nm(o)+" reads the "+bVer(o):"")))}
@@ -3335,7 +3339,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-d";
+const APP_VERSION="2026-11-13-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
