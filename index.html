@@ -156,6 +156,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .nbtext{flex:1;min-width:0;font-size:24px;font-weight:500;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nbrow.on .nbtext{text-decoration:line-through;text-decoration-color:#2f9e5b;text-decoration-thickness:2.5px;color:#7a7a88}
 .nbcount{font-size:19px;color:#9a8a5a;white-space:nowrap}
+.nbrow:disabled{cursor:default;opacity:1;color:inherit}.dtick:disabled{cursor:default}
 .nbrow.on .nbcount{color:#2f9e5b;font-weight:700}
 .gstory{display:flex;flex-direction:column;gap:6px;margin-bottom:-6px}
 .gscap{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--muted)}
@@ -315,7 +316,16 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .pubrow{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.pubrow b{flex:1;font-size:16px}
 .pubhead{display:flex;align-items:center;gap:8px;width:100%;margin-top:14px;padding:10px 0 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer;text-align:left}.pubhead b{flex:1}.pubhead span{color:var(--accent);font-weight:600;font-size:14px}
 .publist{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px}.publist li b{display:block}.publist li span{display:block;font-size:14px;color:var(--muted)}
-.projs{display:flex;flex-direction:column;gap:10px}
+.projs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:10px}
+.projs .pj.open{grid-column:1/-1}
+.pjt{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;border:0;border-radius:20px;padding:12px;min-height:104px;background:linear-gradient(150deg,var(--pc),color-mix(in srgb,var(--pc) 70%,#000));color:#fff;cursor:pointer;box-shadow:0 8px 18px color-mix(in srgb,var(--pc) 30%,transparent);position:relative;overflow:hidden}
+.pjt::after{content:"";position:absolute;right:-18px;top:-18px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.1)}
+.pjt.focus{box-shadow:0 0 0 3px #ffd36b,0 8px 18px color-mix(in srgb,var(--pc) 30%,transparent)}
+.pjttop{display:flex;align-items:center;justify-content:space-between;width:100%}
+.pjtic{font-size:14px;font-weight:800;color:#ffd36b}
+.pjt b{font-family:var(--display);font-weight:800;font-size:16.5px;line-height:1.2;overflow-wrap:break-word;flex:1}
+.pjdue{font-size:12px;font-weight:700;background:rgba(255,255,255,.2);border-radius:999px;padding:2px 9px}
+.pjdue.soon{background:#fff;color:#b5481c}
 .pj{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 12px 10px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
 .pjband{margin:0 -12px 2px;padding:9px 12px;background:var(--pc);color:#fff}.pjband .pjp{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45);color:#fff}.pjband .pjp[aria-pressed="true"]{background:#fff;border-color:#fff;color:var(--pc)}
 .pj.focus{box-shadow:0 0 0 2px color-mix(in srgb,var(--pc) 35%,transparent)}
@@ -834,6 +844,16 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .dav{display:flex;flex:none}.ju .dav span{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--c);border:3px solid var(--card);overflow:hidden;font-size:16px}.ju .dav span+span{margin-left:-12px}.ju .dav img{width:100%;height:100%;object-fit:cover}
 .ju .dbox .spj{background:var(--card);border:0;border-left:6px solid var(--c);box-shadow:var(--shadow);position:relative;z-index:1}
 .ju .dbox form{position:relative;z-index:1}
+.ju .dbox.compact{padding:12px 14px;gap:8px;border-radius:24px}
+.ju .dbox.compact::after{font-size:90px;bottom:-22px}
+.ju .dbox.compact .dhead h2{font-size:19px;margin:0}
+.ju .dbox.compact .dav span{width:30px;height:30px;font-size:13px;border-width:2px}.ju .dbox.compact .dav span+span{margin-left:-9px}
+.ju .spr{display:flex;align-items:center;gap:10px;width:100%;border:0;border-left:5px solid var(--c);border-radius:14px;background:var(--card);padding:8px 12px;cursor:pointer;color:var(--ink);text-align:left;position:relative;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ju .sprt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.ju .sprt b{font-size:15.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ju .sprbar{height:5px;border-radius:99px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden}.ju .sprbar i{display:block;height:100%;background:var(--c);border-radius:99px}
+.ju .spr small{font-weight:800;color:var(--c);font-size:13px}
+.ju .sprform{display:flex;gap:8px}.ju .sprform input{flex:1;min-width:0;border:1px dashed color-mix(in srgb,#e2557c 45%,transparent);background:color-mix(in srgb,var(--card) 70%,transparent);border-radius:999px;padding:8px 14px;font-size:15px;color:var(--ink)}
+.ju .sprform button{width:38px;border:0;border-radius:50%;background:#e2557c;color:#fff;font-size:20px;font-weight:700;cursor:pointer}
 .nav button.owk{background:linear-gradient(135deg,#e2557c,#8b6ad1);color:#fff;border:0;font-weight:700}
 .ju .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .ju .stat{border-radius:24px;padding:16px;background:color-mix(in srgb,var(--c) 15%,var(--card));position:relative;overflow:hidden;min-height:132px;display:flex;flex-direction:column;justify-content:flex-end}
@@ -1450,7 +1470,7 @@ function addCountdownSheet(pid,existing,src){
 
 const DPAL=["#1f9e8f","#4a4fb3","#2f9e5b","#2d7fd3","#7a55c9","#0f7c9c","#3f5fbf","#5f7d2a"];
 function todayHero(pid){
-  const p=P(pid),n=tzNow(p.tz),k=n.key,d=day(pid,k),all=itemsFor(pid,k),it=all.filter(x=>!x.skip),ts=d.tasks.filter(x=>x.t);
+  const ro=pid!==ME,p=P(pid),n=tzNow(p.tz),k=n.key,d=day(pid,k),all=itemsFor(pid,k),it=all.filter(x=>!x.skip),ts=d.tasks.filter(x=>x.t);
   const FAITHH=/\b(pray|prayer|prayers|word|bible|devotion|devotions|scripture)\b/i;
   if((p.habits||[]).some(x=>FAITHH.test(x.title))){p.habits=p.habits.filter(x=>!FAITHH.test(x.title));persist()}
   const hb=p.habits||[],hdn=hb.filter(x=>d.habits.includes(x.id)).length;
@@ -1475,19 +1495,19 @@ function todayHero(pid){
   const MAX=20;
   const tile=o=>{const col=o.st==="miss"?"#d9822b":DPAL[hashN(o.id||o.t,DPAL.length)],e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
     return h("div",{class:"dt"+(o.wide?" wide":"")+(o.st==="cur"?" cur":"")+(o.st==="miss"?" miss":"")+(o.one&&!o.isDone?" one":"")+(o.isDone?" isdone":"")+(o.st==="skip"?" skipped":""),style:"--tc:"+col},
-      h("button",{type:"button",class:"dtick","aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.st==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(!o.isDone)cheer(ev);o.done()}},o.st==="skip"?"↺":"✓"),
-      h("button",{type:"button",class:"dtx","aria-label":o.t+". More options",onclick:()=>menu(o)},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),
-        o.isDone?h("span",{class:"dstamp"},o.st==="skip"?"SKIPPED":"DONE ✓"):null,h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
+      h("button",{type:"button",class:"dtick",disabled:ro,"aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.st==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(ro)return;if(!o.isDone)cheer(ev);o.done()}},o.st==="skip"?"↺":"✓"),
+      h("button",{type:"button",class:"dtx","aria-label":o.t+(ro?"":". More options"),onclick:()=>{if(!ro)menu(o)}},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),
+        o.isDone?h("span",{class:"dstamp"},o.st==="skip"?"SKIPPED":"DONE ✓"):null,ro?null:h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
   const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(tile));
   /* daily habits, editable right here */
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
-    h("div",{class:"dhtop"},h("div",null,h("small",null,"Your day · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
-        h("span",{class:"dsub"},!tot?"Add what you want to get done today.":left?dn+" done so far. Tap ✓ to tick or untick, ⋯ for more 💪":"Everything ticked. Enjoy your evening.")),
+    h("div",{class:"dhtop"},h("div",null,h("small",null,(ro?nm(pid)+"'s day":"Your day")+" · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
+        h("span",{class:"dsub"},!tot?(ro?"Nothing planned for today yet.":"Add what you want to get done today."):left?dn+" done so far."+(ro?"":" Tap ✓ to tick or untick, ⋯ for more 💪"):"Everything ticked. Enjoy your evening.")),
       h("div",{class:"dring",style:"--p:"+pc},h("span",null,pc+"%"))),
     list.length?tiles:null,
     list.length>MAX?h("span",{class:"dmore"},"+"+(list.length-MAX)+" more not shown"):null,
-    h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
+    ro?null:h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
       else{addTask(pid,k,v);render();toast("Added for today ✓",v)}}},
       h("div",{class:"daddrow"},ai,h("label",{class:"dtime"},h("span",null,"⏰"),at),h("button",{type:"submit"},"+ Add")),
@@ -1495,12 +1515,12 @@ function todayHero(pid){
 }
 function growWeek(pid,hid){const p=P(pid),k=tzNow(p.tz).key;let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c}
 function growMe(pid){
-  const p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];
+  const ro=pid!==ME,p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];if(ro&&!hb.length)return null;
   return h("section",{class:"notebook"},
-    h("div",{class:"nbhead"},h("span",{class:"nbtitle"},"Growing me 🌱"),hb.length?h("span",{class:"nbsub"},"this week"):null,h("button",{type:"button",class:"nbedit",onclick:()=>growSheet(pid)},hb.length?"edit":"add")),
+    h("div",{class:"nbhead"},h("span",{class:"nbtitle"},ro?nm(pid)+" is growing 🌱":"Growing me 🌱"),hb.length?h("span",{class:"nbsub"},"this week"):null,ro?null:h("button",{type:"button",class:"nbedit",onclick:()=>growSheet(pid)},hb.length?"edit":"add")),
     hb.map(x=>{const on=d.habits.includes(x.id),w=growWeek(pid,x.id);
-      return h("button",{type:"button",class:"nbrow"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),
-        onclick:ev=>{if(!on){hearts(ev.currentTarget,6);toast("Nice 🌱",x.title+" · "+(w+1)+"× this week")}toggleIn(pid,k,"habits",x.id)}},
+      return h("button",{type:"button",class:"nbrow"+(on?" on":""),disabled:ro,"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),
+        onclick:ev=>{if(ro)return;if(!on){hearts(ev.currentTarget,6);toast("Nice 🌱",x.title+" · "+(w+1)+"× this week")}toggleIn(pid,k,"habits",x.id)}},
         h("span",{class:"nbbox"},on?"✓":""),h("span",{class:"nbtext"},x.title),h("span",{class:"nbcount",title:"Times in the last 7 days"},w?w+"×":""))}),
     !hb.length?h("button",{type:"button",class:"nbrow",onclick:()=>growSheet(pid)},h("span",{class:"nbbox"},"+"),h("span",{class:"nbtext",style:"color:#8a7d55"},"add something you'd love to keep doing")):null);
 }
@@ -1716,13 +1736,12 @@ function viewToday(){
   const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
-    pid===ME&&isT?todayHero(pid):null,
-    pid===ME&&isT?growMe(pid):null,
+    isT?todayHero(pid):null,
+    isT?growMe(pid):null,
     pid===ME?bigBanner():null,
     countdownStrip(pid),
     weekStrip(pid),
-    pid===ME&&isT?null:dayCard(pid,sel,isT?"Today":sel===addDays(n.key,1)?"Tomorrow":longDate(sel)),
-    isT&&pid!==ME?panel("Every day",habitsList(pid,n.key,false)):null
+    isT?null:dayCard(pid,sel,isT?"Today":sel===addDays(n.key,1)?"Tomorrow":longDate(sel))
   ].filter(Boolean);
 }
 
@@ -1749,15 +1768,13 @@ const SPC=["#8c2f55","#3557a8","#246a73","#5b45a8","#b9661c","#3f7d4e"];
 const SPJ=()=>Object.entries(((US.projects||{}).items)||{}).map(([id,x])=>({id,...x})).filter(x=>x&&x.name).sort((a,b)=>(a.at||0)-(b.at||0));
 const saveSpj=(id,o)=>saveDoc("projects",{items:{[id]:o}});
 function sharedProjectsSection(){if(S.viewAs!==ME||!PARTNER||!P(PARTNER)||P(PARTNER).placeholder)return null;
-  const list=SPJ(),ni=h("input",{type:"text",class:"inp",placeholder:"New shared project, e.g. Christmas plans","aria-label":"New shared project"});
+  const list=SPJ(),ni=h("input",{type:"text",placeholder:"New shared project","aria-label":"New shared project"});
   const bub=u=>{const x=P(u),ph=x&&x.avatar;return h("span",{style:"--c:"+(u===ME?"#8b6ad1":"#e2557c")},ph?h("img",{src:ph,alt:""}):(nm(u)[0]||"?"))};
-  return h("section",{class:"ju"},h("div",{class:"dbox"},h("div",{class:"dhead"},h("div",{class:"dav"},bub(ME),bub(PARTNER)),h("div",{style:"flex:1;min-width:0"},h("span",{class:"dk"},"Just us two"),h("h2",null,"Our projects together")),emo("💞",46,true)),
-    list.length?h("p",{class:"hint",style:"position:relative;z-index:1"},nm(PARTNER)+" sees these too. Either of you can add steps and tick them off."):null,
-    list.length?list.map(x=>{const ts=x.tasks||[],n=ts.filter(t=>t.d).length,N=ts.length,nx=ts.find(t=>!t.d);
-      return h("button",{type:"button",class:"spj tap",style:"--c:"+(x.c||SPC[0]),onclick:()=>spjSheet(x.id)},h("div",{class:"spjtop"},emo(kwEmoji(x.name)||"✨",30,false),h("b",null,x.name)),
-        h("div",{class:"jbar"},h("span",{style:"max-width:none"},h("i",{style:"width:"+(N?Math.round(n/N*100):0)+"%"})),h("small",null,N?n+" of "+N+" done":"No steps yet")),
-        h("small",{class:"spjnext"},nx?"Next: "+nx.t:N?"All done 🎉":"Tap to add the first step"))}):h("p",{class:"hint"},"Things you work on together, like saving for a trip, a book you both read, or planning Christmas. Each one gets a checklist you can both tick."),
-    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const t=ni.value.trim();if(!t)return;ni.blur();const id=uid();saveSpj(id,{name:t,by:ME,at:Date.now(),c:SPC[list.length%SPC.length],tasks:[]});ni.value="";toast("Project added",nm(PARTNER)+" sees it too");setTimeout(()=>spjSheet(id),250)}},h("div",{style:"flex:1 1 200px"},ni),h("button",{type:"submit",class:"ghost"},"Create"))))}
+  return h("section",{class:"ju"},h("div",{class:"dbox compact"},h("div",{class:"dhead"},h("div",{class:"dav"},bub(ME),bub(PARTNER)),h("h2",null,"Our projects together 💞")),
+    list.length?list.map(x=>{const ts=x.tasks||[],n=ts.filter(t=>t.d).length,N=ts.length;
+      return h("button",{type:"button",class:"spr tap",style:"--c:"+(x.c||SPC[0]),onclick:()=>spjSheet(x.id)},emo(kwEmoji(x.name)||"✨",24,false),
+        h("span",{class:"sprt"},h("b",null,x.name),h("span",{class:"sprbar"},h("i",{style:"width:"+(N?Math.round(n/N*100):0)+"%"}))),h("small",null,N?n+"/"+N:"＋"))}):h("p",{class:"hint",style:"position:relative;z-index:1;margin:0"},"Things you work on together, like a trip or Christmas plans. You both see them."),
+    h("form",{class:"sprform",onsubmit:e=>{e.preventDefault();const t=ni.value.trim();if(!t)return;ni.blur();const id=uid();saveSpj(id,{name:t,by:ME,at:Date.now(),c:SPC[list.length%SPC.length],tasks:[]});ni.value="";toast("Project added",nm(PARTNER)+" sees it too");setTimeout(()=>spjSheet(id),250)}},ni,h("button",{type:"submit"},"＋"))))}
 function spjSheet(id){juSheet("Shared project",()=>{const x=SPJ().find(y=>y.id===id);if(!x)return [h("p",{class:"hint"},"This project was removed.")];
   const tasks=x.tasks||[],n=tasks.filter(t=>t.d).length,ti=h("input",{type:"text",class:"inp",placeholder:"Add a step","aria-label":"New step"});
   const setTasks=arr=>saveSpj(id,{tasks:arr});
@@ -1843,13 +1860,18 @@ function papersSection(pid){
 
 function projectCard(pid,x){
   const p=P(pid),n=tzNow(p.tz),fid=x.id,run=S.timer&&S.timer.id===fid,edit=ui.projEdit===x.id;
-  const c=h("div",{class:"pj"+(x.focus?" focus":""),style:"--pc:"+colorOf(pid,x)});
+  const open=ui.pjOpen===x.id||edit,dd=x.target?daysBetween(n.key,x.target):null;
+  if(!open)return h("button",{type:"button",class:"pjt tap"+(x.focus?" focus":""),style:"--pc:"+colorOf(pid,x),"aria-label":x.title+". Open",onclick:()=>{ui.pjOpen=x.id;render()}},
+    h("div",{class:"pjttop"},emo(kwEmoji(x.title)||"📁",26,false),h("span",{class:"pjtic"},(x.focus?"★ ":"")+(x.pinned?"📌":""))),
+    h("b",null,x.title),x.target?h("span",{class:"pjdue"+(dd<=7?" soon":"")},dd<0?(-dd)+" days overdue":dd===0?"Due today":"Due "+shortDate(x.target)):null);
+  const c=h("div",{class:"pj open"+(x.focus?" focus":""),style:"--pc:"+colorOf(pid,x)});
   const meta=[];if(x.target){const d=daysBetween(n.key,x.target);meta.push(h("span",{class:d<=7?"soon":""},shortDate(x.target)+(d<0?" · "+(-d)+" days overdue":d===0?" · today":" · in "+d+" days")))}
   if(x.steps&&x.steps.length)meta.push(h("span",null,x.steps.length+" step"+(x.steps.length>1?"s":"")+" done"));
   const fm=focusMins(pid,fid);if(fm)meta.push(h("span",null,hmShort(fm)+" focused"));
   c.appendChild(h("div",{class:"pjtop pjband"},kwEmoji(x.title)?emo(kwEmoji(x.title),26,false):null,h("b",null,x.title),
     h("button",{type:"button",class:"pjp","aria-pressed":String(!!x.focus),title:"This week's focus",onclick:()=>{x.focus=!x.focus;persist();render()}},x.focus?"★ This week":"☆ This week"),
-    h("button",{type:"button",class:"pjp","aria-pressed":String(!!x.pinned),title:"Show on Today",onclick:()=>{x.pinned=!x.pinned;if(x.pinned&&!x.since)x.since=n.key;persist();render()}},x.pinned?"📌 On Today":"Pin")));
+    h("button",{type:"button",class:"pjp","aria-pressed":String(!!x.pinned),title:"Show on Today",onclick:()=>{x.pinned=!x.pinned;if(x.pinned&&!x.since)x.since=n.key;persist();render()}},x.pinned?"📌 On Today":"Pin"),
+    h("button",{type:"button",class:"pjp",onclick:()=>{ui.pjOpen=null;ui.projEdit=null;render()}},"Close ▴")));
   if(meta.length)c.appendChild(h("div",{class:"pjmeta"},meta.reduce((a,m,i)=>i?a.concat([" · ",m]):[m],[])));
   const nx=h("input",{type:"text",class:"pjnext",value:x.next||"",placeholder:"Next step…","aria-label":"Next step",oninput:()=>{x.next=nx.value;persist()}});
   const msg=h("span",{class:"msg"});
@@ -3519,7 +3541,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-q";
+const APP_VERSION="2026-11-13-r";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
