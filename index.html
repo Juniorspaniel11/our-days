@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Manrope:wght@600;700;800&family=Fredoka:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Crimson+Pro:ital,wght@0,500;0,700;1,500&family=Courier+Prime:wght@700&family=Manrope:wght@600;700;800&family=Fredoka:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: header with photo and both clocks, then one column of soft cards, floating tab bar. Light and dark themes */
 :root{
@@ -295,6 +295,23 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 
 /* projects */
 .papers .plist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+/* manuscript look */
+.papers.ms{position:relative;background:#fffefa;color:#22212b;border:1px solid #e4dfd2;border-radius:6px;padding:18px 18px 16px 22px;font-family:"Crimson Pro",Georgia,"Times New Roman",serif;
+  box-shadow:4px 4px 0 -1px #fffefa,4px 4px 0 0 #e4dfd2,8px 8px 0 -1px #fffefa,8px 8px 0 0 #e4dfd2,0 14px 30px rgba(60,50,30,.14);margin-right:8px}
+.papers.ms .mshead{border-bottom:2px solid #22212b;padding-bottom:6px;margin-bottom:12px}
+.papers.ms .mskick{display:block;font-family:"Courier Prime","Courier New",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7a7364}
+.papers.ms .sechead{margin:0}.papers.ms h2{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:25px;color:#22212b;letter-spacing:-.01em}
+.papers.ms .link{color:#a3302a;font-family:"Courier Prime","Courier New",monospace;font-weight:700}
+.papers.ms .pubtile{background:none;border:0;border-bottom:1px dashed #d6cfbd;border-radius:0;padding:4px 0 10px}
+.papers.ms .pubtile b{font-family:"Crimson Pro",Georgia,serif;font-size:19px;font-style:italic;color:#22212b}.papers.ms .pubtile span{color:#7a7364}
+.papers.ms .empty,.papers.ms .hint{color:#5b5648;font-size:16px;font-style:italic}
+.papers.ms .paper{background:#fff;border:1px solid #e4dfd2;border-left:3px solid #22212b;border-radius:3px;padding:10px 12px;box-shadow:0 2px 6px rgba(60,50,30,.08)}
+.papers.ms .paper .ptx b{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:18.5px;line-height:1.2;color:#22212b}
+.papers.ms .pmeta{font-family:"Courier Prime","Courier New",monospace;font-size:12px;color:#6b6556}
+.papers.ms .pchip{display:inline-block;background:none;border:2px solid var(--stc,#a3302a);color:var(--stc,#a3302a);border-radius:4px;padding:0 6px;margin-right:6px;font-family:"Courier Prime","Courier New",monospace;font-weight:700;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;transform:rotate(-4deg)}
+.papers.ms .pcounts .pc1{background:#fff;border-color:#d6cfbd;color:#3b372e;font-family:"Courier Prime","Courier New",monospace}
+.papers.ms .pnext{font-style:italic;color:#3b372e}
+.papers.ms input,.papers.ms select{color:var(--ink)}
 .paper{border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--accent) 4%,var(--card))}
 .paper .ptop{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}.paper .ptx{flex:1}.pcaret{color:var(--muted);font-size:14px}.paper .pchip{margin-right:6px;padding:1px 8px;font-size:11.5px;vertical-align:1px}.paper .ptx{min-width:0;display:flex;flex-direction:column}.paper .ptx b{font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .pmeta{font-size:12.5px;color:var(--muted);margin-top:2px}
@@ -844,6 +861,8 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .dav{display:flex;flex:none}.ju .dav span{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--c);border:3px solid var(--card);overflow:hidden;font-size:16px}.ju .dav span+span{margin-left:-12px}.ju .dav img{width:100%;height:100%;object-fit:cover}
 .ju .dbox .spj{background:var(--card);border:0;border-left:6px solid var(--c);box-shadow:var(--shadow);position:relative;z-index:1}
 .ju .dbox form{position:relative;z-index:1}
+.spinv{display:flex;align-items:center;gap:10px;width:100%;border:1.5px dashed color-mix(in srgb,#e2557c 45%,transparent);background:color-mix(in srgb,#e2557c 6%,var(--card));color:var(--ink);border-radius:18px;padding:12px 14px;font:inherit;font-weight:700;font-size:15.5px;cursor:pointer;text-align:left}
+.spinv span:nth-child(2){flex:1}.spinvp{width:30px;height:30px;border-radius:50%;background:#e2557c;color:#fff;display:grid;place-items:center;font-size:18px}
 .ju .dbox.compact{padding:12px 14px;gap:8px;border-radius:24px}
 .ju .dbox.compact::after{font-size:90px;bottom:-22px}
 .ju .dbox.compact .dhead h2{font-size:19px;margin:0}
@@ -1759,7 +1778,8 @@ function viewProjects(){
     sharedProjectsSection(),
     papersSection(pid),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
-      list)
+      list),
+    sharedInvite()
   ];
 }
 
@@ -1767,7 +1787,12 @@ function viewProjects(){
 const SPC=["#8c2f55","#3557a8","#246a73","#5b45a8","#b9661c","#3f7d4e"];
 const SPJ=()=>Object.entries(((US.projects||{}).items)||{}).map(([id,x])=>({id,...x})).filter(x=>x&&x.name).sort((a,b)=>(a.at||0)-(b.at||0));
 const saveSpj=(id,o)=>saveDoc("projects",{items:{[id]:o}});
-function sharedProjectsSection(){if(S.viewAs!==ME||!PARTNER||!P(PARTNER)||P(PARTNER).placeholder)return null;
+function sharedInvite(){if(S.viewAs!==ME||!PARTNER||!P(PARTNER)||P(PARTNER).placeholder||SPJ().length)return null;
+  return h("button",{type:"button",class:"spinv tap",onclick:()=>{const ni=h("input",{type:"text",class:"inp",placeholder:"e.g. Christmas plans, save for a trip","aria-label":"Project name"});
+    openSheet("A project together 💞",h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ni.value.trim();if(!t){ni.focus();return}const id=uid();saveSpj(id,{name:t,by:ME,at:Date.now(),c:SPC[0],tasks:[]});toast("Project added",nm(PARTNER)+" sees it too");setTimeout(()=>spjSheet(id),250)}},
+      h("p",{class:"hint"},"Something you'll work on together. "+nm(PARTNER)+" sees it, and either of you can add steps and tick them off."),ni,h("button",{type:"submit",class:"primary"},"Start it")))}},
+    h("span",null,"💞"),h("span",null,"Start a project with "+nm(PARTNER)),h("span",{class:"spinvp"},"＋"))}
+function sharedProjectsSection(){if(S.viewAs!==ME||!PARTNER||!P(PARTNER)||P(PARTNER).placeholder||!SPJ().length)return null;
   const list=SPJ(),ni=h("input",{type:"text",placeholder:"New shared project","aria-label":"New shared project"});
   const bub=u=>{const x=P(u),ph=x&&x.avatar;return h("span",{style:"--c:"+(u===ME?"#8b6ad1":"#e2557c")},ph?h("img",{src:ph,alt:""}):(nm(u)[0]||"?"))};
   return h("section",{class:"ju"},h("div",{class:"dbox compact"},h("div",{class:"dhead"},h("div",{class:"dav"},bub(ME),bub(PARTNER)),h("h2",null,"Our projects together 💞")),
@@ -1813,7 +1838,7 @@ function paperCard(pid,x){
   const open=edit||ui.paperOpen===x.id;
   const c=h("div",{class:"paper"+(open?" open":"")},
     h("button",{type:"button",class:"ptop","aria-expanded":String(open),onclick:()=>{ui.paperOpen=open?null:x.id;if(open)ui.paperEdit=null;render()}},emo(s[2],30,false),h("div",{class:"ptx"},h("b",null,x.title||"Untitled paper"),
-      h("span",{class:"pmeta"},h("span",{class:"pchip"},s[1]),[w?w.t.replace(/^(Under review|Submitted) · /,""):"",x.journal,x.role==="co"?"Coauthor":"First author"].filter(Boolean).join(" · "))),h("span",{class:"pcaret"},open?"▴":"▾")));
+      h("span",{class:"pmeta"},h("span",{class:"pchip",style:"--stc:"+({idea:"#7a7364",drafting:"#3557a8",coauthors:"#5b45a8",submitted:"#b9661c",review:"#a3302a",revision:"#c0392b",accepted:"#2f7f4a",published:"#2f7f4a"}[x.stage]||"#a3302a")},s[1]),[w?w.t.replace(/^(Under review|Submitted) · /,""):"",x.journal,x.role==="co"?"Coauthor":"First author"].filter(Boolean).join(" · "))),h("span",{class:"pcaret"},open?"▴":"▾")));
   if(open){c.appendChild(bar);
     if(x.next)c.appendChild(h("div",{class:"pnext"},h("span",{class:"lbl"},"Next"),x.next));
     c.appendChild(h("div",{class:"row"},
@@ -1855,7 +1880,7 @@ function papersSection(pid){
       h("button",{type:"button",class:"parr","aria-label":"One more",onclick:()=>{p.pubCount=(p.pubCount||0)+1;persist();render()}},"+"),
       h("button",{type:"button",class:"link",onclick:()=>{ui.pubEdit=false;render()}},"Done"))
     :!ro?h("button",{type:"button",class:"link",onclick:()=>{ui.pubEdit=true;render()}},"Edit"):null);
-  const out=h("section",{class:"panel papers"},h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add),pubTile,summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
+  const out=h("section",{class:"panel papers ms"},h("div",{class:"mshead"},h("span",{class:"mskick"},"Manuscripts · "+tzNow(p.tz).key.slice(0,4)),h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add)),pubTile,summary,h("div",{class:"plist"},live.map(x=>paperCard(pid,x))));
   return out}
 
 function projectCard(pid,x){
@@ -3541,7 +3566,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-r";
+const APP_VERSION="2026-11-13-s";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
