@@ -144,6 +144,19 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dtx small{font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;opacity:.92}
 .dtx b{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.2;overflow-wrap:anywhere}
 .dmore{font-size:13.5px;opacity:.85}
+.grow{display:flex;flex-direction:column;gap:9px;border-radius:20px;padding:12px;background:rgba(95,224,168,.08);border:1px solid rgba(95,224,168,.35)}
+.growhd{display:flex;justify-content:space-between;align-items:center;gap:8px}.growhd b{font-family:var(--display);font-weight:800;font-size:16px;color:#c4f7e0}
+.dlink.mint{color:#5fe0a8}
+.gpills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gp{display:flex;align-items:center;gap:8px;border-radius:22px;padding:5px 8px 5px 5px;border:1.5px solid rgba(95,224,168,.45);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;text-align:left;min-width:0}
+.gpe{width:36px;height:36px;border-radius:50%;background:rgba(95,224,168,.16);display:grid;place-items:center;flex:none}
+.gpt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.gpt b{font-size:13.5px;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}.gpt small{font-size:11px;opacity:.8;white-space:nowrap}
+.gpck{width:22px;height:22px;border-radius:50%;border:2px solid rgba(95,224,168,.7);flex:none;display:grid;place-items:center;font-size:12px;font-weight:900;color:transparent}
+.gp.on{background:linear-gradient(135deg,#2f9e5b,#1f9e8f);border-color:#5fe0a8;box-shadow:0 4px 14px rgba(47,158,91,.35)}
+.gp.on .gpe{background:#fff}.gp.on .gpck{background:#fff;color:#2f9e5b;border-color:#fff}.gp.on small{opacity:1;font-weight:700}
+.gp.edit{cursor:default;border-style:dashed}
+.gpx{width:26px;height:26px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:16px;font-weight:700;cursor:pointer;flex:none}
+.gpempty{border:2px dashed rgba(95,224,168,.5);background:none;color:#a8f0d0;border-radius:16px;padding:10px 12px;font-weight:700;cursor:pointer;text-align:left;font-size:14px}
 .dhab{display:flex;flex-direction:column;gap:10px;border-radius:22px;padding:14px;background:linear-gradient(150deg,rgba(255,196,87,.2),rgba(255,138,61,.12));border:1px solid rgba(255,211,107,.4)}
 .dhab.alldone{background:linear-gradient(150deg,rgba(255,211,107,.38),rgba(255,138,61,.22));box-shadow:0 0 24px rgba(255,211,107,.25)}
 .hhead{display:block;font-family:var(--display);font-weight:800;font-size:19px;color:#fff;margin-top:1px}
@@ -1453,8 +1466,10 @@ function addCountdownSheet(pid,existing,src){
 const DPAL=["#1f9e8f","#4a4fb3","#2f9e5b","#2d7fd3","#7a55c9","#0f7c9c","#3f5fbf","#5f7d2a"];
 function todayHero(pid){
   const p=P(pid),n=tzNow(p.tz),k=n.key,d=day(pid,k),all=itemsFor(pid,k),it=all.filter(x=>!x.skip),ts=d.tasks.filter(x=>x.t);
+  const FAITHH=/\b(pray|prayer|prayers|word|bible|devotion|devotions|scripture)\b/i;
+  if((p.habits||[]).some(x=>FAITHH.test(x.title))){p.habits=p.habits.filter(x=>!FAITHH.test(x.title));persist()}
   const hb=p.habits||[],hdn=hb.filter(x=>d.habits.includes(x.id)).length;
-  const tot=it.length+ts.length+hb.length,dn=it.filter(x=>x.done).length+ts.filter(x=>x.d).length+hdn,left=tot-dn,pc=tot?Math.round(dn/tot*100):0;
+  const tot=it.length+ts.length,dn=it.filter(x=>x.done).length+ts.filter(x=>x.d).length,left=tot-dn,pc=tot?Math.round(dn/tot*100):0;
   const open=it.filter(x=>!x.done),rel=m=>m>=60?Math.floor(m/60)+" h"+(m%60?" "+m%60+"m":""):m+" min";
   const cheer=ev=>{hearts(ev.currentTarget,6);confetti(left===1?160:30);if(left===1)toast("All done for today 🎉","Look at you go")};
   const list=[];
@@ -1480,19 +1495,16 @@ function todayHero(pid){
         o.isDone?h("span",{class:"dstamp"},o.st==="skip"?"SKIPPED":"DONE ✓"):null,h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
   const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(tile));
   /* daily habits, editable right here */
-  const he=!!ui.habitEdit,hn=h("input",{type:"text",placeholder:"New habit, e.g. Accent practice","aria-label":"New habit"}),hg=h("input",{type:"number",min:"0",placeholder:"Min","aria-label":"Daily goal in minutes (optional)"});
-  const hist=hid=>{const o=h("span",{class:"hdots","aria-hidden":"true"});for(let i=6;i>=0;i--){const kk=addDays(k,-i),dd=p.days[kk];o.appendChild(h("i",{class:(dd&&(dd.habits||[]).includes(hid)?"on":"")+(i===0?" htd":"")}))}return o};
-  const allH=hb.length&&hdn===hb.length;
-  const habs=h("div",{class:"dhab"+(allH?" alldone":"")},h("div",{class:"dhabhd"},h("div",null,h("small",null,"✨ Daily habits"),h("b",{class:"hhead"},!hb.length?"Build something daily":allH?"All habits done 🌟":hdn+" of "+hb.length+" done today")),
-      h("button",{type:"button",class:"dlink gold",onclick:()=>{ui.habitEdit=!he;render()}},he?"Done editing":hb.length?"+ Add or edit":"+ Add a habit")),
-    hb.length?h("div",{class:"hrings"},hb.map(x=>{const on=d.habits.includes(x.id),st=streak(pid,x.id),e=kwEmoji(x.title)||"⭐",mins=habitMinutes(pid,k,x.id),pc=on?100:x.goal?Math.min(100,Math.round(mins/x.goal*100)):0;
-      const ring=h("span",{class:"hring",style:"--p:"+pc},h("span",{class:"hin"},emo(e,32,false)),st?h("span",{class:"hflame"},"🔥"+st):null,on?h("span",{class:"hcheck"},"✓"):null);
-      const sub=on?"Done ✓":x.goal?(mins?mins+"/"+x.goal+" min":x.goal+" min"):"Tap when done";
-      if(he)return h("div",{class:"hr edit"},ring,h("b",null,x.title),h("button",{type:"button",class:"dhx","aria-label":"Remove "+x.title,onclick:()=>{p.habits=p.habits.filter(y=>y.id!==x.id);persist();render()}},"Remove"));
-      return h("div",{class:"hrwrap"},h("button",{type:"button",class:"hr"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", not done yet. Tap when done")+(st?", "+st+" day streak":""),onclick:ev=>{if(!on)cheer(ev);toggleIn(pid,k,"habits",x.id)}},ring,h("b",null,x.title),h("small",null,sub),hist(x.id)),
-        x.goal&&!on?h("button",{type:"button",class:"htimer",onclick:()=>{startTimer("habit",x.id,x.title);render()}},S.timer&&S.timer.id===x.id?"⏱ Running":"▶ "+x.goal+" min"):null)})):
-      (he?null:h("button",{type:"button",class:"dhabempty",onclick:()=>{ui.habitEdit=true;render()}},"Add things you want to do every day, like accent practice or reading a book")),
-    he?h("form",{class:"daddrow",onsubmit:e=>{e.preventDefault();const v=hn.value.trim();if(!v){hn.focus();return}p.habits.push({id:uid(),title:v,goal:+hg.value||0});persist();render();toast("Habit added ✓",v)}},hn,h("label",{class:"dtime"},h("span",null,"⏱"),hg),h("button",{type:"submit"},"+ Add")):null);
+  const he=!!ui.habitEdit,hn=h("input",{type:"text",placeholder:"e.g. Read a book, learn a skill","aria-label":"New growth item"}),hg=h("input",{type:"number",min:"0",placeholder:"Min","aria-label":"Daily goal in minutes (optional)"});
+  const wk=hid=>{let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c};
+  const habs=h("div",{class:"grow"},h("div",{class:"growhd"},h("b",null,"🌱 Growing me"+(hb.length?" · "+hdn+" today":"")),
+      h("button",{type:"button",class:"dlink mint",onclick:()=>{ui.habitEdit=!he;render()}},he?"Done":hb.length?"+ Add or edit":"+ Add")),
+    hb.length?h("div",{class:"gpills"},hb.map(x=>{const on=d.habits.includes(x.id),e=kwEmoji(x.title)||"🌱",w=wk(x.id);
+      const inner=[h("span",{class:"gpe"},emo(e,24,false)),h("span",{class:"gpt"},h("b",null,x.title),h("small",null,on?"Done today ✓":w?w+"× this week":"Not yet this week"))];
+      if(he)return h("div",{class:"gp edit"},...inner,h("button",{type:"button",class:"gpx","aria-label":"Remove "+x.title,onclick:()=>{p.habits=p.habits.filter(y=>y.id!==x.id);persist();render()}},"×"));
+      return h("button",{type:"button",class:"gp"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),onclick:ev=>{if(!on){hearts(ev.currentTarget,6);confetti(25)}toggleIn(pid,k,"habits",x.id)}},...inner,h("span",{class:"gpck"},"✓"))})):
+      (he?null:h("button",{type:"button",class:"gpempty",onclick:()=>{ui.habitEdit=true;render()}},"Things you'd love to keep doing: read a book, learn the American accent, learn a skill")),
+    he?h("form",{class:"daddrow",onsubmit:e=>{e.preventDefault();const v=hn.value.trim();if(!v){hn.focus();return}p.habits.push({id:uid(),title:v,goal:0});persist();render();toast("Added to Growing me 🌱",v)}},hn,h("button",{type:"submit"},"+ Add")):null);
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
     h("div",{class:"dhtop"},h("div",null,h("small",null,"Your day · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
@@ -2074,7 +2086,7 @@ function emo(e,size,anim){
   const left=srcs.filter(u=>!EMO_BAD.has(u));if(!left.length)return span();
   const img=h("img",{class:"emoimg",src:left[0],alt:"",width:String(size),height:String(size),"aria-hidden":"true",decoding:"async"});let i=0;
   img.onerror=()=>{EMO_BAD.add(left[i]);i++;if(i<left.length)img.src=left[i];else img.replaceWith(span())};return img}
-const kwEmoji=t=>{t=(t||"").toLowerCase();const R=[[/pray|bible|church|devot|worship/,"🙏"],[/work ?out|gym|run|exercise|lift/,"💪"],[/read|book/,"📚"],[/data|analysis|stat|plot/,"📊"],[/manuscript|paper|writ|draft|thesis|dissert/,"📝"],[/niw|visa|green card|immigr|eb2/,"🗂️"],[/intern|job|career|apply/,"💼"],[/present|talk|slides|defen/,"🎤"],[/conference|poster/,"🧳"],[/water|hydrat/,"💧"],[/sleep|bed/,"😴"],[/visit|trip|flight|travel/,"✈️"],[/lab|cell|experiment|culture/,"🧪"],[/finance|money|budget|sav/,"💰"],[/journal/,"📓"],[/meditat|rest/,"🧘"],[/cook|meal/,"🍳"],[/walk/,"🚶"],[/call|fiona|joel/,"💞"]];
+const kwEmoji=t=>{t=(t||"").toLowerCase();const R=[[/accent|pronunc|speak|language|spanish|french|german|english/,"🗣️"],[/skill|learn|course|class|coding|code|python/,"🛠️"],[/guitar|piano|music|sing|keyboard|drum/,"🎸"],[/pray|bible|church|devot|worship/,"🙏"],[/work ?out|gym|run|exercise|lift/,"💪"],[/read|book/,"📚"],[/data|analysis|stat|plot/,"📊"],[/manuscript|paper|writ|draft|thesis|dissert/,"📝"],[/niw|visa|green card|immigr|eb2/,"🗂️"],[/intern|job|career|apply/,"💼"],[/present|talk|slides|defen/,"🎤"],[/conference|poster/,"🧳"],[/water|hydrat/,"💧"],[/sleep|bed/,"😴"],[/visit|trip|flight|travel/,"✈️"],[/lab|cell|experiment|culture/,"🧪"],[/finance|money|budget|sav/,"💰"],[/journal/,"📓"],[/meditat|rest/,"🧘"],[/cook|meal/,"🍳"],[/walk/,"🚶"],[/call|fiona|joel/,"💞"]];
   for(const [r,e] of R)if(r.test(t))return e;return ""};
 const CD_EMOJI={visit:"✈️",presentation:"🎤",conference:"🧳",deadline:"⏳",project:"📌",other:"📅"};
 
@@ -3515,7 +3527,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-l";
+const APP_VERSION="2026-11-13-m";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
