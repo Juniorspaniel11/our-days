@@ -675,6 +675,9 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .fdots{display:flex;gap:2px;margin-left:-5px}.ju .fdots button{width:22px;height:24px;display:grid;place-items:center;background:none;border:0;padding:0;cursor:pointer}
 .ju .fttl{background:none;border:0;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:0;text-align:left}.ju .fttl b{font-family:var(--fun);font-weight:600;font-size:21px;line-height:1.15}.ju .fttl span{font-size:14px;opacity:.88}
 .ju .fhint{font-size:12.5px;opacity:.7}
+.ju .bfill{border-radius:18px;border:1px dashed var(--line);background:var(--bg);padding:10px 14px;display:flex;flex-direction:column;gap:10px}
+.ju .bfill[open]{display:flex}.ju .bfill summary{cursor:pointer;font-weight:700;font-size:15.5px}
+.ju .bfill>*+*{margin-top:10px}
 .ju .fdaywrap{display:flex;flex-direction:column;gap:6px}
 .ju .fdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .ju .fday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:#fff;cursor:pointer;min-height:52px}
@@ -1688,10 +1691,19 @@ function prayerFull(){
   return out[0];
 }
 function prayerSheet(){juSheet("Pray and read tonight",()=>{const act=PP().filter(x=>!x.answered).sort((a,b)=>b.at-a.at),ans=PP().filter(x=>x.answered).length;
-  return [prayerFull(),h("h2",{style:"font-size:19px"},"Pray for"+(act.length?" ("+act.length+")":"")),
+  return [prayerFull(),backfillBox(),h("h2",{style:"font-size:19px"},"Pray for"+(act.length?" ("+act.length+")":"")),
     act.length?act.slice(0,4).map(ppMini):h("p",{class:"hint"},"No prayer points yet. Add what's on your hearts."),
     h("button",{type:"button",class:"btn alt",onclick:prayerPointsSheet},act.length>4?"See all "+act.length+" prayer points":"🙏 Add or see prayer points"+(ans?" · "+ans+" answered":"")),
     h("h2",{style:"font-size:19px"},"Tonight's reading"),bibleStrip()]})}
+function backfillBox(){const log=S.shared.prayer.log,nk=nightKey(P(ME).tz),ks=Object.keys(log).sort(),first=ks[0]||nk,to=addDays(first,-1),from=addDays(first,-7);
+  const a=h("input",{type:"date",class:"inp",value:from,max:nk,"aria-label":"First night"}),b=h("input",{type:"date",class:"inp",value:to,max:nk,"aria-label":"Last night"});
+  return h("details",{class:"bfill",open:ui.bfillOpen||null,ontoggle:e=>{ui.bfillOpen=e.currentTarget.open}},h("summary",null,"🕯️ Prayed before you started ticking?"),
+    h("p",{class:"hint"},"Fill in a run of nights you prayed together. Every night from the first date to the last gets ticked. The dates below are the 7 nights just before your first tick."),
+    h("div",{class:"row"},h("label",{style:"flex:1 1 140px;display:flex;flex-direction:column;gap:4px"},h("small",{class:"hint"},"First night"),a),h("label",{style:"flex:1 1 140px;display:flex;flex-direction:column;gap:4px"},h("small",{class:"hint"},"Last night"),b)),
+    h("button",{type:"button",class:"btn alt",onclick:()=>{let x=a.value,y=b.value;if(!x||!y){toast("Pick both dates","");return}if(x>y)[x,y]=[y,x];if(y>nk)y=nk;
+      if(daysBetween(x,y)>366){toast("That's over a year","Pick a shorter range");return}
+      let n=0;for(let k=x;k<=y;k=addDays(k,1)){if(!log[k]){log[k]={by:ME,at:Date.now(),late:true};n++}}a.blur();b.blur();ui.bfillOpen=false;persist();render();
+      if(n){confetti(90);toast(n+(n===1?" night":" nights")+" added ✓",shortDate(x)+" to "+shortDate(y)+" now count in your prayer history")}else toast("Already ticked","Those nights were already in")}},"Tick these nights"))}
 function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
   return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
     h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
@@ -1709,7 +1721,7 @@ function faithSection(){
   const pray=h("div",{class:"frow"},candle,h("div",{class:"fmid"},h("button",{type:"button",class:"fttl",onclick:prayerSheet},
     h("b",null,done?"We prayed tonight ✓":"Pray together tonight"),
     h("span",null,(st?st+(st===1?" night":" nights")+" in a row 🔥":done?"Your streak starts tonight":"Tap the candle after you pray")+when))));
-  const days=h("div",{class:"fdaywrap"},pd,h("small",{class:"fhint"},"Forgot to tick a night? Tap its day above. Tap again to untick."));
+  const days=h("div",{class:"fdaywrap"},pd,h("small",{class:"fhint"},"Forgot to tick a night? Tap its day above. Older nights: ",h("button",{type:"button",class:"flink",style:"font-size:12.5px;display:inline",onclick:()=>{ui.bfillOpen=true;prayerSheet()}},"add earlier nights")));
   const pl=bplan(),o=PARTNER;let read;
   if(!pl)read=h("button",{type:"button",class:"fread tap",onclick:bibleSheet},h("span",{class:"fk"},"📖 Read the Bible together"),h("b",{class:"fch"},"Pick a book"),h("span",{class:"fsub"},"John, Proverbs, Psalms and more. One chapter a day each, at your own pace."));
   else{const a=bRead(ME),b=bRead(o),N=pl[3],next=Math.min(a+1,N),fin=a>=N,today=mn.key,readToday=Object.values(((BIB().read||{})[pl[0]]||{})[ME]||{}).includes(today);
@@ -3282,7 +3294,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-11-e";
+const APP_VERSION="2026-11-13-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
