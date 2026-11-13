@@ -1508,7 +1508,7 @@ function todayHero(pid){
   const list=[];
   all.forEach(x=>{const inWin=!x.allDay&&n.min>=x.s&&n.min<x.e,past=!x.allDay&&n.min>=x.e,st=x.skip?"skip":x.done?"done":inWin?"cur":past?"miss":"open";
     const sub=x.allDay?"All day":inWin?"Right now · until "+fmt(x.e)+" · "+rel(x.e-n.min)+" left":past?(st==="miss"?"⏰ Not ticked · was "+fmt(x.s):fmt(x.s)+" to "+fmt(x.e)):fmt(x.s)+" · in "+rel(x.s-n.min)+(x.kind==="one"?" · ⭐ only today":"");
-    list.push({x,t:x.title,id:x.id,st,wide:inWin,one:x.kind==="one",sub,isDone:st==="done"||st==="skip",kind:st,done:()=>toggleIn(pid,k,x.skip?"skip":"done",x.id)})});
+    list.push({x,t:x.title,id:x.id,st,wide:inWin||past,one:x.kind==="one",sub,isDone:st==="done"||st==="skip",kind:st,done:()=>toggleIn(pid,k,x.skip?"skip":"done",x.id)})});
   ts.forEach(x=>list.push({task:x,t:x.t,id:x.id,st:x.d?"done":"open",isDone:!!x.d,kind:x.d?"done":"todo",sub:x.c?"↪ From an earlier day":"To do · anytime",done:()=>{x.d=!x.d;persist();render()}}));
   const menu=o=>{const fid=o.task?"t:"+o.task.id:"e:"+o.x.id,box=h("div",{class:"tmenu"});
     box.appendChild(o.isDone?h("button",{type:"button",class:"tmbtn",onclick:()=>{closeSheet();o.done()}},o.st==="skip"?"↺ Restore for today":"↺ Undo, not done yet"):h("button",{type:"button",class:"tmbtn ok",onclick:ev=>{cheer(ev);closeSheet();o.done()}},"✓ Mark done"));
@@ -3585,7 +3585,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-y";
+const APP_VERSION="2026-11-13-z";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
