@@ -138,6 +138,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dt.exmp{opacity:.82;border:1.5px dashed rgba(255,255,255,.45);box-shadow:none}
 .dt.exmp .dtick{color:#fff;font-size:20px}
 .exl{display:block;margin-top:4px;font-size:11.5px;font-weight:700;opacity:.8}
+.pjt.exmp:disabled,.papers.ms .paper.exmp:disabled{cursor:default}
 .pjt.exmp{opacity:.8;border:2px dashed rgba(255,255,255,.55);box-shadow:none}
 .papers.ms .paper.exmp{opacity:.75;border-style:dashed;border-left-style:solid;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit}
 .dt.miss{box-shadow:0 0 0 3px #ffb347,0 8px 18px rgba(0,0,0,.2)}
@@ -1531,11 +1532,11 @@ function todayHero(pid){
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
     h("div",{class:"dhtop"},h("div",null,h("small",null,(ro?nm(pid)+"'s day":"Your day")+" · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
-        h("span",{class:"dsub"},!tot?(ro?"Nothing planned for today yet.":"Here's how your day can look. Tap ＋ on an example or add your own below."):left?dn+" done so far."+(ro?"":" Tap ✓ to tick or untick, ⋯ for more 💪"):"Everything ticked. Enjoy your evening.")),
+        h("span",{class:"dsub"},!tot?(ro?"Nothing added yet. "+nm(pid)+" sees these examples.":"Here's how your day can look. Tap ＋ on an example or add your own below."):left?dn+" done so far."+(ro?"":" Tap ✓ to tick or untick, ⋯ for more 💪"):"Everything ticked. Enjoy your evening.")),
       h("div",{class:"dring",style:"--p:"+pc},h("span",null,pc+"%"))),
-    list.length?tiles:ro?null:h("div",{class:"dtiles"},[["Morning quiet time","Morning","todo"],["Read for class","To do · anytime","todo"],["Call "+(PARTNER?nm(PARTNER):"someone")+" 💞","Evening","todo"]].map(([t,sub],i)=>
-      h("div",{class:"dt exmp",style:"--tc:"+DPAL[i]},h("button",{type:"button",class:"dtick","aria-label":"Add "+t+" to today",onclick:()=>{addTask(pid,k,t);render();toast("Added for today ✓",t)}},"＋"),
-        h("div",{class:"dtx"},h("small",null,sub),h("b",null,t),h("span",{class:"exl"},"Example · tap ＋ to add"))))),
+    list.length?tiles:h("div",{class:"dtiles"},[["Morning quiet time","Morning","todo"],["Read for class","To do · anytime","todo"],["Call "+(partnerOf(pid)&&P(partnerOf(pid))?nm(partnerOf(pid)):"someone")+" 💞","Evening","todo"]].map(([t,sub],i)=>
+      h("div",{class:"dt exmp",style:"--tc:"+DPAL[i]},h("button",{type:"button",class:"dtick",disabled:ro,"aria-label":"Add "+t+" to today",onclick:()=>{if(ro)return;addTask(pid,k,t);render();toast("Added for today ✓",t)}},"＋"),
+        h("div",{class:"dtx"},h("small",null,sub),h("b",null,t),h("span",{class:"exl"},ro?"Example · "+nm(pid)+" sees this until adding her own":"Example · tap ＋ to add"))))),
     list.length>MAX?h("span",{class:"dmore"},"+"+(list.length-MAX)+" more not shown"):null,
     ro?null:h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
@@ -1545,16 +1546,16 @@ function todayHero(pid){
 }
 function growWeek(pid,hid){const p=P(pid),k=tzNow(p.tz).key;let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c}
 function growMe(pid){
-  const ro=pid!==ME,p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];if(ro&&!hb.length)return null;
+  const ro=pid!==ME,p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];
   return h("section",{class:"notebook"},
     h("div",{class:"nbhead"},h("span",{class:"nbtitle"},ro?nm(pid)+" is growing 🌱":"Growing me 🌱"),hb.length?h("span",{class:"nbsub"},"this week"):null,ro?null:h("button",{type:"button",class:"nbedit",onclick:()=>growSheet(pid)},hb.length?"edit":"add")),
     hb.map(x=>{const on=d.habits.includes(x.id),w=growWeek(pid,x.id);
       return h("button",{type:"button",class:"nbrow"+(on?" on":""),disabled:ro,"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),
         onclick:ev=>{if(ro)return;if(!on){hearts(ev.currentTarget,6);toast("Nice 🌱",x.title+" · "+(w+1)+"× this week")}toggleIn(pid,k,"habits",x.id)}},
         h("span",{class:"nbbox"},on?"✓":""),h("span",{class:"nbtext"},x.title),h("span",{class:"nbcount",title:"Times in the last 7 days"},w?w+"×":""))}),
-    !hb.length?["Read a book","Learn a new language","Learn a skill"].map(t=>h("button",{type:"button",class:"nbrow nbex","aria-label":"Add "+t,onclick:()=>{(p.habits=p.habits||[]).push({id:uid(),title:t,goal:0});persist();render();toast("Added 🌱",t)}},
+    !hb.length?["Read a book","Learn a new language","Learn a skill"].map(t=>h("button",{type:"button",class:"nbrow nbex",disabled:ro,"aria-label":"Add "+t,onclick:()=>{if(ro)return;(p.habits=p.habits||[]).push({id:uid(),title:t,goal:0});persist();render();toast("Added 🌱",t)}},
       h("span",{class:"nbbox"},"+"),h("span",{class:"nbtext"},t),h("span",{class:"nbcount"},"example"))):null,
-    !hb.length?h("small",{class:"nbhint"},"Tap one to keep it, or add your own"):null);
+    !hb.length?h("small",{class:"nbhint"},ro?nm(pid)+" sees these examples":"Tap one to keep it, or add your own"):null);
 }
 function growSheet(pid){const p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hn=h("input",{type:"text",class:"inp",placeholder:"e.g. Read a book, learn a skill","aria-label":"New thing to grow"});
   const box=h("div",{class:"gsheet"},h("p",{class:"hint"},"Things you'd love to keep doing, not daily duties. Tap a bubble on the Today page on days you did it."),
@@ -1786,8 +1787,8 @@ function viewProjects(){
   const sum=h("div",{class:"fsum"},ids.length||tt||tp?ids.map(id=>{const x=p.projects.find(y=>y.id===id);return h("div",{class:"frow"},h("span",null,x?x.title:"Project"),h("span",null,hm(tot[id])))}).concat(tp?[h("div",{class:"frow"},h("span",null,"Papers"),h("span",null,hm(tp)))]:[],tt?[h("div",{class:"frow"},h("span",null,"To do items"),h("span",null,hm(tt)))]:[])
     :h("p",{class:"empty"},"No focus time yet this week. Tap Start focus on a project or ▶ Focus on anything in your to do list."));
   const list=h("div",{class:"projs"});
-  if(!p.projects.filter(x=>!x.done).length&&pid===ME)[["My big goal this semester","🎯"],["A skill I'm building","🛠️"]].forEach(([t,e],i)=>list.appendChild(h("button",{type:"button",class:"pjt tap exmp",style:"--pc:"+DPAL[i*3],onclick:()=>{const id=uid();p.projects.push({id,title:t,focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;ui.pjOpen=id;persist();render()}},
-    h("div",{class:"pjttop"},emo(e,26,false),h("span",{class:"pjtic"},"＋")),h("b",null,t),h("span",{class:"pjdue"},"Example · tap to make it yours"))));
+  if(!p.projects.filter(x=>!x.done).length)[["My big goal this semester","🎯"],["A skill I'm building","🛠️"]].forEach(([t,e],i)=>list.appendChild(h("button",{type:"button",class:"pjt tap exmp",disabled:pid!==ME,style:"--pc:"+DPAL[i*3],onclick:()=>{if(pid!==ME)return;const id=uid();p.projects.push({id,title:t,focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;ui.pjOpen=id;persist();render()}},
+    h("div",{class:"pjttop"},emo(e,26,false),h("span",{class:"pjtic"},"＋")),h("b",null,t),h("span",{class:"pjdue"},pid!==ME?"Example "+nm(pid)+" sees":"Example · tap to make it yours"))));
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
     sharedProjectsSection(),
@@ -1886,8 +1887,8 @@ function papersSection(pid){
   const p=P(pid);p.papers=p.papers||[];
   const live=p.papers.filter(x=>x.stage!=="published"),pub=p.papers.filter(x=>x.stage==="published").sort((a,b)=>(b.year||"").localeCompare(a.year||""));
   const counts=PSTAGES.slice(0,7).map(s=>[s,live.filter(x=>x.stage===s[0]).length]).filter(z=>z[1]);
-  const exPaper=!live.length&&!npubX(p)&&pid===ME?h("button",{type:"button",class:"paper exmp",onclick:()=>{const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;ui.paperOpen=id;persist();render()}},
-    h("div",{class:"ptop"},emo("✍️",30,false),h("div",{class:"ptx"},h("b",null,"Your first manuscript"),h("span",{class:"pmeta"},h("span",{class:"pchip",style:"--stc:#3557a8"},"Drafting"),"Example · tap to add yours")))):null;
+  const exPaper=!live.length&&!npubX(p)?h("button",{type:"button",class:"paper exmp",disabled:pid!==ME,onclick:()=>{if(pid!==ME)return;const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;ui.paperOpen=id;persist();render()}},
+    h("div",{class:"ptop"},emo("✍️",30,false),h("div",{class:"ptx"},h("b",null,"Your first manuscript"),h("span",{class:"pmeta"},h("span",{class:"pchip",style:"--stc:#3557a8"},"Drafting"),pid!==ME?"Example "+nm(pid)+" sees":"Example · tap to add yours")))):null;
   const summary=live.length?h("div",{class:"pcounts"},counts.map(([s,n])=>h("span",{class:"pc1"},emo(s[2],18,false),n+" "+s[1].toLowerCase()))):
     exPaper?null:h("p",{class:"empty"},"Add the papers you're working on or planning, first author or coauthor, so you can watch them move toward published.");
   const add=h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.papers.push({id,title:"",journal:"",role:"first",stage:"drafting",next:"",at:{drafting:tzNow(p.tz).key}});ui.paperEdit=id;ui.paperOpen=id;persist();render()}},"+ Add");
@@ -3584,7 +3585,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-x";
+const APP_VERSION="2026-11-13-y";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
