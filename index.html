@@ -687,6 +687,16 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .pcday.on{background:#f2b84b;border:1px solid #f2b84b;color:#2a1a08;box-shadow:0 0 10px rgba(242,184,75,.5)}
 .ju .pcday.cur{outline:2px solid #fff;outline-offset:1px}
 .ju .pcday.fut{opacity:.3}
+.ju .flane{display:flex;flex-direction:column;gap:7px;border-radius:16px;padding:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16)}
+.ju .flane.them{border-color:rgba(255,143,171,.35)}
+.ju .flhead{display:flex;align-items:baseline;gap:8px}.ju .flhead b{font-family:var(--fun);font-weight:600;font-size:16px}.ju .flhead span{flex:1;font-size:13.5px;opacity:.88;min-width:0}.ju .flhead small{font-weight:700;font-size:13px;opacity:.9;white-space:nowrap}
+.ju .flsq{display:flex;flex-wrap:wrap;gap:5px}
+.ju .fsq{width:16px;height:16px;border-radius:5px;background:rgba(255,255,255,.16)}
+.ju .flsq.mine .fsq{width:30px;height:30px;border-radius:8px;border:0;display:grid;place-items:center;color:rgba(255,255,255,.75);font-size:12px;font-weight:700;padding:0;cursor:pointer}
+.ju .flane.me .fsq.on{background:#f2b84b;color:#2a1a08;box-shadow:0 0 6px rgba(242,184,75,.5)}
+.ju .flane.them .fsq.on{background:#ff8fab}
+.ju .fsq.cur{outline:2px solid #fff;outline-offset:1px}
+.ju .fcheer{align-self:flex-start;border:1px solid rgba(255,143,171,.6);background:rgba(255,143,171,.16);color:#fff;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700;cursor:pointer}
 .ju .fdaywrap{display:flex;flex-direction:column;gap:6px}
 .ju .fdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .ju .fday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:#fff;cursor:pointer;min-height:52px}
@@ -1703,7 +1713,7 @@ function prayerSheet(){juSheet("Pray and read tonight",()=>{const act=PP().filte
   return [prayerFull(),h("h2",{style:"font-size:19px"},"Pray for"+(act.length?" ("+act.length+")":"")),
     act.length?act.slice(0,4).map(ppMini):h("p",{class:"hint"},"No prayer points yet. Add what's on your hearts."),
     h("button",{type:"button",class:"btn alt",onclick:prayerPointsSheet},act.length>4?"See all "+act.length+" prayer points":"🙏 Add or see prayer points"+(ans?" · "+ans+" answered":"")),
-    h("h2",{style:"font-size:19px"},"Tonight's reading"),bibleStrip()]})}
+    h("h2",{style:"font-size:19px"},"Tonight's reading"),h("div",{class:"ju"},h("div",{class:"faith"},readingBlock()))]})}
 function prayerCalSheet(){juSheet("Our prayer nights",()=>{
   const log=S.shared.prayer.log,nk=nightKey(P(ME).tz),ks=Object.keys(log).sort(),first=ks[0]||nk;
   let best=0,run=0,prev=null;ks.forEach(k=>{run=prev&&addDays(prev,1)===k?run+1:1;best=Math.max(best,run);prev=k});
@@ -1726,6 +1736,28 @@ function prayerCalSheet(){juSheet("Our prayer nights",()=>{
       h("button",{type:"button",class:"pcnav","aria-label":"Next month",disabled:off>=0,onclick:()=>{ui.pcalOff=off+1;prayerCalSheet()}},"\u203a")),
     grid,
     h("small",{class:"fhint"},"Gold nights are the ones you prayed. You can tick or untick the last 7 nights here.")))]})}
+function bNext(pl,u){const m=(((BIB().read||{})[pl[0]]||{})[u])||{};for(let i=1;i<=pl[3];i++)if(!m[i])return i;return 0}
+function readingBlock(){
+  const pl=bplan(),o=PARTNER,mn=tzNow(P(ME).tz);
+  if(!pl)return h("button",{type:"button",class:"fread tap",onclick:bibleSheet},h("span",{class:"fk"},"📖 Read the Bible together"),h("b",{class:"fch"},"Pick a book"),h("span",{class:"fsub"},"John, Proverbs, Psalms and more. One chapter a day each, at your own pace."));
+  const N=pl[3],R=((BIB().read||{})[pl[0]])||{},real=!!(o&&P(o)&&!P(o).placeholder);
+  const lane=u=>{const m=R[u]||{},n=Object.keys(m).length,nx=bNext(pl,u),tk=tzNow(P(u).tz).key,rt=Object.values(m).includes(tk),mine=u===ME;
+    const sq=h("div",{class:"flsq"+(mine?" mine":"")});
+    for(let i=1;i<=N;i++){const on=!!m[i],cls="fsq"+(on?" on":"")+(i===nx?" cur":"");
+      sq.appendChild(mine?h("button",{type:"button",class:cls,"aria-label":bName(pl,i)+(on?", read. Tap to untick":", not read. Tap to tick"),"aria-pressed":String(on),
+        onclick:()=>{saveBible({read:{[pl[0]]:{[ME]:{[i]:on?firebase.firestore.FieldValue.delete():mn.key}}}});if(!on)confetti(25);toast(on?bName(pl,i)+" unticked":bName(pl,i)+" ticked ✓","")}},String(i)):h("i",{class:cls,title:bName(pl,i)}))}
+    return h("div",{class:"flane"+(mine?" me":" them")},
+      h("div",{class:"flhead"},h("b",null,mine?"You":nm(u)),h("span",null,nx?(rt?"Read today ✓":"Up next: "+bName(pl,nx)):"Finished 🎉"),h("small",null,n+" of "+N)),sq,
+      !mine&&real?h("button",{type:"button",class:"fcheer tap",onclick:ev=>{if(DB&&CID)DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"big",title:nm(ME)+" is cheering on your Bible reading 👏",body:nx?(rt?"You read today. Keep it going!":"Next up: "+bName(pl,nx)+". You've got this!"):"You finished "+pl[1]+"! So proud of you."}).catch(syncErr);hearts(ev.currentTarget,10);toast("Cheer sent 👏",nm(u)+" gets a little boost")}},"👏 Cheer "+nm(u)+" on"):null)};
+  const nx=bNext(pl,ME),rt=Object.values(R[ME]||{}).includes(mn.key);
+  return h("div",{class:"fread"},h("span",{class:"fk"},"📖 "+pl[1]+" · one chapter a day each"),
+    h("b",{class:"fch"},!nx?"Finished 🎉":rt?"Read today ✓":bName(pl,nx)),
+    h("span",{class:"fsub"},!nx?"You read all of "+pl[1]+". Pick the next book together.":rt?"Next up tomorrow: "+bName(pl,nx):"Your chapter tonight · about 5 minutes"),
+    h("div",{class:"row",style:"gap:8px"},!nx?h("button",{type:"button",class:"fbig gold",onclick:bibleSheet},"Pick the next book"):h("a",{class:"fbig",href:bUrl(pl,nx),target:"_blank",rel:"noopener"},"Open "+bName(pl,nx)+" · "+bVer(ME)),
+      nx&&!rt?h("button",{type:"button",class:"fbig gold",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[nx]:mn.key}}}});hearts(ev.currentTarget,8);confetti(nx===N?160:40);toast(nx===N?"You finished "+pl[1]+" 🎉":"Chapter done ✓",real?nm(o)+" sees your progress":"")}},"✓ I read it"):null),
+    lane(ME),real?lane(o):null,
+    h("small",{class:"fhint"},"Tap any of your squares to tick or untick that chapter."),
+    h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(real?" · "+nm(o)+" reads the "+bVer(o):"")))}
 function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
   return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
     h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
@@ -1744,20 +1776,7 @@ function faithSection(){
     h("b",null,done?"We prayed tonight ✓":"Pray together tonight"),
     h("span",null,(st?st+(st===1?" night":" nights")+" in a row 🔥":done?"Your streak starts tonight":"Tap the candle after you pray")+when))));
   const days=h("div",{class:"fdaywrap"},pd,h("div",{class:"row",style:"justify-content:space-between;gap:8px"},h("small",{class:"fhint"},"Forgot one? Tap its day."),h("button",{type:"button",class:"fcalbtn tap",onclick:()=>{ui.pcalOff=0;prayerCalSheet()}},"📅 See all our nights")));
-  const pl=bplan(),o=PARTNER;let read;
-  if(!pl)read=h("button",{type:"button",class:"fread tap",onclick:bibleSheet},h("span",{class:"fk"},"📖 Read the Bible together"),h("b",{class:"fch"},"Pick a book"),h("span",{class:"fsub"},"John, Proverbs, Psalms and more. One chapter a day each, at your own pace."));
-  else{const a=bRead(ME),b=bRead(o),N=pl[3],next=Math.min(a+1,N),fin=a>=N,today=mn.key,readToday=Object.values(((BIB().read||{})[pl[0]]||{})[ME]||{}).includes(today);
-    const path=h("div",{class:"fpath","aria-label":"You have read "+a+" of "+N+", "+nm(o)+" "+b+" of "+N});
-    for(let i=1;i<=N;i++)path.appendChild(h("i",{class:(i<=a&&i<=b?"both":i<=a?"me":i<=b?"them":"")+(i===next&&!fin?" cur":""),title:bName(pl,i)}));
-    read=h("div",{class:"fread"},h("span",{class:"fk"},"📖 "+pl[1]),
-      h("b",{class:"fch"},fin?"Finished 🎉":readToday?"Read today ✓":bName(pl,next)),
-      h("span",{class:"fsub"},fin?"You read all of "+pl[1]+". Pick the next book together.":readToday?"Next up tomorrow: "+bName(pl,next):"Tonight's chapter · about 5 minutes"),
-      path,
-      h("div",{class:"flegend"},h("span",null,h("i",{class:"me"}),"You "+a),h("span",null,h("i",{class:"them"}),nm(o)+" "+b),h("span",null,h("i",{class:"both"}),"Both read"),h("span",null,"of "+N)),
-      h("div",{class:"row",style:"gap:8px"},
-        fin?h("button",{type:"button",class:"fbig gold",onclick:bibleSheet},"Pick the next book"):h("a",{class:"fbig",href:bUrl(pl,next),target:"_blank",rel:"noopener"},"Open "+bName(pl,next)+" · "+bVer(ME)),
-        !fin&&!readToday?h("button",{type:"button",class:"fbig gold",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[next]:today}}}});hearts(ev.currentTarget,8);confetti(next===N?160:40);toast(next===N?"You finished "+pl[1]+" 🎉":"Chapter done ✓",b>=next?nm(o)+" read it too":nm(o)+" sees your progress")}},"✓ I read it"):null),
-      h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(o&&P(o)&&!P(o).placeholder?" · "+nm(o)+" reads the "+bVer(o):"")))}
+  const read=readingBlock();
   const pts=h("div",{class:"fpts"},h("span",{class:"fk"},"🙏 Praying for"),
     h("div",{class:"fchips"},act.slice(0,4).map(x=>h("button",{type:"button",class:"fchip tap",onclick:prayerPointsSheet},x.text)),
       act.length>4?h("button",{type:"button",class:"fchip tap",onclick:prayerPointsSheet},"+"+(act.length-4)+" more"):null,
@@ -3316,7 +3335,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-c";
+const APP_VERSION="2026-11-13-d";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
