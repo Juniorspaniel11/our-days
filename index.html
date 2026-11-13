@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Fredoka:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Manrope:wght@600;700;800&family=Fredoka:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: header with photo and both clocks, then one column of soft cards, floating tab bar. Light and dark themes */
 :root{
@@ -145,6 +145,18 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dtx b{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.2;overflow-wrap:break-word;word-break:normal;hyphens:auto}
 @media (max-width:400px){.dtx b{font-size:16px}.dtx small{font-size:10.5px!important}.dt{padding:11px 10px;gap:8px}}
 .dmore{font-size:13.5px;opacity:.85}
+.notebook{position:relative;border-radius:6px 22px 22px 6px;padding:0 16px 10px 48px;background:repeating-linear-gradient(#fffdf3 0 37px,#cfdcf0 37px 38px);border:1px solid #e9dcb8;box-shadow:0 10px 24px rgba(120,90,30,.16);color:#2b2a33;font-family:"Caveat","Patrick Hand","Segoe Print",cursive;overflow:hidden}
+.notebook::before{content:"";position:absolute;left:36px;top:0;bottom:0;width:2px;background:#f0a3a3}
+.notebook::after{content:"";position:absolute;left:12px;top:12px;width:13px;height:13px;border-radius:50%;background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
+.nbhead{display:flex;justify-content:space-between;align-items:flex-end;height:38px;gap:10px}.nbsub{font-size:17px;color:#9a8a5a;margin-left:auto;padding-bottom:5px;white-space:nowrap}
+.nbtitle{font-size:26px;font-weight:700;color:#3557a8;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:4px}
+.nbedit{font-family:inherit;font-size:21px;font-weight:700;background:none;border:0;color:#c0392b;cursor:pointer;text-decoration:underline;padding:0 0 4px}
+.nbrow{display:flex;align-items:flex-end;gap:10px;height:38px;width:100%;background:none;border:0;padding:0 0 5px;cursor:pointer;color:inherit;font-family:inherit;text-align:left}
+.nbbox{width:22px;height:22px;border:2.5px solid #3b3b4f;border-radius:4px 7px 5px 3px;transform:rotate(-4deg);display:grid;place-items:center;font-size:24px;line-height:1;color:#2f9e5b;font-weight:700;flex:none;margin-bottom:1px}
+.nbtext{flex:1;min-width:0;font-size:24px;font-weight:500;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nbrow.on .nbtext{text-decoration:line-through;text-decoration-color:#2f9e5b;text-decoration-thickness:2.5px;color:#7a7a88}
+.nbcount{font-size:19px;color:#9a8a5a;white-space:nowrap}
+.nbrow.on .nbcount{color:#2f9e5b;font-weight:700}
 .gstory{display:flex;flex-direction:column;gap:6px;margin-bottom:-6px}
 .gscap{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--muted)}
 .gsrow{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.gsrow::-webkit-scrollbar{display:none}
@@ -1484,12 +1496,13 @@ function todayHero(pid){
 function growWeek(pid,hid){const p=P(pid),k=tzNow(p.tz).key;let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c}
 function growMe(pid){
   const p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];
-  return h("section",{class:"gstory"},h("small",{class:"gscap"},"🌱 Growing me"+(hb.length?" · tap the ones you did today":"")),
-    h("div",{class:"gsrow"},hb.map(x=>{const on=d.habits.includes(x.id),e=kwEmoji(x.title)||"🌱";
-      return h("button",{type:"button",class:"gsb"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),
-        onclick:ev=>{if(!on){hearts(ev.currentTarget,6);toast("Nice 🌱",x.title+" · "+(growWeek(pid,x.id)+1)+"× this week")}toggleIn(pid,k,"habits",x.id)}},
-        h("span",{class:"gsring"},h("span",{class:"gsin"},emo(e,30,false)),on?h("span",{class:"gsck"},"✓"):null),h("span",{class:"gsname"},x.title))}),
-      h("button",{type:"button",class:"gsb add","aria-label":"Add or edit Growing me",onclick:()=>growSheet(pid)},h("span",{class:"gsring"},h("span",{class:"gsin"},"+")),h("span",{class:"gsname"},hb.length?"Edit":"Add one"))));
+  return h("section",{class:"notebook"},
+    h("div",{class:"nbhead"},h("span",{class:"nbtitle"},"Growing me 🌱"),hb.length?h("span",{class:"nbsub"},"this week"):null,h("button",{type:"button",class:"nbedit",onclick:()=>growSheet(pid)},hb.length?"edit":"add")),
+    hb.map(x=>{const on=d.habits.includes(x.id),w=growWeek(pid,x.id);
+      return h("button",{type:"button",class:"nbrow"+(on?" on":""),"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),
+        onclick:ev=>{if(!on){hearts(ev.currentTarget,6);toast("Nice 🌱",x.title+" · "+(w+1)+"× this week")}toggleIn(pid,k,"habits",x.id)}},
+        h("span",{class:"nbbox"},on?"✓":""),h("span",{class:"nbtext"},x.title),h("span",{class:"nbcount",title:"Times in the last 7 days"},w?w+"×":""))}),
+    !hb.length?h("button",{type:"button",class:"nbrow",onclick:()=>growSheet(pid)},h("span",{class:"nbbox"},"+"),h("span",{class:"nbtext",style:"color:#8a7d55"},"add something you'd love to keep doing")):null);
 }
 function growSheet(pid){const p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hn=h("input",{type:"text",class:"inp",placeholder:"e.g. Read a book, learn a skill","aria-label":"New thing to grow"});
   const box=h("div",{class:"gsheet"},h("p",{class:"hint"},"Things you'd love to keep doing, not daily duties. Tap a bubble on the Today page on days you did it."),
@@ -1703,8 +1716,8 @@ function viewToday(){
   const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
-    pid===ME&&isT?growMe(pid):null,
     pid===ME&&isT?todayHero(pid):null,
+    pid===ME&&isT?growMe(pid):null,
     pid===ME?bigBanner():null,
     countdownStrip(pid),
     weekStrip(pid),
@@ -3506,7 +3519,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-p";
+const APP_VERSION="2026-11-13-q";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
