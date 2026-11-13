@@ -158,6 +158,16 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dhb.edit{cursor:default;animation:none;border-style:dashed}
 .dhx{margin-top:4px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
 .dtx{background:none;border:0;color:#fff;text-align:left;padding:0;cursor:pointer;flex:1}
+.dt.done,.dt.skip{background:rgba(255,255,255,.07);border:1.5px solid rgba(95,224,168,.55);box-shadow:none}
+.dt.skip{border-color:rgba(255,255,255,.3)}
+.dt.done .dtick{background:#5fe0a8;border-color:#5fe0a8;color:#0d2b22}
+.dt.skip .dtick{color:#fff}
+.dt.done .dtx b,.dt.skip .dtx b{text-decoration:line-through;opacity:.75}
+.dt.done .dtx small{color:#5fe0a8;opacity:1}
+.ddone2{display:flex;flex-direction:column;gap:8px}
+.ddhd{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:#5fe0a8}
+.dtx{position:relative;padding-right:30px!important}
+.dmenu{position:absolute;right:-2px;top:-2px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-weight:900;font-size:16px;line-height:1;letter-spacing:1px}
 .ddone{border-top:1px solid rgba(255,255,255,.18);padding-top:10px}
 .ddone>summary{cursor:pointer;font-weight:800;font-size:14.5px;color:#5fe0a8;list-style:none}.ddone>summary::-webkit-details-marker{display:none}
 .drow2{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1)}
@@ -1434,27 +1444,25 @@ function todayHero(pid){
   ts.filter(x=>!x.d).forEach(x=>list.push({task:x,kind:"todo",t:x.t,sub:x.c?"↪ From an earlier day":"To do · anytime",done:()=>{x.d=true;persist();render()}}));
   open.filter(x=>!x.allDay&&x.s>n.min).forEach(x=>list.push({...timed(x),kind:x.kind==="one"?"up one":"up",sub:fmt(x.s)+" · in "+rel(x.s-n.min)+(x.kind==="one"?" · ⭐ only today":"")}));
   const menu=o=>{const fid=o.task?"t:"+o.task.id:"e:"+o.x.id,box=h("div",{class:"tmenu"});
-    box.appendChild(h("button",{type:"button",class:"tmbtn ok",onclick:ev=>{cheer(ev);closeSheet();o.done()}},"✓ Mark done"));
+    box.appendChild(o.isDone?h("button",{type:"button",class:"tmbtn",onclick:()=>{closeSheet();o.done()}},o.kind==="skip"?"↺ Restore for today":"↺ Undo, not done yet"):h("button",{type:"button",class:"tmbtn ok",onclick:ev=>{cheer(ev);closeSheet();o.done()}},"✓ Mark done"));
     box.appendChild(h("div",{class:"tmrow"},focusBtn(fid,o.t,focusMins(pid,fid,k))));
     if(o.task){const ri=h("input",{type:"text",class:"inp",value:o.task.t,"aria-label":"Rename"});
       box.appendChild(h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=ri.value.trim();if(!v)return;o.task.t=v;persist();closeSheet()}},h("div",{style:"flex:1 1 200px"},ri),h("button",{type:"submit",class:"ghost"},"Rename")));
       box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>{d.tasks=d.tasks.filter(y=>y.id!==o.task.id);if(p.bigdays)delete p.bigdays[o.task.id];persist();closeSheet()}},"🗑 Remove"))}
     else{if(o.x.kind!=="cal")box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>itemSheet(pid,k,o.x)},"✏️ Change time or details"));
-      box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>{toggleIn(pid,k,"skip",o.x.id);closeSheet();toast("Skipped for today",o.t)}},"⏭ Skip for today"));
+      if(!o.isDone)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>{toggleIn(pid,k,"skip",o.x.id);closeSheet();toast("Skipped for today",o.t)}},"⏭ Skip for today"));
       if(o.x.agenda)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>agendaSheet(pid,o.x)},"📝 Agenda"))}
     box.appendChild(h("small",{class:"hint"},o.sub));openSheet(o.t,box)};
+  const doneL=[...it.filter(x=>x.done).map(x=>({...timed(x),isDone:true,kind:"done",sub:"Done ✓"+(x.allDay?"":" · "+fmt(x.s))})),
+    ...ts.filter(x=>x.d).map(x=>({task:x,isDone:true,kind:"done",t:x.t,sub:"Done ✓ · to do",done:()=>{x.d=false;persist();render()}})),
+    ...all.filter(x=>x.skip).map(x=>({x,t:x.title,isDone:true,kind:"skip",sub:"Skipped today",done:()=>toggleIn(pid,k,"skip",x.id)}))];
   let ci=0;const MAX=12;
-  const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(o=>{const col=o.kind==="miss"?"#d9822b":DPAL[(ci++)%DPAL.length],e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
-    return h("div",{class:"dt "+o.kind,style:"--tc:"+col},
-      h("button",{type:"button",class:"dtick","aria-label":"Mark "+o.t+" done",onclick:ev=>{cheer(ev);o.done()}},"✓"),
-      h("button",{type:"button",class:"dtx","aria-label":o.t+". Options",onclick:()=>menu(o)},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t)))}));
-  /* done and skipped, with undo */
-  const doneRows=[...it.filter(x=>x.done).map(x=>({t:x.title,sub:x.allDay?"All day":fmt(x.s),undo:()=>toggleIn(pid,k,"done",x.id)})),
-    ...ts.filter(x=>x.d).map(x=>({t:x.t,sub:"To do",undo:()=>{x.d=false;persist();render()}})),
-    ...hb.filter(x=>d.habits.includes(x.id)).map(x=>({t:x.title,sub:"Daily habit",undo:()=>toggleIn(pid,k,"habits",x.id)})),
-    ...all.filter(x=>x.skip).map(x=>({t:x.title,sub:"Skipped today",lab:"↺ Restore",undo:()=>toggleIn(pid,k,"skip",x.id)}))];
-  const doneBox=doneRows.length?h("details",{class:"ddone",open:ui.doneOpen||null,ontoggle:e=>{ui.doneOpen=e.currentTarget.open}},h("summary",null,"✓ Done today ("+doneRows.length+") · tap to see or undo"),
-    doneRows.map(r=>h("div",{class:"drow2"},h("div",null,h("b",null,r.t),h("small",null,r.sub)),h("button",{type:"button",class:"dundo",onclick:r.undo},r.lab||"↺ Undo")))):null;
+  const tile=o=>{const col=o.kind==="miss"?"#d9822b":o.isDone?"":DPAL[(ci++)%DPAL.length],e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
+    return h("div",{class:"dt "+o.kind,style:col?"--tc:"+col:""},
+      h("button",{type:"button",class:"dtick","aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.kind==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(!o.isDone)cheer(ev);o.done()}},o.kind==="skip"?"↺":"✓"),
+      h("button",{type:"button",class:"dtx","aria-label":o.t+". More options",onclick:()=>menu(o)},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
+  const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(tile));
+  const doneBox=doneL.length?h("div",{class:"ddone2"},h("small",{class:"ddhd"},"✓ Done today · "+doneL.length+" · tap ✓ again to undo"),h("div",{class:"dtiles"},doneL.map(tile))):null;
   /* daily habits, editable right here */
   const he=!!ui.habitEdit,hn=h("input",{type:"text",placeholder:"New habit, e.g. Accent practice","aria-label":"New habit"}),hg=h("input",{type:"number",min:"0",placeholder:"Min","aria-label":"Daily goal in minutes (optional)"});
   const habs=h("div",{class:"dhab"},h("div",{class:"dhabhd"},h("small",null,"✨ Daily habits"+(hb.length?" · "+hdn+" of "+hb.length:"")),h("button",{type:"button",class:"dlink",onclick:()=>{ui.habitEdit=!he;render()}},he?"Done editing":hb.length?"+ Add or edit":"+ Add a habit")),
@@ -1466,17 +1474,17 @@ function todayHero(pid){
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
     h("div",{class:"dhtop"},h("div",null,h("small",null,"Your day · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
-        h("span",{class:"dsub"},!tot?"Add what you want to get done today.":left?dn+" done so far. Tap a tile for options 💪":"Everything ticked. Enjoy your evening.")),
+        h("span",{class:"dsub"},!tot?"Add what you want to get done today.":left?dn+" done so far. Tap ✓ to tick, ⋯ for more 💪":"Everything ticked. Enjoy your evening.")),
       h("div",{class:"dring",style:"--p:"+pc},h("span",null,pc+"%"))),
     list.length?tiles:null,
     list.length>MAX?h("span",{class:"dmore"},"+"+(list.length-MAX)+" more not shown"):null,
+    doneBox,
     h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
       else{addTask(pid,k,v);render();toast("Added for today ✓",v)}}},
       h("div",{class:"daddrow"},ai,h("label",{class:"dtime"},h("span",null,"⏰"),at),h("button",{type:"submit"},"+ Add")),
       h("button",{type:"button",class:"dlink",onclick:()=>itemSheet(pid,k,null)},"More options: repeat, end time, another day")),
-    habs,
-    doneBox);
+    habs);
 }
 function repLabel(ds){const d=(ds||[]).slice().sort((a,b)=>((a+6)%7)-((b+6)%7)),j=d.join();
   return d.length===7?"Daily":j==="1,2,3,4,5"?"Weekdays":j==="6,0"?"Weekends":d.map(x=>SH[x]).join(" ")}
@@ -3486,7 +3494,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-i";
+const APP_VERSION="2026-11-13-j";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
