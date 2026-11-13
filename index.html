@@ -132,9 +132,9 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dsub{font-size:14.5px;opacity:.85}
 .dring{--p:0;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#5fe0a8 calc(var(--p)*1%),rgba(255,255,255,.16) 0);flex:none}
 .dring span{width:54px;height:54px;border-radius:50%;background:#1a2b4f;display:grid;place-items:center;font-weight:800;font-size:15px}
-.dtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:10px}
 .dt{display:flex;align-items:flex-start;gap:10px;border-radius:18px;padding:12px;background:var(--tc);color:#fff;min-width:0;box-shadow:0 8px 18px rgba(0,0,0,.2)}
-.dt.cur,.dt.miss{grid-column:1/-1}
+.dt.wide{grid-column:1/-1}
 .dt.cur{background:linear-gradient(135deg,#1f9e8f,#4a4fb3);padding:15px;box-shadow:0 0 0 2px rgba(255,255,255,.55),0 12px 28px rgba(31,158,143,.45)}
 .dt.cur .dtx b{font-size:22px}
 .dt.one{box-shadow:0 0 0 2px #ffd36b,0 8px 18px rgba(0,0,0,.2)}
@@ -158,12 +158,12 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dhb.edit{cursor:default;animation:none;border-style:dashed}
 .dhx{margin-top:4px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
 .dtx{background:none;border:0;color:#fff;text-align:left;padding:0;cursor:pointer;flex:1}
-.dt.done,.dt.skip{background:rgba(255,255,255,.07);border:1.5px solid rgba(95,224,168,.55);box-shadow:none}
-.dt.skip{border-color:rgba(255,255,255,.3)}
-.dt.done .dtick{background:#5fe0a8;border-color:#5fe0a8;color:#0d2b22}
-.dt.skip .dtick{color:#fff}
-.dt.done .dtx b,.dt.skip .dtx b{text-decoration:line-through;opacity:.75}
-.dt.done .dtx small{color:#5fe0a8;opacity:1}
+.dt.isdone{filter:saturate(.5) brightness(.92);box-shadow:none;animation:none}
+.dt.isdone .dtx b{text-decoration:line-through;text-decoration-thickness:2px;opacity:.85}
+.dt.isdone .dtick{background:#fff;border-color:#fff;color:#1d7a4a}
+.dt.skipped .dtick{color:#555}
+.dstamp{white-space:nowrap;align-self:flex-start;margin-top:5px;font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.14em;background:#fff;color:#1d7a4a;border-radius:8px;padding:2px 9px;transform:rotate(-4deg);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.dt.skipped .dstamp{color:#555}
 .ddone2{display:flex;flex-direction:column;gap:8px}
 .ddhd{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:#5fe0a8}
 .dtx{position:relative;padding-right:30px!important}
@@ -1437,14 +1437,13 @@ function todayHero(pid){
   const tot=it.length+ts.length+hb.length,dn=it.filter(x=>x.done).length+ts.filter(x=>x.d).length+hdn,left=tot-dn,pc=tot?Math.round(dn/tot*100):0;
   const open=it.filter(x=>!x.done),rel=m=>m>=60?Math.floor(m/60)+" h"+(m%60?" "+m%60+"m":""):m+" min";
   const cheer=ev=>{hearts(ev.currentTarget,6);confetti(left===1?160:30);if(left===1)toast("All done for today 🎉","Look at you go")};
-  const list=[],timed=x=>({x,t:x.title,done:()=>toggleIn(pid,k,"done",x.id)});
-  open.filter(x=>!x.allDay&&n.min>=x.s&&n.min<x.e).forEach(x=>list.push({...timed(x),kind:"cur",sub:"Right now · until "+fmt(x.e)+" · "+rel(x.e-n.min)+" left"}));
-  open.filter(x=>!x.allDay&&n.min>=x.e).forEach(x=>list.push({...timed(x),kind:"miss",sub:"⏰ Not ticked · was "+fmt(x.s)}));
-  open.filter(x=>x.allDay).forEach(x=>list.push({...timed(x),kind:"todo",sub:"All day"}));
-  ts.filter(x=>!x.d).forEach(x=>list.push({task:x,kind:"todo",t:x.t,sub:x.c?"↪ From an earlier day":"To do · anytime",done:()=>{x.d=true;persist();render()}}));
-  open.filter(x=>!x.allDay&&x.s>n.min).forEach(x=>list.push({...timed(x),kind:x.kind==="one"?"up one":"up",sub:fmt(x.s)+" · in "+rel(x.s-n.min)+(x.kind==="one"?" · ⭐ only today":"")}));
+  const list=[];
+  all.forEach(x=>{const inWin=!x.allDay&&n.min>=x.s&&n.min<x.e,past=!x.allDay&&n.min>=x.e,st=x.skip?"skip":x.done?"done":inWin?"cur":past?"miss":"open";
+    const sub=x.allDay?"All day":inWin?"Right now · until "+fmt(x.e)+" · "+rel(x.e-n.min)+" left":past?(st==="miss"?"⏰ Not ticked · was "+fmt(x.s):fmt(x.s)+" to "+fmt(x.e)):fmt(x.s)+" · in "+rel(x.s-n.min)+(x.kind==="one"?" · ⭐ only today":"");
+    list.push({x,t:x.title,id:x.id,st,wide:inWin,one:x.kind==="one",sub,isDone:st==="done"||st==="skip",kind:st,done:()=>toggleIn(pid,k,x.skip?"skip":"done",x.id)})});
+  ts.forEach(x=>list.push({task:x,t:x.t,id:x.id,st:x.d?"done":"open",isDone:!!x.d,kind:x.d?"done":"todo",sub:x.c?"↪ From an earlier day":"To do · anytime",done:()=>{x.d=!x.d;persist();render()}}));
   const menu=o=>{const fid=o.task?"t:"+o.task.id:"e:"+o.x.id,box=h("div",{class:"tmenu"});
-    box.appendChild(o.isDone?h("button",{type:"button",class:"tmbtn",onclick:()=>{closeSheet();o.done()}},o.kind==="skip"?"↺ Restore for today":"↺ Undo, not done yet"):h("button",{type:"button",class:"tmbtn ok",onclick:ev=>{cheer(ev);closeSheet();o.done()}},"✓ Mark done"));
+    box.appendChild(o.isDone?h("button",{type:"button",class:"tmbtn",onclick:()=>{closeSheet();o.done()}},o.st==="skip"?"↺ Restore for today":"↺ Undo, not done yet"):h("button",{type:"button",class:"tmbtn ok",onclick:ev=>{cheer(ev);closeSheet();o.done()}},"✓ Mark done"));
     box.appendChild(h("div",{class:"tmrow"},focusBtn(fid,o.t,focusMins(pid,fid,k))));
     if(o.task){const ri=h("input",{type:"text",class:"inp",value:o.task.t,"aria-label":"Rename"});
       box.appendChild(h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=ri.value.trim();if(!v)return;o.task.t=v;persist();closeSheet()}},h("div",{style:"flex:1 1 200px"},ri),h("button",{type:"submit",class:"ghost"},"Rename")));
@@ -1453,16 +1452,13 @@ function todayHero(pid){
       if(!o.isDone)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>{toggleIn(pid,k,"skip",o.x.id);closeSheet();toast("Skipped for today",o.t)}},"⏭ Skip for today"));
       if(o.x.agenda)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>agendaSheet(pid,o.x)},"📝 Agenda"))}
     box.appendChild(h("small",{class:"hint"},o.sub));openSheet(o.t,box)};
-  const doneL=[...it.filter(x=>x.done).map(x=>({...timed(x),isDone:true,kind:"done",sub:"Done ✓"+(x.allDay?"":" · "+fmt(x.s))})),
-    ...ts.filter(x=>x.d).map(x=>({task:x,isDone:true,kind:"done",t:x.t,sub:"Done ✓ · to do",done:()=>{x.d=false;persist();render()}})),
-    ...all.filter(x=>x.skip).map(x=>({x,t:x.title,isDone:true,kind:"skip",sub:"Skipped today",done:()=>toggleIn(pid,k,"skip",x.id)}))];
-  let ci=0;const MAX=12;
-  const tile=o=>{const col=o.kind==="miss"?"#d9822b":o.isDone?"":DPAL[(ci++)%DPAL.length],e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
-    return h("div",{class:"dt "+o.kind,style:col?"--tc:"+col:""},
-      h("button",{type:"button",class:"dtick","aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.kind==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(!o.isDone)cheer(ev);o.done()}},o.kind==="skip"?"↺":"✓"),
-      h("button",{type:"button",class:"dtx","aria-label":o.t+". More options",onclick:()=>menu(o)},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
+  const MAX=20;
+  const tile=o=>{const col=o.st==="miss"?"#d9822b":DPAL[hashN(o.id||o.t,DPAL.length)],e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
+    return h("div",{class:"dt"+(o.wide?" wide":"")+(o.st==="cur"?" cur":"")+(o.st==="miss"?" miss":"")+(o.one&&!o.isDone?" one":"")+(o.isDone?" isdone":"")+(o.st==="skip"?" skipped":""),style:"--tc:"+col},
+      h("button",{type:"button",class:"dtick","aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.st==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(!o.isDone)cheer(ev);o.done()}},o.st==="skip"?"↺":"✓"),
+      h("button",{type:"button",class:"dtx","aria-label":o.t+". More options",onclick:()=>menu(o)},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),
+        o.isDone?h("span",{class:"dstamp"},o.st==="skip"?"SKIPPED":"DONE ✓"):null,h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
   const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(tile));
-  const doneBox=doneL.length?h("div",{class:"ddone2"},h("small",{class:"ddhd"},"✓ Done today · "+doneL.length+" · tap ✓ again to undo"),h("div",{class:"dtiles"},doneL.map(tile))):null;
   /* daily habits, editable right here */
   const he=!!ui.habitEdit,hn=h("input",{type:"text",placeholder:"New habit, e.g. Accent practice","aria-label":"New habit"}),hg=h("input",{type:"number",min:"0",placeholder:"Min","aria-label":"Daily goal in minutes (optional)"});
   const habs=h("div",{class:"dhab"},h("div",{class:"dhabhd"},h("small",null,"✨ Daily habits"+(hb.length?" · "+hdn+" of "+hb.length:"")),h("button",{type:"button",class:"dlink",onclick:()=>{ui.habitEdit=!he;render()}},he?"Done editing":hb.length?"+ Add or edit":"+ Add a habit")),
@@ -1474,11 +1470,10 @@ function todayHero(pid){
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
     h("div",{class:"dhtop"},h("div",null,h("small",null,"Your day · "+DAYS[parseKey(k).getDay()]),h("h2",null,!tot?"A fresh day":left?left+(left===1?" thing to go":" things to go"):"All done 🎉"),
-        h("span",{class:"dsub"},!tot?"Add what you want to get done today.":left?dn+" done so far. Tap ✓ to tick, ⋯ for more 💪":"Everything ticked. Enjoy your evening.")),
+        h("span",{class:"dsub"},!tot?"Add what you want to get done today.":left?dn+" done so far. Tap ✓ to tick or untick, ⋯ for more 💪":"Everything ticked. Enjoy your evening.")),
       h("div",{class:"dring",style:"--p:"+pc},h("span",null,pc+"%"))),
     list.length?tiles:null,
     list.length>MAX?h("span",{class:"dmore"},"+"+(list.length-MAX)+" more not shown"):null,
-    doneBox,
     h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
       else{addTask(pid,k,v);render();toast("Added for today ✓",v)}}},
@@ -3494,7 +3489,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-j";
+const APP_VERSION="2026-11-13-k";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
