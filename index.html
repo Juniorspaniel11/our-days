@@ -132,8 +132,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dsub{font-size:14.5px;opacity:.85}
 .dring{--p:0;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#5fe0a8 calc(var(--p)*1%),rgba(255,255,255,.16) 0);flex:none}
 .dring span{width:54px;height:54px;border-radius:50%;background:#1a2b4f;display:grid;place-items:center;font-weight:800;font-size:15px}
-.dtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:10px}
-.dt{display:flex;align-items:flex-start;gap:10px;border-radius:18px;padding:12px;min-height:96px;background:linear-gradient(150deg,color-mix(in srgb,var(--tc) 92%,#fff),color-mix(in srgb,var(--tc) 72%,#141b3d));border:1px solid rgba(255,255,255,.14);color:#fff;min-width:0;box-shadow:0 8px 18px rgba(0,0,0,.2)}
+.dtiles{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+.dt{display:flex;align-items:flex-start;gap:12px;border-radius:18px;padding:12px 14px;min-height:0;background:linear-gradient(150deg,color-mix(in srgb,var(--tc) 92%,#fff),color-mix(in srgb,var(--tc) 72%,#141b3d));border:1px solid rgba(255,255,255,.14);color:#fff;min-width:0;box-shadow:0 8px 18px rgba(0,0,0,.2)}
 .dt.wide{grid-column:1/-1}
 .dt.exmp{opacity:.82;border:1.5px dashed rgba(255,255,255,.45);box-shadow:none}
 .dt.exmp .dtick{color:#fff;font-size:20px}
@@ -193,6 +193,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dt.skipped .dtick{color:#555}
 .dstamp{white-space:nowrap;align-self:flex-start;margin-top:5px;font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.14em;background:#fff;color:#1d7a4a;border-radius:8px;padding:2px 9px;transform:rotate(-4deg);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .dt.skipped .dstamp{color:#555}
+.dt.isdone .dstamp{position:absolute;right:48px;top:50%;transform:translateY(-50%) rotate(-6deg);margin:0;font-size:16px}
+.dt.isdone .dtx b{padding-right:90px}
 .ddone2{display:flex;flex-direction:column;gap:8px}
 .ddhd{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:#5fe0a8}
 .dt{position:relative}.dtx{position:static;padding-right:0!important}
@@ -3585,7 +3587,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-13-z";
+const APP_VERSION="2026-11-14-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
