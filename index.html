@@ -587,6 +587,8 @@ body.ro main .robar button{pointer-events:auto}
 .ju .totres .rrow{flex-direction:row;align-items:center;gap:10px}
 .ju .semo{position:absolute;right:12px;top:12px}
 .ju .tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ju .tgrid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ju .actions.one{grid-template-columns:1fr}
 @media (max-width:340px){.ju .tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ju .make{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ju .mk{border-radius:24px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;cursor:pointer;text-align:left;color:var(--ink);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);
@@ -2412,8 +2414,19 @@ function coverEl(b,w){const box=h("div",{class:"cover",style:"width:"+w+"px;heig
 function addBook(b,start){const list=SHELF();if(list.some(x=>x.title.toLowerCase()===b.title.toLowerCase())){toast("Already on your shelf",b.title);return}
   const nb={id:uid(),title:b.title,author:b.author||"",key:b.key||"",cover:b.cover??null,status:start?"reading":"want",ch:{},chapters:0,by:ME,at:Date.now()};
   const o={list:list.concat([nb])};if(start&&!BK().current)o.current=nb.id;saveDoc("books",o);toast(start?"Reading together 📖":"Added to your shelf",b.title);if(start)confetti(60)}
-function readSheet(){juSheet("Read together",()=>{
-  const list=SHELF(),cur=list.find(x=>x.id===BK().current&&x.status==="reading")||list.find(x=>x.status==="reading"),out=[];
+function soloBlock(){const so=BK().solo||{},mine=so[ME],th=so[PARTNER],out=[h("h2",{style:"font-size:19px"},"On my own")];
+  if(mine){const set=n=>saveDoc("books",{solo:{[ME]:{ch:Math.max(0,n)}}});
+    out.push(h("div",{class:"bookcur"},coverEl(mine,80),h("div",{class:"tx"},h("span",{class:"k"},"I'm reading"),h("b",null,mine.title),mine.author?h("small",null,mine.author):null,
+      h("div",{class:"row"},h("span",{class:"hint"},"Chapter"),h("button",{type:"button",class:"ghost",onclick:()=>set((mine.ch||0)-1)},"−"),h("b",{style:"min-width:28px;text-align:center"},String(mine.ch||0)),h("button",{type:"button",class:"ghost",onclick:()=>set((mine.ch||0)+1)},"+")),
+      h("div",{class:"row"},confirmBtn("I finished it 🎉",()=>{saveDoc("books",{solo:{[ME]:DEL()},soloDone:(BK().soloDone||[]).concat([{title:mine.title,author:mine.author||"",by:ME,at:Date.now()}])});confetti(150)})))))}
+  else{const t=h("input",{type:"text",class:"inp",placeholder:"Title of the book you're reading","aria-label":"Book title"}),a=h("input",{type:"text",class:"inp",placeholder:"Author (optional)","aria-label":"Author"});
+    out.push(h("p",{class:"hint"},"Reading something on your own, paper copy included? Add it so "+nm(PARTNER)+" can see what you're into."),
+      h("form",{class:"body",style:"padding:0",onsubmit:e=>{e.preventDefault();const v=t.value.trim();if(!v){t.focus();return}saveDoc("books",{solo:{[ME]:{title:v,author:a.value.trim(),ch:0,at:Date.now()}}});toast("Added","📚 "+v)}},t,a,h("button",{type:"submit",class:"ghost"},"I'm reading this")))}
+  if(th)out.push(h("div",{class:"letter",style:"cursor:default"},coverEl(th,54),h("div",null,h("b",{style:"font-size:16px"},nm(PARTNER)+" is reading "+th.title),h("small",{class:"hint"},(th.author?th.author+" · ":"")+(th.ch?"chapter "+th.ch:"just started")))));
+  const fin=(BK().soloDone||[]);if(fin.length)out.push(h("p",{class:"hint",style:"font-size:14px"},"Finished: "+fin.slice(-6).reverse().map(b=>b.title+" ("+(b.by===ME?"you":nm(b.by))+")").join(", ")));
+  return out}
+function readSheet(){juSheet("Reading",()=>{
+  const list=SHELF(),cur=list.find(x=>x.id===BK().current&&x.status==="reading")||list.find(x=>x.status==="reading"),out=[...soloBlock(),h("h2",{style:"font-size:19px;margin-top:8px"},"Together")];
   if(cur){
     const mine=(cur.ch||{})[ME]||0,theirs=(cur.ch||{})[PARTNER]||0,setCh=n=>{const ch={...(cur.ch||{}),[ME]:Math.max(0,n)};saveDoc("books",{list:SHELF().map(x=>x.id===cur.id?{...x,ch}:x),current:cur.id})};
     const chIn=h("input",{type:"number",class:"inp",min:"0",value:cur.chapters||"",placeholder:"?",style:"width:80px","aria-label":"Number of chapters"});
@@ -2528,11 +2541,10 @@ function growSection(){
   const H=US.home||{},hm=SHOPITEM[H.home||"apt"],v=nextVisit(),vi=v?VP(v.id):[],cur=SHELF().find(x=>x.id===BK().current&&x.status==="reading")||SHELF().find(x=>x.status==="reading");
   const wck=checkinState("w"+curWk()),pp=PP().filter(x=>!x.answered).length,mon=monthName(monthKey()).split(" ")[0];
   const T=(c,e,name,sub,hot,fn,anim)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,!!anim),h("b",null,name),h("small",{class:"sub"},sub));
-  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎯",30,false),"Do together"),h("div",{class:"tgrid"},
-    T("#1f7f78",hm.e,"Our dream home",((H.pets||[]).length+(H.kids||[]).length+(H.garden||[]).length+(H.ride?1:0))?[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("")||"Keep building":"Start building",false,homeSheet),
+  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎯",30,false),"Do together"),h("div",{class:"tgrid two"},
     T("#c0398a","🎨","Paint together","One canvas",false,paintSheet),
     T("#2d6fb8","🗺️","Plans",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" for the visit":"Plan the visit"):(S.shared.plans.length?S.shared.plans.filter(x=>!x.d).length+" ideas":"Add ideas"),false,plansSheet),
-    T("#b9661c","📚","Read together",cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet),
+    T("#b9661c","📚","Reading",(BK().solo||{})[ME]?"You: "+(BK().solo||{})[ME].title:cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):(BK().solo||{})[PARTNER]?nm(PARTNER)+": "+(BK().solo||{})[PARTNER].title:"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet),
     T("#3f8a4f","☀️","Sunday check-in",wck.mine&&wck.theirs?"This week ✓":wck.mine?"Waiting for "+nm(PARTNER):wck.theirs?nm(PARTNER)+" is done":"Every Sunday",!!(wck.theirs&&!wck.mine),()=>weekSheet())));
 }
 
@@ -3043,7 +3055,10 @@ function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x
 
 function homeDesignSection(){const link=US.main.homeLink||"";
   const inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared Planner 5D or Homestyler link"});
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our home design")),
+  const H=US.home||{},hm=SHOPITEM[H.home||"apt"],bits=[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,5).join("");
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our dream home")),
+    h("button",{type:"button",class:"pc tap",style:"--c:#c0398a",onclick:homeSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},H.name||"Build it together"),
+      h("span",{class:"tx"},bits?"Your home, "+bits:"Pick the house, pets, kids and garden")),emo(hm.e,56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Just for fun"),h("span",{class:"go"},"Open"))),
     h("div",{class:"pc",style:"--c:#1f7f78"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},link?"Your 3D home":"Design it in 3D"),
         h("span",{class:"tx"},link?"Open it and keep building together":"Build your future home room by room, then walk through it in 3D")),emo("🏡",56,true)),
       link?h("div",{class:"row"},h("a",{class:"btn",href:link,target:"_blank",rel:"noopener"},"Open our home")):
@@ -3568,6 +3583,27 @@ const OBJ={window:windowSheet,frame:memoriesSheet,calendar:datesSheet,letters:le
 /* ---------- the Us tab ---------- */
 function usSeenNudge(){try{return +localStorage.getItem("ourdays-seen-nudge")||0}catch(e){return 0}}
 function setSeenNudge(){try{localStorage.setItem("ourdays-seen-nudge",String(Date.now()))}catch(e){}}
+/* one place for every game and question set */
+function playSection(k){const w=ME,oo=PARTNER,t=scoreboard(),kn=(DU().know||{})[k]||{},tv=(DU().trivia||{})[k]||{},g=c4State(),kr=knowResult(k),tr=triviaResult(k);
+  const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},sub));
+  const sub=(a,b,done)=>done?"See who won":a?"Waiting for "+nm(oo):b?"Your turn":"Play";
+  const c4sub=!g||!g.board?"Start a game":g.w?(g.w==="tie"?"Tie · again":g.w===ME?"You won":nm(oo)+" won"):g.turn===ME?"Your move":"Waiting";
+  const A=ANS(),tops=enabledTopics(),qWait=tops.reduce((a,tp)=>a+tp.qs.filter((q,i)=>{const x=A[tp.id+":"+i]||{};return x[oo]&&!x[w]}).length,0);
+  const lead=t[ME]===t[oo]?"All square":t[ME]>t[oo]?"You lead":nm(oo)+" leads";
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("🎲",30,false),"Play together"),h("span",{class:"hint"},"🏆 "+lead+" "+t[ME]+"–"+t[oo])),
+    h("div",{class:"tgrid"},
+      visibleGames().map(gm=>{const d=GM(gm.id)[gkey(k,gameRound(gm.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
+        return tile(gm.c,gm.e,gm.name,a&&b?"See matches":a?"Waiting for "+nm(oo):b?"Your turn":"Play",b&&!a,()=>gameSheet(gm))}),
+      tile("#e2557c","🧠","Know me best",sub(kn[ME]&&kn[ME].at,kn[oo]&&kn[oo].at,kr.done),!!(kn[oo]&&kn[oo].at&&!(kn[ME]&&kn[ME].at)),knowSheet),
+      tile("#1f7f78","🎯","Trivia duel",sub(tv[ME]&&tv[ME].at,tv[oo]&&tv[oo].at,tr.done),!!(tv[oo]&&tv[oo].at&&!(tv[ME]&&tv[ME].at)),triviaSheet),
+      tile("#5b3b8c","🔴","Connect Four",c4sub,!!(g&&!g.w&&g.turn===ME),c4Sheet),
+      (()=>{const x=tile("#8a5a2b","💬","Ask each other",qWait?qWait+" for you":tops.reduce((a,tp)=>a+tp.qs.length,0)+" questions in "+tops.length+" topics",qWait>0,questionsSheet);if((visibleGames().length+3)%3===0)x.style.gridColumn="1 / -1";return x})()))}
+function questionsSheet(){juSheet("Ask each other",()=>{const A=ANS(),tops=enabledTopics(),w=ME,oo=PARTNER;
+  const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
+  return [h("p",{class:"hint"},"Pick a topic. Answers stay hidden until you both reply."),
+    h("div",{class:"tgrid"},tops.map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
+      return tile(t.c,TOPIC_EMOJI[t.id],t.name,wt?h("small",{class:"sub"},wt+" for you"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"}))),wt>0,()=>topicSheet(t))})),
+    h("button",{type:"button",class:"btn gh",onclick:topicsSettingsSheet},"Choose topics")]})}
 function viewUs(){
   const o=P(partnerOf(ME)),out=[];
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
@@ -3584,7 +3620,7 @@ function viewUs(){
   const heartBtn=h("button",{type:"button",class:"bigbtn heart tap","aria-label":"Send thinking of you"},svgEl(HEART.replace("currentColor","#fff")),"Thinking of you");
   heartBtn.onclick=()=>{addTo("nudges",{from:ME,at:Date.now()});saveUs({counts:{hearts:INC(1)}});setSeenNudge();hearts(heartBtn);toast("Sent to "+nm(PARTNER),nm(PARTNER)+" gets: "+nm(ME)+" is thinking of you")};
   if(got&&got.at>usSeenNudge()&&Date.now()-got.at<2*864e5)gotEl=(h("button",{type:"button",class:"got tap",onclick:()=>heartBtn.click()},svgEl(HEART),h("div",null,h("b",null,nm(PARTNER)+" is thinking of you"),h("span",null,ago(got.at)+" · tap to send one back"))));
-  top.appendChild(h("div",{class:"actions"},heartBtn,h("button",{type:"button",class:"bigbtn doodle tap",onclick:doodleSheet},svgEl(ICON.spark("#5b3b8c")),"Doodle")));
+  top.appendChild(h("div",{class:"actions one"},heartBtn));
 
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
@@ -3596,9 +3632,8 @@ function viewUs(){
   {const rm=recapDue();if(rm)cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#4b5bc4",onclick:()=>recapSheet(rm)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(rm).split(" ")[0]+" recap"),h("span",{class:"tx"},"Your month together in numbers")),emo("📊",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Prayer, reading, wins"),h("span",{class:"go"},"See"))))}
   if(!qa[w]||(qa[oo]&&!seen("d:"+k)))cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered. Your turn":"Answer"))));
   else if(!qa[oo])waitN++;
-  if(!tA||(tB&&!seen("g:tot:"+ttk))){const first=gItems(tg)[dailySet("tot",ttk)[0]];
-    cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#b9661c",onclick:()=>gameSheet(tg)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"This or That"),h("span",{class:"tx"},first.map(o=>o.t).join(" or ")+"? And 4 more")),h("div",{class:"duo"},first.map(o=>emo(o.e,44,true)))),h("div",{class:"foot"},av(x=>(tt[x]||[]).length===5),h("span",{class:"go"},tA?"See matches":tB?nm(oo)+" played. Your turn":"Play"))))}
-  else if(!tB)waitN++;
+  {const A0=ANS(),wo=[];enabledTopics().forEach(t=>t.qs.forEach((q,i)=>{const a=A0[t.id+":"+i]||{};if(a[oo]&&!a[w])wo.push({t,i,q,at:a[oo].at||0})}));wo.sort((x,y)=>y.at-x.at);const wq=wo[0];
+    if(wq)cards.push(h("button",{type:"button",class:"pc tap",style:"--c:"+wq.t.c,onclick:()=>answerSheet(wq.t.id+":"+wq.i,wq.q,wq.t.name)},h("span",{class:"k"},nm(oo)+" is waiting on you"+(wo.length>1?" · "+wo.length+" questions":"")),h("span",{class:"tx"},wq.q),h("div",{class:"foot"},h("span",{class:"hint"},TOPIC_EMOJI[wq.t.id]+" "+wq.t.name),h("span",{class:"go"},"Answer"))))}
   const wt=waitN?"Waiting on "+nm(oo)+" for "+waitN+(waitN===1?" thing":" things"):"";
   if(gotEl)out.push(h("div",{class:"ju"},gotEl));
   out.push(h("section",{class:"ju"},h("div",{class:"tdbox"},h("div",{class:"tdhead"},emo("✨",30,true),h("h2",null,"For you two today"),h("span",{class:"tbadge"+(cards.length?"":" ok")},cards.length?cards.length+" for you":"All done ✓")),cards.length?cards:h("div",{class:"caught"},emo("💞",48,true),h("div",null,h("b",null,"You two are all caught up"),h("small",null,wt?wt+".":"Nothing waiting today. Send a heart or plan the evening."))),
@@ -3611,19 +3646,7 @@ function viewUs(){
   const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);
 
-  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("🎲",30,false),"Play together"),h("span",{class:"hint"},"5 rounds a day")),
-    sc(visibleGames().map(g=>{const d=GM(g.id)[gkey(k,gameRound(g.id,k))]||{},a=(d[w]||[]).length===5,b=(d[oo]||[]).length===5;
-      return tile(g.c,g.e,g.name,h("small",{class:"sub"},a&&b?"See matches":a?"Waiting for "+nm(oo):b?"Your turn":"Play"),b&&!a,()=>gameSheet(g))}))));
-  out.push(duelSection());
-
-  const A=ANS(),tops=enabledTopics();
-  const waitOn=[];tops.forEach(t=>t.qs.forEach((q,i)=>{const a=A[t.id+":"+i]||{};if(a[oo]&&!a[w])waitOn.push({t,i,q,at:a[oo].at||0})}));waitOn.sort((x,y)=>y.at-x.at);
-  const wq=waitOn[0];
-  out.push(h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("💬",30,false),"Ask each other"),h("button",{type:"button",class:"lnk",onclick:topicsSettingsSheet},"Choose topics")),
-    wq?h("button",{type:"button",class:"pc tap",style:"--c:"+wq.t.c,onclick:()=>answerSheet(wq.t.id+":"+wq.i,wq.q,wq.t.name)},h("span",{class:"k"},nm(oo)+" is waiting on you"+(waitOn.length>1?" · "+waitOn.length+" questions":"")),h("span",{class:"tx"},wq.q),h("div",{class:"foot"},h("span",{class:"hint"},TOPIC_EMOJI[wq.t.id]+" "+wq.t.name),h("span",{class:"go"},"Answer"))):null,
-    sc(tops.map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
-      return tile(t.c,TOPIC_EMOJI[t.id],t.name,wt?h("small",{class:"sub"},wt+" for you"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"}))),wt>0,()=>topicSheet(t))})),
-    h("p",{class:"hint"},tops.reduce((a,t)=>a+t.qs.length,0)+" questions in "+tops.length+" topics.")));
+  out.push(playSection(k));
 
   setTimeout(usTick,0);
   return out;
@@ -3845,7 +3868,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-q";
+const APP_VERSION="2026-11-15-r";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
