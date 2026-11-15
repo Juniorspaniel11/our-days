@@ -554,6 +554,15 @@ html,body{margin:0}
 .rctable{display:flex;flex-direction:column;gap:2px;margin:6px 0 10px;background:rgba(128,128,160,.08);border-radius:16px;padding:8px 12px}
 .rcrow{display:grid;grid-template-columns:1fr 64px 64px;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(128,128,160,.2);font-size:15.5px}
 .rcrow:last-child{border-bottom:0}.rcrow span{display:flex;align-items:center;gap:8px}.rcrow b{text-align:center;font-size:18px}.rch b{font-size:14px}
+.fml{margin-top:10px;background:linear-gradient(135deg,rgba(42,31,74,.92),rgba(92,64,30,.85));border:1px solid rgba(242,200,110,.45);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.fmlh{color:#f6d38a;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.fmr{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left;color:#fff;font:inherit;width:100%}
+.fmt{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:2px solid #f6d38a;background:rgba(246,211,138,.12);color:#f6d38a;font-size:18px;font-weight:800;display:grid;place-items:center;cursor:pointer}
+.fmt:disabled{opacity:.6;cursor:default}
+.fmx{flex:1;min-width:0;display:flex;flex-direction:column;background:none;border:0;padding:0;text-align:left;color:#fff;font:inherit;cursor:pointer}
+.fmx b{font-size:16px;line-height:1.25}.fmx small{font-size:12.5px;opacity:.75;line-height:1.3;margin-top:1px}
+.fmadd .fmt{border-style:dashed}
+.vnow{display:inline-block;margin-top:6px;font-size:13px;font-weight:700;color:#f6d38a;background:rgba(246,211,138,.13);border:1px solid rgba(246,211,138,.4);border-radius:999px;padding:3px 10px;line-height:1.35}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1606,6 +1615,7 @@ function todayHero(pid){
       h("div",{class:"dt exmp",style:"--tc:"+DPAL[i]},h("button",{type:"button",class:"dtick",disabled:ro,"aria-label":"Add "+t+" to today",onclick:()=>{if(ro)return;addTask(pid,k,t);render();toast("Added for today ✓",t)}},"＋"),
         h("div",{class:"dtx"},h("small",null,sub),h("b",null,t),h("span",{class:"exl"},ro?"Example · "+nm(pid)+" sees this until adding their own":"Example · tap ＋ to add"))))),
     list.length>MAX?h("span",{class:"dmore"},"+"+(list.length-MAX)+" more not shown"):null,
+    futureLine(pid),
     ro?null:h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
       else{addTask(pid,k,v);render();toast("Added for today ✓",v)}}},
@@ -2493,6 +2503,8 @@ function weekDue(){const d=parseKey(usDay()).getDay();return (d===0||d===1)&&!ch
 function weekReveal(){const d=parseKey(usDay()).getDay(),st=checkinState("w"+curWk());return d<=2&&st.mine&&st.theirs&&!seen("ck:"+curWk())}
 function weekSheet(wk){wk=wk||curWk();const mk="w"+wk,draft=DR["ck"+mk]||(DR["ck"+mk]={});juSheet("Sunday check-in",()=>{
   const {mine,theirs}=checkinState(mk),out=[h("div",{class:"bigemo"},emo("☀️",64,true)),h("p",{class:"q",style:"text-align:center"},wkLabel(wk))];
+  {const lo=addDays(wk,-6),hi=addDays(wk,1),got=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder).map(u=>[u,vList(u).flatMap(v=>(v.stepsDone||[]).filter(d=>{const k=dkey(new Date(d.at));return k>=lo&&k<=hi}))]).filter(([,a])=>a.length);
+    if(got.length)out.push(h("div",{class:"ckq"},h("b",null,"🎯 Steps toward Future me this week"),got.map(([u,a])=>h("p",{style:"margin:4px 0"},h("b",null,(u===ME?"You":nm(u))+": "),a.map(d=>d.t).join(" · ")))))}
   if(!mine){
     out.push(h("p",{class:"hint",style:"text-align:center"},"Ten minutes to look back on the week and set up the next one. "+nm(PARTNER)+" sees your answers once you've both finished. Skip any you like."));
     WEEKQ.forEach(([t,q,e],i)=>{
@@ -2520,13 +2532,13 @@ function recapData(mk){const log=S.shared.prayer.log,inM=k=>k&&k.slice(0,7)===mk
   const per=u=>{const p=P(u),days=Object.entries(p.days||{}).filter(([k])=>inM(k));
     const read=Object.values(BIB().read||{}).reduce((a,pl)=>a+Object.values((pl||{})[u]||{}).filter(inM).length,0);
     return {tasks:days.reduce((a,[,d])=>a+((d.done||[]).length),0),habits:days.reduce((a,[,d])=>a+((d.habits||[]).length),0),habitDays:days.filter(([,d])=>(d.habits||[]).length).length,read,
-      letters:US.letters.filter(l=>l.from===u&&l.at&&inM(dkey(new Date(l.at)))).length,visions:(p.vision||[]).filter(x=>x.at&&inM(dkey(new Date(x.at)))).length}};
+      steps:(p.vision||[]).reduce((a,v)=>a+(v.stepsDone||[]).filter(d=>inM(dkey(new Date(d.at)))).length,0),letters:US.letters.filter(l=>l.from===u&&l.at&&inM(dkey(new Date(l.at)))).length,visions:(p.vision||[]).filter(x=>x.at&&inM(dkey(new Date(x.at)))).length}};
   const weeks=Object.keys(CK()).filter(k=>k[0]==="w"&&inM(k.slice(1))&&CK()[k][ME]&&CK()[k][PARTNER]).length;
   return {prayed,bestRun,weeks,ppl,per:Object.fromEntries(ppl.map(u=>[u,per(u)]))}}
 function recapDue(){const d=+usDay().slice(8);if(d>5)return null;const mk=addDays(usDay().slice(0,7)+"-01",-1).slice(0,7);return seen("rc:"+mk)?null:mk}
 function recapSheet(mk){markSeen("rc:"+mk);juSheet("Monthly recap",()=>{const R=recapData(mk),mn=monthName(mk).split(" ")[0];
   const big=(e,n,l)=>h("div",{class:"rcbig"},emo(e,34,false),h("b",null,String(n)),h("small",null,l));
-  const rows=[["✅","Things done","tasks"],["🌱","Growing me ticks","habits"],["📖","Bible chapters read","read"],["💌","Letters written","letters"],["✨","Visions added","visions"]]
+  const rows=[["✅","Things done","tasks"],["🌱","Growing me ticks","habits"],["📖","Bible chapters read","read"],["🎯","Future me steps","steps"],["💌","Letters written","letters"],["✨","Visions added","visions"]]
     .filter(([,,k])=>R.ppl.some(u=>R.per[u][k]));
   const prev=addDays(mk+"-01",-1).slice(0,7),next=addDays(mk+"-01",40).slice(0,7),cur=usDay().slice(0,7);
   return [h("div",{class:"bigemo"},emo("📊",60,true)),
@@ -3113,7 +3125,7 @@ function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
 /* key words in gold */
 const VKEYS=["science, music and faith","heal hearts","lift spirits","open doors","the poor, the disabled, and the brilliant but needy","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
 function vHi(t){const ks=VKEYS.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
-  const re=new RegExp("("+ks.join("|")+"|\\b\\d[\\d,]*\\b)","gi"),out=[];let last=0,m;
+  const re=new RegExp("(?<![A-Za-z])("+ks.join("|")+"|\\b\\d[\\d,]*\\b)(?![A-Za-z])","gi"),out=[];let last=0,m;
   while((m=re.exec(t))){if(m.index>last)out.push(t.slice(last,m.index));const w=m[0];out.push(h("span",{class:"vk"+(/foundation/i.test(w)&&/aboagye/i.test(w)?" fn":"")},w));last=m.index+w.length}
   if(last<t.length)out.push(t.slice(last));return out}
 const VQ={faith:"How do you want to walk with God?",character:"What do you want people to know you for?",family:"What does your family and home look like?",health:"How do you want to feel in your body and mind?",career:"What work do you want to be known for?",impact:"Who do you want to help, and how?",wealth:"What does financial freedom look like for you?",growth:"What do you want to keep learning?"};
@@ -3126,12 +3138,28 @@ function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)retur
     h("div",{class:"fmbx"},h("small",null,ro?nm(pid)+"'s future":"✨ Future me · say it today"),h("b",null,v?v.t:"I am Dr. "+fullName(pid)),
       h("span",null,L.length?(dn?dn+" of "+L.length+" manifested":L.length+(L.length===1?" vision":" visions")+" · tap to see them all"):"Tap to write your vision")),
     h("span",{class:"fmbe"},emo(v?v.e||kwEmoji(v.t)||"✨":"🎓",44,true)))}
+/* visions you're working on now: each has one next step that shows on Today */
+const vNow=pid=>vList(pid).filter(x=>x.now);
+/* always act on the live copy: a sync can swap the objects while a sheet is open */
+const vLive=x=>{const L=(P(ME).vision||[]);return L.find(v=>x.id&&v.id===x.id)||L.find(v=>v.t===x.t)||x};
+function nextStepSheet(x,after){const ti=h("input",{type:"text",class:"inp",placeholder:"One small, concrete step","aria-label":"Next step"});ti.value=x.step||"";
+  openSheet("Next step",h("form",{class:"body",onsubmit:e=>{e.preventDefault();const v=vLive(x);v.step=ti.value.trim();persist();closeSheet();render();if(v.step)toast("On your Today ✓",v.step)}},
+    h("p",{class:"hint"},"Toward: "+x.t),ti,
+    h("p",{class:"hint",style:"font-size:14px"},"Small enough to do this week. For example: draft the results section, email Dr. Yang, run 3 km."),
+    h("div",{class:"row"},h("button",{type:"submit",class:"primary"},"Save step"),h("button",{type:"button",class:"quiet",onclick:()=>{closeSheet();render()}},after?"Later":"Cancel"))));
+  setTimeout(()=>ti.focus(),80)}
+function futureLine(pid){const ro=pid!==ME,L=vNow(pid);if(!L.length)return null;
+  return h("div",{class:"fml"},h("small",{class:"fmlh"},"✨ Toward Future me"),L.map(x=>x.step?
+      h("div",{class:"fmr"},h("button",{type:"button",class:"fmt",disabled:ro,"aria-label":"Mark done: "+x.step,onclick:ev=>{if(ro)return;hearts(ev.currentTarget,8);
+          const v=vLive(x);v.stepsDone=(v.stepsDone||[]).concat([{t:v.step,at:Date.now()}]);v.step="";persist();render();confetti(70);setTimeout(()=>nextStepSheet(v,true),450)}},"✓"),
+        h("button",{type:"button",class:"fmx",onclick:()=>{if(!ro)nextStepSheet(x)}},h("b",null,x.step),h("small",null,x.t.length>70?x.t.slice(0,68)+"…":x.t)))
+    :ro?null:h("button",{type:"button",class:"fmr fmadd",onclick:()=>nextStepSheet(x)},h("span",{class:"fmt"},"＋"),h("span",{class:"fmx"},h("b",null,"Add your next step"),h("small",null,x.t.length>70?x.t.slice(0,68)+"…":x.t)))))}
 function visionSection(pid){pid=pid||ME;const ro=pid!==ME,p=P(pid);if(!ro){p.vision=p.vision||[];visionTidy(p)}const L=vList(pid),adding=!ro&&!!ui.visAdd;
   let cat=ui.visCat||"family";const ti=h("textarea",{class:"inp",rows:"3",placeholder:"Write it as if it's already true, and be specific: who, what, where","aria-label":"Your vision"});
   const cc=h("div",{class:"vcats"},VCATS.map(([id,lab,e])=>h("button",{type:"button","aria-pressed":String(id===cat),onclick:ev=>{cat=id;cc.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},emo(e,18,false),lab)));
   const hide=p.visionHide||[],exs=(ro&&L.length)?[]:VIS_EX(pid).filter(([c,e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!hide.includes(t));
   const card=(x,ex)=>h("div",{class:"vcard"+(ex?" ex":"")},h("span",{class:"vemo"},emo(x.e||(VCATS.find(z=>z[0]===vCat(x))||VCATS[7])[2],30,false)),
-    h("div",{class:"vtx"},h("b",null,vHi(x.t)),ex?h("small",null,ro?"Example "+plainNm(pid)+" can keep":"Example · ＋ to keep, × to hide"):null),
+    h("div",{class:"vtx"},h("b",null,vHi(x.t)),!ex&&x.now?h("span",{class:"vnow"},"🎯 Working on it"+(x.step?" · Next: "+x.step:ro?"":" · tap ⋯ to add a step")):null,ex?h("small",null,ro?"Example "+plainNm(pid)+" can keep":"Example · ＋ to keep, × to hide"):null),
     ro?null:ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,c:x.c,at:Date.now()});persist();render();toast("Vision added ✨","")}},"＋"),
         h("button",{type:"button",class:"vx","aria-label":"Hide this example",onclick:()=>{(p.visionHide=p.visionHide||[]).push(x.t);persist();render()}},"×"))
       :h("button",{type:"button",class:"vact","aria-label":"Edit or remove",onclick:()=>visionSheet(x)},"⋯"));
@@ -3161,14 +3189,17 @@ function visionSection(pid){pid=pid||ME;const ro=pid!==ME,p=P(pid);if(!ro){p.vis
     h("div",{class:"vplate"},h("small",null,"I am"),h("b",{style:"font-size:"+vPlateFs("Dr. "+fn+", PhD")},"Dr. "+fn+", PhD")),
     MISSIONX(),
     adding?ADDFORM():null,
+    !ro&&L.length&&!vNow(pid).length?h("p",{class:"vsub",style:"text-align:center"},"Tap ⋯ on up to 3 visions to work on now. Their next step shows on your Today."):null,
     groups,
     ro&&!L.length&&!exs.length?h("p",{class:"vsub",style:"text-align:center;font-style:italic"},plainNm(pid)+" hasn't written any visions yet."):null)}
 function missionSheet(cur){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"My mission",placeholder:"One sentence on why you exist"});ti.value=cur||"";
   openSheet("My mission",h("form",{class:"body",onsubmit:e=>{e.preventDefault();p.mission=ti.value.trim();persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")))}
 function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"Edit vision"});ti.value=x.t;
-  openSheet("Edit vision",h("div",{class:"tmenu"},
-    h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;x.t=t;persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")),
-    h("button",{type:"button",class:"tmbtn",onclick:()=>{p.vision=p.vision.filter(y=>y.id!==x.id);persist();closeSheet()}},"🗑 Remove")))}
+  const nowBtn=x.now?h("button",{type:"button",class:"tmbtn",onclick:()=>{vLive(x).now=false;persist();closeSheet();render();toast("Taken off Today","")}},"⏸ Stop working on this now")
+    :h("button",{type:"button",class:"tmbtn",onclick:()=>{if(vNow(ME).length>=3){toast("Three at a time","Pause one first so Today stays light");return}const v=vLive(x);v.now=true;persist();closeSheet();render();nextStepSheet(v)}},"🎯 Work on this now");
+  openSheet("Edit vision",h("div",{class:"tmenu"},nowBtn,x.now?h("button",{type:"button",class:"tmbtn",onclick:()=>{closeSheet();nextStepSheet(x)}},"✏️ "+(x.step?"Change next step":"Add next step")):null,
+    h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;vLive(x).t=t;persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")),
+    h("button",{type:"button",class:"tmbtn",onclick:()=>{const v=vLive(x);P(ME).vision=P(ME).vision.filter(y=>y!==v);persist();closeSheet();render()}},"🗑 Remove")))}
 
 
 /* ---------- Big day alerts ---------- */
@@ -3868,7 +3899,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-r";
+const APP_VERSION="2026-11-15-s";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
