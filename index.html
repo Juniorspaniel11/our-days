@@ -2983,14 +2983,22 @@ const VCATS=[["family","Family","👨‍👩‍👧"],["faith","Faith","🙏"],[
 const vCat=x=>x.c||((/wife|husband|children|family|home|marri/i.test(x.t))?"family":/god|faith|pray|church/i.test(x.t)?"faith":/foundation|needy|poor|disab|give|students who|fees/i.test(x.t)?"impact":/research|lab|career|work|professor|lead/i.test(x.t)?"career":/own|asset|propert|business|invest|wealth|income/i.test(x.t)?"wealth":/health|strong|fit|energy/i.test(x.t)?"health":/learn|skill|read|accent|language/i.test(x.t)?"growth":"life");
 const VIS_EX=pid=>{const me=(nm(pid)||"").toLowerCase()==="joel",o=partnerOf(pid)&&P(partnerOf(pid))?nm(partnerOf(pid)):"my partner";
   return me?[
-  ["family","👨‍👩‍👧","My wife Fiona, our children and I live in our own beautiful home, full of God's peace, love and laughter."],
-  ["faith","🙏","I walk closely with God, and I lead my family in faith and prayer."],
-  ["impact","🎓","Through my foundation, brilliant but needy students have their school fees paid, so no gifted child has to sell on the streets, beg or farm instead of learning."],
-  ["impact","🤝","My foundation gives disabled people who sell on the streets for their daily bread a steady income, dignity and care."],
-  ["career","🔬","I lead a cardiovascular research lab whose discoveries help heart patients live longer, healthier lives."],
+  ["family","💍","I am a faithful, patient and present husband. Fiona feels loved, safe and honoured by me every day."],
+  ["family","🙏","I pray with my wife, I listen to her, and I put our marriage before my work."],
+  ["family","👨‍👧","I am a present and joyful father. My children know they are loved, they know God, and they see in me a man of integrity."],
+  ["family","🍽️","I am home for dinner, I show up for my children's big moments, and I teach them to give."],
+  ["family","🏡","Fiona and I own our home in the United States and a family house in Ghana, full of God's peace, love and laughter."],
+  ["family","👵","My parents live in a comfortable home I built for them, and they want for nothing."],
+  ["faith","⛪","I walk closely with God, and our family serves faithfully in our church."],
+  ["impact","🌍","My foundation works in Ghana and the United States, helping people who genuinely need it, not just people who ask the loudest."],
+  ["impact","🎓","Every year my foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning."],
+  ["impact","🤝","My foundation gives disabled people who sell on the streets a steady monthly income, skills training and a place to work with dignity."],
+  ["impact","🇺🇸","In the United States, my foundation helps struggling families with food, rent support and job training."],
+  ["impact","🔁","The students we support come back to mentor the next ones, and the circle keeps growing."],
+  ["career","📜","I defend my PhD with strong first author papers and a clear next step waiting for me."],
+  ["career","🔬","I lead my own funded cardiovascular research lab, and our discoveries reach patients."],
   ["career","👨‍🏫","I mentor young scientists from Ghana and beyond the way I was mentored."],
-  ["wealth","💰","I own assets that earn for my family every month, in property, businesses and technology, and they fund the foundation."],
-  ["family","🏡","My parents are well cared for, and they are proud of the man I have become."],
+  ["wealth","💰","I own assets in Ghana and the United States that earn for my family every month and fund the foundation."],
   ["health","💪","I am healthy, strong and full of energy for my family and my work."]]:[
   ["family","👨‍👩‍👧","My husband "+o+", our children and I live in our own beautiful home, full of God's peace, love and laughter."],
   ["faith","🙏","I walk closely with God, and my faith carries our home."],
@@ -3679,7 +3687,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-d";
+const APP_VERSION="2026-11-15-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
