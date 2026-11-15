@@ -1442,12 +1442,12 @@ function nowBanner(pid){
 }
 function countdownStrip(pid){
   const p=P(pid),t=tzNow(p.tz).key,all=[];
-  p.projects.filter(x=>x.pinned&&!x.target&&!x.done).forEach(x=>all.push({pin:true,proj:x,title:x.title,col:"#2b2350",open:()=>pinSheet(pid,x)}));
+  p.projects.filter(x=>x.pinned&&!x.target&&!x.done).forEach(x=>all.push({pin:true,proj:x,title:x.title,col:"#2b2350",open:()=>pinProjSheet(pid,x)}));
   countdownsFor(pid).filter(c=>daysBetween(t,c.date)>=0&&c.kind!=="visit").forEach(c=>{const n=daysBetween(t,c.date);
     const proj=c.src==="project"?p.projects.find(y=>y.id===c.projectId):null;
     const type=c.src==="project"?"project":(CDT[c.kind]?c.kind:"other");
     all.push({c,n,proj,title:c.title,col:proj?colorOf(pid,proj):c.color||null,
-      kick:proj&&proj.pinned?"Priority":c.src==="shared"&&c.by&&c.by!==pid?"From "+P(c.by).name:CDT[type][0],open:()=>proj?pinSheet(pid,proj):countdownSheet(pid,c)})});
+      kick:proj&&proj.pinned?"Priority":c.src==="shared"&&c.by&&c.by!==pid?"From "+P(c.by).name:CDT[type][0],open:()=>proj?pinProjSheet(pid,proj):countdownSheet(pid,c)})});
   const used=new Set(all.filter(x=>x.col).map(x=>x.col));let pi=0;
   all.forEach(x=>{if(x.col)return;let tries=0;while(used.has(PAL[pi%PAL.length])&&tries<PAL.length){pi++;tries++}x.col=PAL[pi%PAL.length];used.add(x.col);pi++});
   const big=all.slice(0,2),rest=all.slice(2);
@@ -1470,7 +1470,7 @@ function countdownStrip(pid){
   }
   return sec;
 }
-function pinSheet(pid,x){
+function pinProjSheet(pid,x){
   const p=P(pid),n=tzNow(p.tz),since=x.since||n.key,body=h("div",{class:"body"});
   body.appendChild(h("div",{class:"now solid",style:"background:"+colorOf(pid,x)},h("span",{class:"lbl"},x.pinned?"Pinned priority":"Project"),
     h("b",null,x.target?daysBetween(n.key,x.target)+" days to your target":"No deadline yet"),
@@ -1479,15 +1479,15 @@ function pinSheet(pid,x){
   const msg=h("span",{class:"msg"});
   body.append(h("div",{class:"field"},h("label",null,"Next step"),nx),
     h("div",{class:"row"},h("button",{type:"button",class:"primary",onclick:()=>{const t=nx.value.trim();if(!t){msg.textContent="Write a next step first";return}addTask(pid,n.key,x.title+": "+t);msg.textContent="Added to today's tasks"}},"Do today"),
-      h("button",{type:"button",class:"ghost",onclick:()=>{const t=nx.value.trim();if(!t)return;x.steps=(x.steps||[]).concat([{t,date:n.key}]);x.next="";persist();pinSheet(pid,x)}},"Step done"),msg));
+      h("button",{type:"button",class:"ghost",onclick:()=>{const t=nx.value.trim();if(!t)return;x.steps=(x.steps||[]).concat([{t,date:n.key}]);x.next="";persist();pinProjSheet(pid,x)}},"Step done"),msg));
   const dt=h("input",{type:"date",class:"inp",value:x.target||""});
   body.append(h("div",{class:"field"},h("label",null,"Target date (optional)"),dt),
     h("p",{class:"hint"},"A date you set yourself still turns this into a real countdown, and it tends to make things move."),
-    h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{x.target=dt.value;persist();pinSheet(pid,x)}},"Save date"),
-      x.target?h("button",{type:"button",class:"quiet",onclick:()=>{x.target="";persist();pinSheet(pid,x)}},"Remove date"):null));
+    h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{x.target=dt.value;persist();pinProjSheet(pid,x)}},"Save date"),
+      x.target?h("button",{type:"button",class:"quiet",onclick:()=>{x.target="";persist();pinProjSheet(pid,x)}},"Remove date"):null));
   body.append(h("div",{class:"row",style:"justify-content:space-between;border-top:1px solid var(--line);padding-top:12px"},
     h("button",{type:"button",class:"primary",onclick:()=>{x.pinned=false;x.done=true;x.steps=(x.steps||[]).concat([{t:"Finished",date:n.key}]);persist();closeSheet()}},"Mark finished"),
-    h("button",{type:"button",class:"quiet",onclick:()=>{x.pinned=!x.pinned;if(x.pinned&&!x.since)x.since=n.key;persist();pinSheet(pid,x)}},x.pinned?"Unpin":"Pin to Today")));
+    h("button",{type:"button",class:"quiet",onclick:()=>{x.pinned=!x.pinned;if(x.pinned&&!x.since)x.since=n.key;persist();pinProjSheet(pid,x)}},x.pinned?"Unpin":"Pin to Today")));
   openSheet(x.title,body);
 }
 function countdownSheet(pid,c){
@@ -3756,7 +3756,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-o";
+const APP_VERSION="2026-11-15-p";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
