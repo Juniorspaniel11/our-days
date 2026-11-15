@@ -545,6 +545,10 @@ html,body{margin:0}
 .tz{cursor:pointer;font-family:inherit;color:inherit}
 .tz.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .tz:disabled{cursor:default}
+.pvbar{position:sticky;top:6px;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#e2557c,#7b5fcf);color:#fff;border-radius:16px;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.pvbar span{display:flex;flex-direction:column;line-height:1.2}.pvbar b{font-size:16px}.pvbar small{font-size:12.5px;opacity:.9}
+.pvbar button{background:#fff;color:#2a2340;border:0;border-radius:999px;padding:8px 16px;font:inherit;font-weight:700;font-size:15px}
+.robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
 .robar button{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:14px}
@@ -1161,7 +1165,7 @@ const me=()=>S.viewAs;
 const partnerOf=id=>P(id).partner;
 
 /* ---------- sync ---------- */
-let DB=null,AUTH=null,ME=null,CID=null,PARTNER=null,unsubs=[],partnerUnsubs=[];
+let PREVIEW=null,DB=null,AUTH=null,ME=null,CID=null,PARTNER=null,unsubs=[],partnerUnsubs=[];
 const sent={};
 const clean=o=>JSON.parse(JSON.stringify(o===undefined?null:o));
 const js=o=>JSON.stringify(o);
@@ -1172,7 +1176,7 @@ const extraRef=u=>DB.doc("couples/"+CID+"/people/"+u+"/extra/photo");
 const sharedRef=()=>DB.doc("couples/"+CID+"/shared/main");
 let syncT=null;
 let dirty=false;
-function persist(){saveLocal();if(!ME||!CID)return;dirty=true;clearTimeout(syncT);syncT=setTimeout(flush,400)}
+function persist(){if(PREVIEW)return;saveLocal();if(!ME||!CID)return;dirty=true;clearTimeout(syncT);syncT=setTimeout(flush,400)}
 function hasContent(d){return d&&((d.tasks&&d.tasks.length)||(d.done&&d.done.length)||(d.skip&&d.skip.length)||(d.habits&&d.habits.length)||(d.checkin&&Object.keys(d.checkin).length))}
 function flush(){
   if(!DB||!ME||!CID)return;const p=S.people[ME];if(!p||!p.loaded)return;dirty=false;
@@ -3657,6 +3661,9 @@ function settingsSheet(){
     h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{p.name=nm.value.trim()||p.name;p.city=ct.value.trim()||p.city;p.phone=ph.value.trim();
       const t=tzi.value.trim();try{new Intl.DateTimeFormat("en-US",{timeZone:t});p.tz=t}catch(e){}persist();DB.doc("users/"+ME).set({name:p.name,city:p.city,tz:p.tz,cid:CID},{merge:true});render();settingsSheet()}},"Save profile"),
       h("button",{type:"button",class:"quiet",onclick:()=>{tzi.value=Intl.DateTimeFormat().resolvedOptions().timeZone}},"Use this device's time zone")));
+  if(!PREVIEW&&PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder)body.append(h("div",{class:"lbl"},"See "+plainNm(PARTNER)+"'s screen"),
+    h("p",{class:"hint"},"Opens the whole app exactly as "+plainNm(PARTNER)+" sees it on her phone, every tab. Nothing you tap there saves."),
+    h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:previewAs},"👀 Preview "+plainNm(PARTNER)+"'s app")));
   body.append(h("div",{class:"lbl"},"Shared space code"),h("div",{class:"code",style:"font-size:18px"},S.code||CID||""),
     h("p",{class:"hint"},"Your partner joins with this code."),
     h("div",{class:"row"},confirmBtn("Sign out",()=>{AUTH.signOut()})));
@@ -3694,6 +3701,19 @@ function renderTimer(){
 setInterval(()=>{if(S.timer)renderTimer()},1000);
 
 /* ---------- shell ---------- */
+/* ---------- preview: see the app exactly as the partner sees it, nothing saves ---------- */
+function blockWrites(){const F=firebase.firestore,ok=()=>Promise.resolve();
+  try{["set","update","delete"].forEach(m=>{F.DocumentReference.prototype[m]=ok});
+    F.CollectionReference.prototype.add=()=>Promise.resolve({id:"preview",delete:ok});
+    F.WriteBatch.prototype.commit=ok;F.WriteBatch.prototype.set=function(){return this};F.WriteBatch.prototype.update=function(){return this};F.WriteBatch.prototype.delete=function(){return this}}catch(e){return false}
+  if(AUTH)AUTH.signOut=()=>{toast("Preview","Sign out is off while you preview");return Promise.resolve()};return F.DocumentReference.prototype.set===ok&&F.CollectionReference.prototype.add.length===0}
+function previewAs(){const o=PARTNER;if(!o||!P(o)||P(o).placeholder)return;
+  if(!blockWrites()){toast("Preview not available","Couldn't switch safely, so nothing changed.");return}PREVIEW={real:ME};ME=o;PARTNER=PREVIEW.real;S.viewAs=ME;ui.sel=null;ui.weekOff=0;ui.visAdd=false;ui.habitEdit=false;ui.projEdit=null;
+  try{closeSheet()}catch(e){}S.tab=S.tab==="home"?"today":S.tab;render();window.scrollTo({top:0});
+  toast("This is "+plainNm(ME)+"'s screen","Tap around freely. Nothing you do here saves.")}
+function previewBar(){if(!PREVIEW)return null;
+  return h("div",{class:"pvbar"},h("span",null,h("b",null,"👀 "+plainNm(ME)+"'s screen"),h("small",null,"Preview · nothing saves")),
+    h("button",{type:"button",onclick:()=>{location.reload()}},"Exit"))}
 function go(tab){S.tab=tab;persist();render();window.scrollTo({top:0})}
 function render(){
   if(S.tab==="week")S.tab="today";
@@ -3722,9 +3742,9 @@ function render(){
         :h("button",{type:"button",class:"tzst",onclick:()=>toast(nm(id)+(pr.on?" is online":" · "+(pr.text||"offline")),st.e+" "+st.t),title:st.t},h("span",{class:"e"},st.e),h("span",{class:"t"},st.t)))}
     sl.appendChild(row)});
   const th=S.theme||"system";if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
-  const main=el("main");main.innerHTML="";
+  const main=el("main");main.innerHTML="";document.body.classList.toggle("preview",!!PREVIEW);{const pb=previewBar();if(pb)main.appendChild(pb)}
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
-    h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
+    h("div",{class:"robtns"},!PREVIEW&&pid===PARTNER?h("button",{type:"button",class:"pv",onclick:previewAs},"👀 See "+plainNm(pid)+"'s screen"):null,h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine"))));
   const v={today:viewToday,projects:viewProjects,us:viewUs,home:viewHome,future:viewFuture}[S.tab]();
   v.filter(Boolean).forEach(x=>main.appendChild(x));
   renderTimer();
@@ -3736,7 +3756,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-n";
+const APP_VERSION="2026-11-15-o";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
