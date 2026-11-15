@@ -3021,7 +3021,7 @@ function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
   const before=p.vision.length;p.vision=p.vision.filter(x=>!/^I am Dr\b/i.test((x.t||"").trim()));if(p.vision.length!==before)ch=true;
   if(ch)persist()}
 /* key words in gold */
-const VKEYS=["science, music and faith","heal hearts","lift spirits","open doors","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
+const VKEYS=["science, music and faith","heal hearts","lift spirits","open doors","the poor, the disabled, and the brilliant but needy","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
 function vHi(t){const ks=VKEYS.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   const re=new RegExp("("+ks.join("|")+"|\\b\\d[\\d,]*\\b)","gi"),out=[];let last=0,m;
   while((m=re.exec(t))){if(m.index>last)out.push(t.slice(last,m.index));const w=m[0];out.push(h("span",{class:"vk"+(/foundation/i.test(w)&&/aboagye/i.test(w)?" fn":"")},w));last=m.index+w.length}
@@ -3056,7 +3056,7 @@ function visionSection(){const p=P(ME);p.vision=p.vision||[];visionTidy(p);const
   return h("section",{class:"vboard",id:"visionBoard"},
     h("div",{class:"vhead"},h("div",null,h("small",null,"Future me"),h("h2",null,"My vision")),h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
     h("div",{class:"vplate"},h("small",null,"I am"),h("b",null,"Dr. "+fn+", PhD")),
-    (()=>{const ms=p.mission!=null?p.mission:((nm(ME)||"").toLowerCase()==="joel"?"I use science, music and faith to heal hearts, lift spirits and open doors for people the world overlooks.":"");
+    (()=>{if(p.mission==="I use science, music and faith to heal hearts, lift spirits and open doors for people the world overlooks.")p.mission="I use science, music and faith to heal hearts, lift spirits and open doors for the poor, the disabled, and the brilliant but needy.";const ms=p.mission!=null?p.mission:((nm(ME)||"").toLowerCase()==="joel"?"I use science, music and faith to heal hearts, lift spirits and open doors for the poor, the disabled, and the brilliant but needy.":"");
       return h("button",{type:"button",class:"vmission"+(ms?"":" empty"),"aria-label":"Edit my mission",onclick:()=>missionSheet(ms)},h("small",null,"My mission"),ms?h("span",null,vHi(ms)):h("span",null,"＋ Add one sentence on why you exist"))})(),
     adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,c:cat,e:(VCATS.find(z=>z[0]===cat)||VCATS[7])[2],at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","")}},
       h("small",{class:"vsub"},"Which part of life?"),cc,ti,h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")):null,
@@ -3719,7 +3719,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-j";
+const APP_VERSION="2026-11-15-k";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
