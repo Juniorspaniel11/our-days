@@ -178,6 +178,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .vcard.done{background:linear-gradient(135deg,rgba(255,211,107,.38),rgba(255,211,107,.12));border-color:#ffd36b;box-shadow:0 0 20px rgba(255,211,107,.25)}
 .vcard.done .vemo{background:#ffd36b}
 .vcard.ex{opacity:.72;border-style:dashed}
+.vexa{display:flex;flex-direction:column;gap:6px;align-items:center}.vx{background:none;border:0;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;line-height:1;padding:0}
 .vact{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font-size:17px;font-weight:900;cursor:pointer;flex:none}
 .vform{display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(255,211,107,.3);padding-top:12px}
 .vform .inp{background:rgba(255,255,255,.95);color:#22212b}
@@ -1800,7 +1801,6 @@ function viewToday(){
   const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
-    isT?futureBanner(pid):null,
     isT?todayHero(pid):null,
     isT?growMe(pid):null,
     pid===ME?bigBanner():null,
@@ -2984,14 +2984,15 @@ function visionSection(){const p=P(ME),L=vList(ME),adding=!!ui.visAdd;p.vision=p
     yi=h("input",{type:"number",class:"inp",placeholder:"Year (optional)",min:"2025",max:"2100","aria-label":"Year"});
   const ec=h("div",{class:"vemos"},VEMO.map(e=>h("button",{type:"button","aria-label":"Pick "+e,onclick:ev=>{pick=e;ec.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===ev.currentTarget))}},emo(e,24,false))));
   const card=(x,ex)=>h("div",{class:"vcard"+(x.done?" done":"")+(ex?" ex":"")},h("span",{class:"vemo"},emo(x.e||kwEmoji(x.t)||"✨",34,false)),
-    h("div",{class:"vtx"},h("b",null,x.t),h("small",null,ex?"Example · tap ＋ to keep it":[x.yr?"By "+x.yr:"",x.done?"✨ Manifested "+(x.doneAt?shortDate(x.doneAt):""):""].filter(Boolean).join(" · ")||"Becoming")),
-    ex?h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,at:Date.now()});persist();render();toast("Vision added ✨",x.t)}},"＋")
+    h("div",{class:"vtx"},h("b",null,x.t),h("small",null,ex?"Example · ＋ to keep, × to hide":[x.yr?"By "+x.yr:"",x.done?"✨ Manifested "+(x.doneAt?shortDate(x.doneAt):""):""].filter(Boolean).join(" · ")||"Becoming")),
+    ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,at:Date.now()});persist();render();toast("Vision added ✨",x.t)}},"＋"),
+        h("button",{type:"button",class:"vx","aria-label":"Hide this example",onclick:()=>{(p.visionHide=p.visionHide||[]).push(x.t);persist();render()}},"×"))
       :h("button",{type:"button",class:"vact","aria-label":"Options",onclick:()=>visionSheet(x)},"⋯"));
   return h("section",{class:"vboard",id:"visionBoard"},
     h("div",{class:"vhead"},h("div",null,h("small",null,"Future me"),h("h2",null,"My vision")),h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
     h("p",{class:"vsub"},"Who you're becoming, written as if it's already true."),
-    (()=>{const on=((p.settings||{}).visionDaily)!==false;return h("button",{type:"button",class:"vtog","role":"switch","aria-checked":String(on),onclick:()=>{p.settings=p.settings||{};p.settings.visionDaily=!on;persist();render();toast(on?"Hidden from Today":"Showing on Today ✨",on?"Your vision stays here on the board":"One vision greets you each day")}},h("span",{class:"vsw"+(on?" on":"")}),"Show one on my Today page each day")})(),
-    L.length?L.map(x=>card(x)):VIS_EX(fullName(ME)).map(([e,t])=>card({e,t},true)),
+    L.map(x=>card(x)),
+    VIS_EX(fullName(ME)).filter(([e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!(p.visionHide||[]).includes(t)).map(([e,t])=>card({e,t},true)),
     adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,e:pick||kwEmoji(t)||"✨",yr:yi.value||"",at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","You'll see it on your Today page")}},
       ti,h("div",{class:"row",style:"gap:8px"},h("div",{style:"flex:1 1 140px"},yi),h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")),h("small",{class:"vsub"},"Pick a picture (optional)"),ec):null)}
 function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"2","aria-label":"Edit vision"});ti.value=x.t;const yi=h("input",{type:"number",class:"inp",value:x.yr||"",placeholder:"Year (optional)","aria-label":"Year"});
@@ -3651,7 +3652,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-b";
+const APP_VERSION="2026-11-15-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
