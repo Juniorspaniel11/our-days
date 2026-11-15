@@ -153,6 +153,33 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .dtx b{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.2;overflow-wrap:break-word;word-break:normal;hyphens:auto}
 @media (max-width:400px){.dtx b{font-size:16px}.dtx small{font-size:10.5px!important}.dt{padding:11px 10px;gap:8px}}
 .dmore{font-size:13.5px;opacity:.85}
+.fmb{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:22px;padding:14px 16px;cursor:pointer;color:#fff;border:1px solid rgba(255,211,107,.5);
+  background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.55) 0 1px,transparent 2px),radial-gradient(circle at 62% 80%,rgba(255,255,255,.4) 0 1px,transparent 2px),radial-gradient(120% 90% at 0% 0%,rgba(255,211,107,.32),transparent 60%),linear-gradient(135deg,#251a3d,#4a2f5e 55%,#7a5520);box-shadow:0 12px 28px rgba(60,35,20,.28)}
+.fmbx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.fmbx small{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#ffd36b}
+.fmbx b{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-style:italic;font-size:23px;line-height:1.2;color:#ffe1a1;text-shadow:0 0 18px rgba(255,211,107,.35)}
+.fmbx span{font-size:13px;opacity:.85}
+.fmbe{flex:none}
+.vboard{border-radius:28px;padding:18px 16px;color:#fff;display:flex;flex-direction:column;gap:11px;border:1px solid rgba(255,211,107,.45);box-shadow:0 16px 36px rgba(40,25,60,.3);
+  background:radial-gradient(circle at 10% 12%,rgba(255,255,255,.6) 0 1px,transparent 2px),radial-gradient(circle at 80% 8%,rgba(255,255,255,.5) 0 1px,transparent 2px),radial-gradient(circle at 45% 55%,rgba(255,255,255,.3) 0 1px,transparent 2px),radial-gradient(circle at 92% 70%,rgba(255,255,255,.45) 0 1px,transparent 2px),radial-gradient(110% 60% at 50% 115%,rgba(255,211,107,.35),transparent 60%),linear-gradient(165deg,#1c1530,#3a2550 55%,#5e3f1d)}
+.vhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.vhead small{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#ffd36b}
+.vhead h2{margin:2px 0 0;font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:30px;color:#ffe1a1;line-height:1.05}
+.vsub{margin:0;font-size:14px;opacity:.85}
+.vbtn{border:1px solid rgba(255,211,107,.6);background:rgba(255,211,107,.12);color:#ffd36b;border-radius:999px;padding:7px 14px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}
+.vbtn.solid{background:#ffd36b;color:#3a2550;border-color:#ffd36b}
+.vcard{display:flex;align-items:center;gap:12px;border-radius:18px;padding:12px 12px 12px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,211,107,.3)}
+.vemo{width:50px;height:50px;border-radius:50%;background:rgba(255,211,107,.14);display:grid;place-items:center;flex:none}
+.vtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.vtx b{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:20.5px;line-height:1.22;color:#fff;overflow-wrap:break-word}
+.vtx small{font-size:12.5px;color:#ffd36b;font-weight:700}
+.vcard.done{background:linear-gradient(135deg,rgba(255,211,107,.38),rgba(255,211,107,.12));border-color:#ffd36b;box-shadow:0 0 20px rgba(255,211,107,.25)}
+.vcard.done .vemo{background:#ffd36b}
+.vcard.ex{opacity:.72;border-style:dashed}
+.vact{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font-size:17px;font-weight:900;cursor:pointer;flex:none}
+.vform{display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(255,211,107,.3);padding-top:12px}
+.vform .inp{background:rgba(255,255,255,.95);color:#22212b}
+.vemos{display:flex;flex-wrap:wrap;gap:6px}.vemos button{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);cursor:pointer;display:grid;place-items:center}.vemos button.on{background:#ffd36b;border-color:#ffd36b}
 .notebook{position:relative;border-radius:6px 22px 22px 6px;padding:0 16px 10px 48px;background:repeating-linear-gradient(#fffdf3 0 37px,#cfdcf0 37px 38px);border:1px solid #e9dcb8;box-shadow:0 10px 24px rgba(120,90,30,.16);color:#2b2a33;font-family:"Caveat","Patrick Hand","Segoe Print",cursive;overflow:hidden}
 .notebook::before{content:"";position:absolute;left:36px;top:0;bottom:0;width:2px;background:#f0a3a3}
 .notebook::after{content:"";position:absolute;left:12px;top:12px;width:13px;height:13px;border-radius:50%;background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
@@ -1771,6 +1798,7 @@ function viewToday(){
   const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
+    isT?futureBanner(pid):null,
     isT?todayHero(pid):null,
     isT?growMe(pid):null,
     pid===ME?bigBanner():null,
@@ -2935,7 +2963,38 @@ function homeDesignSection(){const link=US.main.homeLink||"";
       h("div",{style:"flex:1 1 220px"},inp),h("button",{type:"submit",class:"ghost"},link?"Update":"Save link")),
     !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
 
-function viewHome(){return [savingsSection(),wishSection(),homeDesignSection()]}
+function viewHome(){return [visionSection(),savingsSection(),wishSection(),homeDesignSection()]}
+
+/* ---------- Future me: vision board ---------- */
+const VEMO=["🎓","🤝","🔬","🏡","💍","👨‍👩‍👧","💰","🌍","✈️","🙏","💪","📚","🏆","❤️","✨"];
+const vList=pid=>((P(pid)||{}).vision||[]).filter(x=>x&&x.t);
+const VIS_EX=n=>[["🎓","I am Dr. "+n+", PhD"],["🤝","My foundation lifts families out of poverty"],["🔬","My research changes lives"],["🏡","We live in our dream home, full of peace and love"]];
+function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)return null;
+  const live=L.filter(x=>!x.done),pool=live.length?live:L,k=tzNow(P(pid).tz).key,v=pool.length?pool[hashN(k+"fm",pool.length)]:null,dn=L.filter(x=>x.done).length;
+  return h("button",{type:"button",class:"fmb tap",onclick:()=>{if(ro)return;go("home");setTimeout(()=>{const x=el("visionBoard");if(x)x.scrollIntoView({behavior:"smooth",block:"start"})},80)}},
+    h("div",{class:"fmbx"},h("small",null,ro?nm(pid)+"'s future":"✨ Future me · say it today"),h("b",null,v?v.t:"I am Dr. "+nm(pid)+"."),
+      h("span",null,L.length?(dn?dn+" of "+L.length+" manifested":L.length+(L.length===1?" vision":" visions")+" · tap to see them all"):"Tap to write your vision")),
+    h("span",{class:"fmbe"},emo(v?v.e||kwEmoji(v.t)||"✨":"🎓",44,true)))}
+function visionSection(){const p=P(ME),L=vList(ME),adding=!!ui.visAdd;p.vision=p.vision||[];
+  let pick=null;const ti=h("textarea",{class:"inp",rows:"2",placeholder:"Write it as if it's already true, e.g. I run a foundation that feeds 1,000 families","aria-label":"Your vision"}),
+    yi=h("input",{type:"number",class:"inp",placeholder:"Year (optional)",min:"2025",max:"2100","aria-label":"Year"});
+  const ec=h("div",{class:"vemos"},VEMO.map(e=>h("button",{type:"button","aria-label":"Pick "+e,onclick:ev=>{pick=e;ec.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===ev.currentTarget))}},emo(e,24,false))));
+  const card=(x,ex)=>h("div",{class:"vcard"+(x.done?" done":"")+(ex?" ex":"")},h("span",{class:"vemo"},emo(x.e||kwEmoji(x.t)||"✨",34,false)),
+    h("div",{class:"vtx"},h("b",null,x.t),h("small",null,ex?"Example · tap ＋ to keep it":[x.yr?"By "+x.yr:"",x.done?"✨ Manifested "+(x.doneAt?shortDate(x.doneAt):""):""].filter(Boolean).join(" · ")||"Becoming")),
+    ex?h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,at:Date.now()});persist();render();toast("Vision added ✨",x.t)}},"＋")
+      :h("button",{type:"button",class:"vact","aria-label":"Options",onclick:()=>visionSheet(x)},"⋯"));
+  return h("section",{class:"vboard",id:"visionBoard"},
+    h("div",{class:"vhead"},h("div",null,h("small",null,"Future me"),h("h2",null,"My vision")),h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
+    h("p",{class:"vsub"},"Who you're becoming, written as if it's already true. One of these greets you on the Today page every day."),
+    L.length?L.map(x=>card(x)):VIS_EX(nm(ME)).map(([e,t])=>card({e,t},true)),
+    adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,e:pick||kwEmoji(t)||"✨",yr:yi.value||"",at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","You'll see it on your Today page")}},
+      ti,h("div",{class:"row",style:"gap:8px"},h("div",{style:"flex:1 1 140px"},yi),h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")),h("small",{class:"vsub"},"Pick a picture (optional)"),ec):null)}
+function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"2","aria-label":"Edit vision"});ti.value=x.t;const yi=h("input",{type:"number",class:"inp",value:x.yr||"",placeholder:"Year (optional)","aria-label":"Year"});
+  openSheet("Future me",h("div",{class:"tmenu"},
+    x.done?h("button",{type:"button",class:"tmbtn",onclick:()=>{x.done=false;x.doneAt=null;persist();closeSheet()}},"↺ Not yet"):h("button",{type:"button",class:"tmbtn ok",style:"background:linear-gradient(135deg,#c8902a,#8a5a1b);border-color:#c8902a",onclick:()=>{x.done=true;x.doneAt=tzNow(p.tz).key;persist();closeSheet();confetti(260);toast("✨ Manifested!","“"+x.t+"” came true. Thank God.")}},"✨ It came true! Mark manifested"),
+    h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;x.t=t;x.yr=yi.value||"";persist();closeSheet()}},ti,yi,h("button",{type:"submit",class:"ghost"},"Save changes")),
+    h("button",{type:"button",class:"tmbtn",onclick:()=>{p.vision=p.vision.filter(y=>y.id!==x.id);persist();closeSheet()}},"🗑 Remove")))}
+
 
 /* ---------- Big day alerts ---------- */
 function bigToday(u){const p=P(u);if(!p||p.placeholder)return [];const k=tzNow(p.tz).key;return Object.entries(p.bigdays||{}).map(([id,x])=>({id,...x})).filter(x=>x.date===k)}
@@ -3587,7 +3646,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-14-a";
+const APP_VERSION="2026-11-15-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
