@@ -166,6 +166,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .vhead small{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#ffd36b}
 .vhead h2{margin:2px 0 0;font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:30px;color:#ffe1a1;line-height:1.05}
 .vsub{margin:0;font-size:14px;opacity:.85}
+.vtog{display:flex;align-items:center;gap:10px;background:none;border:0;color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:0;text-align:left}
+.vsw{position:relative;width:42px;height:24px;border-radius:999px;background:rgba(255,255,255,.25);flex:none;transition:background .2s}.vsw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}.vsw.on{background:#ffd36b}.vsw.on::after{left:21px}
 .vbtn{border:1px solid rgba(255,211,107,.6);background:rgba(255,211,107,.12);color:#ffd36b;border-radius:999px;padding:7px 14px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}
 .vbtn.solid{background:#ffd36b;color:#3a2550;border-color:#ffd36b}
 .vcard{display:flex;align-items:center;gap:12px;border-radius:18px;padding:12px 12px 12px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,211,107,.3)}
@@ -2968,11 +2970,13 @@ function viewHome(){return [visionSection(),savingsSection(),wishSection(),homeD
 /* ---------- Future me: vision board ---------- */
 const VEMO=["🎓","🤝","🔬","🏡","💍","👨‍👩‍👧","💰","🌍","✈️","🙏","💪","📚","🏆","❤️","✨"];
 const vList=pid=>((P(pid)||{}).vision||[]).filter(x=>x&&x.t);
-const VIS_EX=n=>[["🎓","I am Dr. "+n+", PhD"],["🤝","My foundation lifts families out of poverty"],["🔬","My research changes lives"],["🏡","We live in our dream home, full of peace and love"]];
-function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)return null;
+const FULLN={joel:"Joel Kofi Aboagye",fiona:"Fiona Antoinette Quarshie"};
+const fullName=pid=>{const p=P(pid)||{};return p.fullName||FULLN[(nm(pid)||"").toLowerCase()]||nm(pid)};
+const VIS_EX=n=>[["🎓","I am Dr. "+n],["🤝","My foundation lifts families out of poverty"],["🔬","My research changes lives"],["🏡","We live in our dream home, full of peace and love"]];
+function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)return null;if(((P(pid).settings||{}).visionDaily)===false)return null;
   const live=L.filter(x=>!x.done),pool=live.length?live:L,k=tzNow(P(pid).tz).key,v=pool.length?pool[hashN(k+"fm",pool.length)]:null,dn=L.filter(x=>x.done).length;
   return h("button",{type:"button",class:"fmb tap",onclick:()=>{if(ro)return;go("home");setTimeout(()=>{const x=el("visionBoard");if(x)x.scrollIntoView({behavior:"smooth",block:"start"})},80)}},
-    h("div",{class:"fmbx"},h("small",null,ro?nm(pid)+"'s future":"✨ Future me · say it today"),h("b",null,v?v.t:"I am Dr. "+nm(pid)+"."),
+    h("div",{class:"fmbx"},h("small",null,ro?nm(pid)+"'s future":"✨ Future me · say it today"),h("b",null,v?v.t:"I am Dr. "+fullName(pid)),
       h("span",null,L.length?(dn?dn+" of "+L.length+" manifested":L.length+(L.length===1?" vision":" visions")+" · tap to see them all"):"Tap to write your vision")),
     h("span",{class:"fmbe"},emo(v?v.e||kwEmoji(v.t)||"✨":"🎓",44,true)))}
 function visionSection(){const p=P(ME),L=vList(ME),adding=!!ui.visAdd;p.vision=p.vision||[];
@@ -2985,8 +2989,9 @@ function visionSection(){const p=P(ME),L=vList(ME),adding=!!ui.visAdd;p.vision=p
       :h("button",{type:"button",class:"vact","aria-label":"Options",onclick:()=>visionSheet(x)},"⋯"));
   return h("section",{class:"vboard",id:"visionBoard"},
     h("div",{class:"vhead"},h("div",null,h("small",null,"Future me"),h("h2",null,"My vision")),h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
-    h("p",{class:"vsub"},"Who you're becoming, written as if it's already true. One of these greets you on the Today page every day."),
-    L.length?L.map(x=>card(x)):VIS_EX(nm(ME)).map(([e,t])=>card({e,t},true)),
+    h("p",{class:"vsub"},"Who you're becoming, written as if it's already true."),
+    (()=>{const on=((p.settings||{}).visionDaily)!==false;return h("button",{type:"button",class:"vtog","role":"switch","aria-checked":String(on),onclick:()=>{p.settings=p.settings||{};p.settings.visionDaily=!on;persist();render();toast(on?"Hidden from Today":"Showing on Today ✨",on?"Your vision stays here on the board":"One vision greets you each day")}},h("span",{class:"vsw"+(on?" on":"")}),"Show one on my Today page each day")})(),
+    L.length?L.map(x=>card(x)):VIS_EX(fullName(ME)).map(([e,t])=>card({e,t},true)),
     adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,e:pick||kwEmoji(t)||"✨",yr:yi.value||"",at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","You'll see it on your Today page")}},
       ti,h("div",{class:"row",style:"gap:8px"},h("div",{style:"flex:1 1 140px"},yi),h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")),h("small",{class:"vsub"},"Pick a picture (optional)"),ec):null)}
 function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"2","aria-label":"Edit vision"});ti.value=x.t;const yi=h("input",{type:"number",class:"inp",value:x.yr||"",placeholder:"Year (optional)","aria-label":"Year"});
@@ -3646,7 +3651,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-a";
+const APP_VERSION="2026-11-15-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
