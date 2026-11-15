@@ -2983,8 +2983,8 @@ const VCATS=[["faith","Faith","🙏"],["character","Character","🕊️"],["fami
 const vCat=x=>x.c||((/integrity|humility|humble|honest|kind/i.test(x.t))?"character":(/wife|husband|children|family|home|marri/i.test(x.t))?"family":/god|faith|pray|church/i.test(x.t)?"faith":/foundation|needy|poor|disab|give|students who|fees/i.test(x.t)?"impact":/research|lab|career|work|professor|lead/i.test(x.t)?"career":/own|asset|propert|business|invest|wealth|income/i.test(x.t)?"wealth":/health|strong|fit|energy/i.test(x.t)?"health":/learn|skill|read|accent|language/i.test(x.t)?"growth":"life");
 const VH="I am a faithful, patient and present husband. I pray with Fiona, I listen to her, and I put our marriage before my work. She feels loved, safe and honoured every day.",
   VF="I am a present and joyful father. I am home for dinner and I show up for my children's big moments. They know they are loved, they know God, and they learn from me to give.",
-  VFO="My foundation serves genuinely needy people in Ghana and the United States. In the United States we help struggling families with food, rent support and job training.",
-  VS="Every year my foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning. They grow up to mentor the next ones, and the circle keeps growing.",
+  VFO="The Joel & Fiona Aboagye Foundation serves genuinely needy people in Ghana and the United States. In the United States we help struggling families with food, rent support and job training.",
+  VS="Every year our foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning. They grow up to mentor the next ones, and the circle keeps growing.",
   VL="I lead my own funded cardiovascular research lab. Our discoveries reach patients, and I mentor young scientists from Ghana and beyond the way I was mentored.";
 const VJOEL=[
   ["faith","⛪","I walk closely with God, and our family serves faithfully in our church."],
@@ -2996,8 +2996,8 @@ const VJOEL=[
   ["career","📜","I defend my PhD with strong first author papers and a clear next step waiting for me."],
   ["career","🔬",VL],
   ["impact","🌍",VFO],["impact","🎓",VS],
-  ["impact","🤝","My foundation gives disabled people who sell on the streets a steady monthly income, skills training and a place to work with dignity."],
-  ["wealth","💰","I own assets in Ghana and the United States that earn for my family every month and fund the foundation."]];
+  ["impact","🤝","Our foundation gives disabled people who sell on the streets a steady monthly income, skills training and a place to work with dignity."],
+  ["wealth","💰","I own assets in Ghana and the United States that earn for my family every month and fund our foundation."]];
 /* one time tidy: earlier example wordings the user kept are updated and merged */
 const VMERGE=[[VH,"family","💍",["I am a faithful, patient and present husband. Fiona feels loved, safe and honoured by me every day.","I pray with my wife, I listen to her, and I put our marriage before my work."]],
   [VF,"family","👨‍👧",["I am a present and joyful father. My children know they are loved, they know God, and they see in me a man of integrity.","I am home for dinner, I show up for my children's big moments, and I teach them to give."]],
@@ -3005,6 +3005,8 @@ const VMERGE=[[VH,"family","💍",["I am a faithful, patient and present husband
   [VS,"impact","🎓",["Every year my foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning.","The students we support come back to mentor the next ones, and the circle keeps growing."]],
   [VL,"career","🔬",["I lead my own funded cardiovascular research lab, and our discoveries reach patients.","I mentor young scientists from Ghana and beyond the way I was mentored."]]];
 function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
+  const RN=[[/^My foundation serves genuinely needy people/,"The Joel & Fiona Aboagye Foundation serves genuinely needy people"],[/^Every year my foundation pays/,"Every year our foundation pays"],[/^My foundation gives disabled people/,"Our foundation gives disabled people"],[/fund the foundation\.$/,"fund our foundation."],[/^I use my gifts and resources to lift up people who genuinely need help\.$/,"Through the Joel & Fiona Aboagye Foundation, I use my gifts and resources to lift up people who genuinely need help."]];
+  p.vision.forEach(x=>RN.forEach(([re,to])=>{if(re.test(x.t)){x.t=x.t.replace(re,to);ch=true}}));
   VMERGE.forEach(([nt,c,e,olds])=>{const hits=p.vision.filter(x=>olds.some(o=>norm(o)===norm(x.t)));if(!hits.length)return;
     const has=p.vision.find(x=>norm(x.t)===norm(nt));const keep=has||hits[0];keep.t=nt;keep.c=c;keep.e=e;
     p.vision=p.vision.filter(x=>x===keep||!hits.includes(x));ch=true});
@@ -3014,7 +3016,7 @@ const VIS_EX=pid=>{const me=(nm(pid)||"").toLowerCase()==="joel",o=partnerOf(pid
   ["family","👨‍👩‍👧","My husband "+o+", our children and I live in our own beautiful home, full of God's peace, love and laughter."],
   ["faith","🙏","I walk closely with God, and my faith carries our home."],
   ["career","🔬","My work opens doors and changes lives."],
-  ["impact","🤝","I use my gifts and resources to lift up people who genuinely need help."],
+  ["impact","🤝","Through the Joel & Fiona Aboagye Foundation, I use my gifts and resources to lift up people who genuinely need help."],
   ["wealth","💰","I own assets that earn for my family every month."],
   ["health","💪","I am healthy, strong and full of energy for my family and my work."]]};
 function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)return null;if(((P(pid).settings||{}).visionDaily)===false)return null;
@@ -3699,7 +3701,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-f";
+const APP_VERSION="2026-11-15-g";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
