@@ -2979,27 +2979,38 @@ const VEMO=["🎓","🤝","🔬","🏡","💍","👨‍👩‍👧","💰","🌍
 const vList=pid=>((P(pid)||{}).vision||[]).filter(x=>x&&x.t);
 const FULLN={joel:"Joel Kofi Aboagye",fiona:"Fiona Antoinette Quarshie"};
 const fullName=pid=>{const p=P(pid)||{};return p.fullName||FULLN[(nm(pid)||"").toLowerCase()]||nm(pid)};
-const VCATS=[["family","Family","👨‍👩‍👧"],["faith","Faith","🙏"],["impact","Impact","🤝"],["career","Career","🔬"],["wealth","Wealth","💰"],["health","Health","💪"],["growth","Growth","📚"],["life","Life","✨"]];
-const vCat=x=>x.c||((/wife|husband|children|family|home|marri/i.test(x.t))?"family":/god|faith|pray|church/i.test(x.t)?"faith":/foundation|needy|poor|disab|give|students who|fees/i.test(x.t)?"impact":/research|lab|career|work|professor|lead/i.test(x.t)?"career":/own|asset|propert|business|invest|wealth|income/i.test(x.t)?"wealth":/health|strong|fit|energy/i.test(x.t)?"health":/learn|skill|read|accent|language/i.test(x.t)?"growth":"life");
-const VIS_EX=pid=>{const me=(nm(pid)||"").toLowerCase()==="joel",o=partnerOf(pid)&&P(partnerOf(pid))?nm(partnerOf(pid)):"my partner";
-  return me?[
-  ["family","💍","I am a faithful, patient and present husband. Fiona feels loved, safe and honoured by me every day."],
-  ["family","🙏","I pray with my wife, I listen to her, and I put our marriage before my work."],
-  ["family","👨‍👧","I am a present and joyful father. My children know they are loved, they know God, and they see in me a man of integrity."],
-  ["family","🍽️","I am home for dinner, I show up for my children's big moments, and I teach them to give."],
+const VCATS=[["faith","Faith","🙏"],["character","Character","🕊️"],["family","Family","👨‍👩‍👧"],["health","Health","💪"],["career","Career","🔬"],["impact","Impact","🤝"],["wealth","Wealth","💰"],["growth","Growth","📚"],["life","Life","✨"]];
+const vCat=x=>x.c||((/integrity|humility|humble|honest|kind/i.test(x.t))?"character":(/wife|husband|children|family|home|marri/i.test(x.t))?"family":/god|faith|pray|church/i.test(x.t)?"faith":/foundation|needy|poor|disab|give|students who|fees/i.test(x.t)?"impact":/research|lab|career|work|professor|lead/i.test(x.t)?"career":/own|asset|propert|business|invest|wealth|income/i.test(x.t)?"wealth":/health|strong|fit|energy/i.test(x.t)?"health":/learn|skill|read|accent|language/i.test(x.t)?"growth":"life");
+const VH="I am a faithful, patient and present husband. I pray with Fiona, I listen to her, and I put our marriage before my work. She feels loved, safe and honoured every day.",
+  VF="I am a present and joyful father. I am home for dinner and I show up for my children's big moments. They know they are loved, they know God, and they learn from me to give.",
+  VFO="My foundation serves genuinely needy people in Ghana and the United States. In the United States we help struggling families with food, rent support and job training.",
+  VS="Every year my foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning. They grow up to mentor the next ones, and the circle keeps growing.",
+  VL="I lead my own funded cardiovascular research lab. Our discoveries reach patients, and I mentor young scientists from Ghana and beyond the way I was mentored.";
+const VJOEL=[
+  ["faith","⛪","I walk closely with God, and our family serves faithfully in our church."],
+  ["character","🕊️","I am a man of integrity, humility and generosity. People trust my word."],
+  ["family","💍",VH],["family","👨‍👧",VF],
   ["family","🏡","Fiona and I own our home in the United States and a family house in Ghana, full of God's peace, love and laughter."],
   ["family","👵","My parents live in a comfortable home I built for them, and they want for nothing."],
-  ["faith","⛪","I walk closely with God, and our family serves faithfully in our church."],
-  ["impact","🌍","My foundation works in Ghana and the United States, helping people who genuinely need it, not just people who ask the loudest."],
-  ["impact","🎓","Every year my foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning."],
-  ["impact","🤝","My foundation gives disabled people who sell on the streets a steady monthly income, skills training and a place to work with dignity."],
-  ["impact","🇺🇸","In the United States, my foundation helps struggling families with food, rent support and job training."],
-  ["impact","🔁","The students we support come back to mentor the next ones, and the circle keeps growing."],
+  ["health","💪","I am healthy, strong and full of energy for my family and my work."],
   ["career","📜","I defend my PhD with strong first author papers and a clear next step waiting for me."],
-  ["career","🔬","I lead my own funded cardiovascular research lab, and our discoveries reach patients."],
-  ["career","👨‍🏫","I mentor young scientists from Ghana and beyond the way I was mentored."],
-  ["wealth","💰","I own assets in Ghana and the United States that earn for my family every month and fund the foundation."],
-  ["health","💪","I am healthy, strong and full of energy for my family and my work."]]:[
+  ["career","🔬",VL],
+  ["impact","🌍",VFO],["impact","🎓",VS],
+  ["impact","🤝","My foundation gives disabled people who sell on the streets a steady monthly income, skills training and a place to work with dignity."],
+  ["wealth","💰","I own assets in Ghana and the United States that earn for my family every month and fund the foundation."]];
+/* one time tidy: earlier example wordings the user kept are updated and merged */
+const VMERGE=[[VH,"family","💍",["I am a faithful, patient and present husband. Fiona feels loved, safe and honoured by me every day.","I pray with my wife, I listen to her, and I put our marriage before my work."]],
+  [VF,"family","👨‍👧",["I am a present and joyful father. My children know they are loved, they know God, and they see in me a man of integrity.","I am home for dinner, I show up for my children's big moments, and I teach them to give."]],
+  [VFO,"impact","🌍",["My foundation works in Ghana and the United States, helping people who genuinely need it, not just people who ask the loudest.","In the United States, my foundation helps struggling families with food, rent support and job training."]],
+  [VS,"impact","🎓",["Every year my foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning.","The students we support come back to mentor the next ones, and the circle keeps growing."]],
+  [VL,"career","🔬",["I lead my own funded cardiovascular research lab, and our discoveries reach patients.","I mentor young scientists from Ghana and beyond the way I was mentored."]]];
+function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
+  VMERGE.forEach(([nt,c,e,olds])=>{const hits=p.vision.filter(x=>olds.some(o=>norm(o)===norm(x.t)));if(!hits.length)return;
+    const has=p.vision.find(x=>norm(x.t)===norm(nt));const keep=has||hits[0];keep.t=nt;keep.c=c;keep.e=e;
+    p.vision=p.vision.filter(x=>x===keep||!hits.includes(x));ch=true});
+  if(ch)persist()}
+const VIS_EX=pid=>{const me=(nm(pid)||"").toLowerCase()==="joel",o=partnerOf(pid)&&P(partnerOf(pid))?nm(partnerOf(pid)):"my partner";
+  return me?VJOEL:[
   ["family","👨‍👩‍👧","My husband "+o+", our children and I live in our own beautiful home, full of God's peace, love and laughter."],
   ["faith","🙏","I walk closely with God, and my faith carries our home."],
   ["career","🔬","My work opens doors and changes lives."],
@@ -3012,7 +3023,7 @@ function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)retur
     h("div",{class:"fmbx"},h("small",null,ro?nm(pid)+"'s future":"✨ Future me · say it today"),h("b",null,v?v.t:"I am Dr. "+fullName(pid)),
       h("span",null,L.length?(dn?dn+" of "+L.length+" manifested":L.length+(L.length===1?" vision":" visions")+" · tap to see them all"):"Tap to write your vision")),
     h("span",{class:"fmbe"},emo(v?v.e||kwEmoji(v.t)||"✨":"🎓",44,true)))}
-function visionSection(){const p=P(ME),L=vList(ME),adding=!!ui.visAdd;p.vision=p.vision||[];
+function visionSection(){const p=P(ME);p.vision=p.vision||[];visionTidy(p);const L=vList(ME),adding=!!ui.visAdd;
   let cat="family";const ti=h("textarea",{class:"inp",rows:"3",placeholder:"Write it as if it's already true, and be specific: who, what, where","aria-label":"Your vision"});
   const cc=h("div",{class:"vcats"},VCATS.map(([id,lab,e])=>h("button",{type:"button","aria-pressed":String(id===cat),onclick:ev=>{cat=id;cc.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},emo(e,18,false),lab)));
   const hide=p.visionHide||[],exs=VIS_EX(ME).filter(([c,e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!hide.includes(t));
@@ -3021,7 +3032,8 @@ function visionSection(){const p=P(ME),L=vList(ME),adding=!!ui.visAdd;p.vision=p
     ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,c:x.c,at:Date.now()});persist();render();toast("Vision added ✨","")}},"＋"),
         h("button",{type:"button",class:"vx","aria-label":"Hide this example",onclick:()=>{(p.visionHide=p.visionHide||[]).push(x.t);persist();render()}},"×"))
       :h("button",{type:"button",class:"vact","aria-label":"Edit or remove",onclick:()=>visionSheet(x)},"⋯"));
-  const groups=VCATS.map(([id,lab,e])=>{const mine=L.filter(x=>vCat(x)===id),ex=exs.filter(z=>z[0]===id);if(!mine.length&&!ex.length)return null;
+  const ord=x=>{const i=VJOEL.findIndex(z=>z[2].toLowerCase()===x.t.trim().toLowerCase());return i<0?1000+(x.at||0)/1e13:i};
+  const groups=VCATS.map(([id,lab,e])=>{const mine=L.filter(x=>vCat(x)===id).sort((a,b)=>ord(a)-ord(b)),ex=exs.filter(z=>z[0]===id);if(!mine.length&&!ex.length)return null;
     return h("div",{class:"vgroup"},h("span",{class:"vgh"},lab),mine.map(x=>card(x)),ex.map(([c,e,t])=>card({c,e,t},true)))});
   const fn=fullName(ME);
   return h("section",{class:"vboard",id:"visionBoard"},
@@ -3687,7 +3699,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-e";
+const APP_VERSION="2026-11-15-f";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
