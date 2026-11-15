@@ -548,6 +548,12 @@ html,body{margin:0}
 .pvbar{position:sticky;top:6px;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#e2557c,#7b5fcf);color:#fff;border-radius:16px;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .pvbar span{display:flex;flex-direction:column;line-height:1.2}.pvbar b{font-size:16px}.pvbar small{font-size:12.5px;opacity:.9}
 .pvbar button{background:#fff;color:#2a2340;border:0;border-radius:999px;padding:8px 16px;font:inherit;font-weight:700;font-size:15px}
+.rcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.rcbig{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(128,128,160,.1);border:1px solid rgba(128,128,160,.22);border-radius:16px;padding:12px 6px;text-align:center}
+.rcbig b{font-size:30px;line-height:1.1}.rcbig small{font-size:13px;opacity:.8;line-height:1.2}
+.rctable{display:flex;flex-direction:column;gap:2px;margin:6px 0 10px;background:rgba(128,128,160,.08);border-radius:16px;padding:8px 12px}
+.rcrow{display:grid;grid-template-columns:1fr 64px 64px;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(128,128,160,.2);font-size:15.5px}
+.rcrow:last-child{border-bottom:0}.rcrow span{display:flex;align-items:center;gap:8px}.rcrow b{text-align:center;font-size:18px}.rch b{font-size:14px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -874,6 +880,7 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 .ju .pcday.on{background:#f2b84b;border:1px solid #f2b84b;color:#2a1a08;box-shadow:0 0 10px rgba(242,184,75,.5)}
 .ju .pcday.cur{outline:2px solid #fff;outline-offset:1px}
 .ju .pcday.fut{opacity:.3}
+.ju .pcday.wk{opacity:.45;border-style:dashed}
 .ju .flane{display:flex;flex-direction:column;gap:7px;border-radius:16px;padding:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16)}
 .ju .flhead{display:flex;align-items:baseline;gap:8px}.ju .flhead b{font-family:var(--fun);font-weight:600;font-size:16px}.ju .flhead span{flex:1;font-size:13.5px;opacity:.88;min-width:0}.ju .flhead small{font-weight:700;font-size:13px;opacity:.9;white-space:nowrap}
 .ju .flsq{display:flex;flex-wrap:wrap;gap:5px}
@@ -1385,10 +1392,16 @@ function stopTimer(){
 
 /* prayer */
 function nightKey(tz){const n=tzNow(tz);return n.min<240?addDays(n.key,-1):n.key}
+/* weekends are optional: a prayed Saturday or Sunday counts, a skipped one never breaks the streak */
+const isWknd=k=>{const d=parseKey(k).getDay();return d===0||d===6};
 function prayerStreak(){
-  const k0=nightKey(P(me()).tz),log=S.shared.prayer.log;let k=log[k0]?k0:addDays(k0,-1),n=0;
-  while(log[k]){n++;k=addDays(k,-1)}return n;
+  const k0=nightKey(P(me()).tz),log=S.shared.prayer.log,ks=Object.keys(log).sort();if(!ks.length)return 0;
+  let k=log[k0]?k0:addDays(k0,-1),n=0;
+  while(k>=ks[0]){if(log[k])n++;else if(!isWknd(k))break;k=addDays(k,-1)}return n;
 }
+function prayerBest(from,to){const log=S.shared.prayer.log,ks=Object.keys(log).sort();if(!ks.length)return 0;
+  let k=from&&from>ks[0]?from:ks[0],end=to||nightKey(P(ME).tz),run=0,best=0;
+  while(k<=end){if(log[k]){run++;best=Math.max(best,run)}else if(!isWknd(k))run=0;k=addDays(k,1)}return best}
 
 /* colors */
 const CAT={lab:["Lab & research","#246a73"],meeting:["Meeting","#3557a8"],class:["Class","#5b45a8"],workout:["Workout","#3f7d4e"],faith:["Faith","#22397a"],together:["Together","#8c2f55"],personal:["Personal","#56607a"]};
@@ -2016,7 +2029,7 @@ function prayerSheet(){juSheet("Pray and read tonight",()=>{const act=PP().filte
     h("h2",{style:"font-size:19px"},"Tonight's reading"),h("div",{class:"ju"},h("div",{class:"faith"},readingBlock()))]})}
 function prayerCalSheet(){juSheet("Our prayer nights",()=>{
   const log=S.shared.prayer.log,nk=nightKey(P(ME).tz),ks=Object.keys(log).sort(),first=ks[0]||nk;
-  let best=0,run=0,prev=null;ks.forEach(k=>{run=prev&&addDays(prev,1)===k?run+1:1;best=Math.max(best,run);prev=k});
+  const best=prayerBest();
   const now=parseKey(nk),off=ui.pcalOff||0,y=now.getFullYear(),m=now.getMonth()+off,d0=new Date(y,m,1),yy=d0.getFullYear(),mm=d0.getMonth();
   const fd=parseKey(first),minOff=(fd.getFullYear()-now.getFullYear())*12+fd.getMonth()-now.getMonth();
   const inMonth=ks.filter(k=>{const d=parseKey(k);return d.getFullYear()===yy&&d.getMonth()===mm}).length;
@@ -2025,9 +2038,10 @@ function prayerCalSheet(){juSheet("Our prayer nights",()=>{
   const dim=new Date(yy,mm+1,0).getDate();
   for(let dd=1;dd<=dim;dd++){const k=dkey(new Date(yy,mm,dd)),on=!!log[k],fut=k>nk,back=daysBetween(k,nk),edit=!fut&&back<=6;
     const lab=shortDate(k)+(on?", prayed":", not ticked")+(edit?(on?". Tap to untick":". Tap if you prayed"):"");
-    grid.appendChild(edit?h("button",{type:"button",class:"pcday"+(on?" on":"")+(k===nk?" cur":""),"aria-label":lab,"aria-pressed":String(on),
+    const wk=!on&&!fut&&isWknd(k)?" wk":"";
+    grid.appendChild(edit?h("button",{type:"button",class:"pcday"+(on?" on":"")+(k===nk?" cur":"")+wk,"aria-label":lab,"aria-pressed":String(on),
         onclick:()=>{if(on)delete log[k];else log[k]={by:ME,at:Date.now(),late:k!==nk};persist();render();toast(on?shortDate(k)+" unticked":shortDate(k)+" ticked \u2713","")}},String(dd))
-      :h("span",{class:"pcday"+(on?" on":"")+(fut?" fut":""),"aria-label":lab},String(dd)))}
+      :h("span",{class:"pcday"+(on?" on":"")+(fut?" fut":"")+wk,"aria-label":lab},String(dd)))}
   return [h("div",{class:"ju"},h("div",{class:"faith pcal"},
     h("div",{class:"pcstats"},h("div",null,h("b",null,String(ks.length)),h("small",null,"nights prayed")),h("div",null,h("b",null,String(prayerStreak())),h("small",null,"in a row now")),h("div",null,h("b",null,String(best)),h("small",null,"longest run"))),
     h("hr"),
@@ -2035,7 +2049,7 @@ function prayerCalSheet(){juSheet("Our prayer nights",()=>{
       h("div",null,h("b",null,d0.toLocaleDateString("en-US",{month:"long",year:"numeric"})),h("small",null,inMonth+(inMonth===1?" night":" nights")+" this month")),
       h("button",{type:"button",class:"pcnav","aria-label":"Next month",disabled:off>=0,onclick:()=>{ui.pcalOff=off+1;prayerCalSheet()}},"\u203a")),
     grid,
-    h("small",{class:"fhint"},"Gold nights are the ones you prayed. You can tick or untick the last 7 nights here.")))]})}
+    h("small",{class:"fhint"},"Gold nights are the ones you prayed. Weekends are optional and never break your streak. You can tick or untick the last 7 nights here.")))]})}
 let MEMBERS=[];
 /* reading colours per person: the couple's first member is aqua, the second pink, the same on both phones */
 const PCOL=u=>((MEMBERS.length?MEMBERS[0]===u:u===ME)?["#4fd8c8","#062b28"]:["#ff8fab","#3a0d1c"]);
@@ -2457,17 +2471,69 @@ function checkinSheet(mk){mk=mk||monthKey();const draft=DR["ck"+mk]||(DR["ck"+mk
   return out})}
 function checkinDue(){const k=tzNow(P(ME).tz).key,d=+k.slice(8),last=new Date(+k.slice(0,4),+k.slice(5,7),0).getDate();return d>=last-5&&!checkinState(monthKey()).mine}
 
+/* ---------- Sunday check-in (weekly, replaces the monthly one) ---------- */
+const WEEKQ=[["r","How connected did you feel to me this week?","💞"],["t","My win this week","🏆"],["t","What was hard","🌧️"],["t","My prayer request","🙏"],["t","One thing I need from you","🤲"],["t","My big things next week","📅"]];
+const wkKey=k=>addDays(k,-parseKey(k).getDay());
+const curWk=()=>wkKey(usDay());
+const wkLabel=wk=>"Week of "+parseKey(wk).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+function weekDue(){const d=parseKey(usDay()).getDay();return (d===0||d===1)&&!checkinState("w"+curWk()).mine}
+function weekReveal(){const d=parseKey(usDay()).getDay(),st=checkinState("w"+curWk());return d<=2&&st.mine&&st.theirs&&!seen("ck:"+curWk())}
+function weekSheet(wk){wk=wk||curWk();const mk="w"+wk,draft=DR["ck"+mk]||(DR["ck"+mk]={});juSheet("Sunday check-in",()=>{
+  const {mine,theirs}=checkinState(mk),out=[h("div",{class:"bigemo"},emo("☀️",64,true)),h("p",{class:"q",style:"text-align:center"},wkLabel(wk))];
+  if(!mine){
+    out.push(h("p",{class:"hint",style:"text-align:center"},"Ten minutes to look back on the week and set up the next one. "+nm(PARTNER)+" sees your answers once you've both finished. Skip any you like."));
+    WEEKQ.forEach(([t,q,e],i)=>{
+      if(t==="r")out.push(h("div",{class:"ckq"},h("b",null,e+" "+q),h("div",{class:"faces"},FACES.map((f,j)=>h("button",{type:"button",class:"face"+(draft[i]===j+1?" on":""),"aria-label":(j+1)+" of 5",onclick:ev=>{draft[i]=j+1;ev.currentTarget.parentNode.querySelectorAll(".face").forEach((b,n)=>b.classList.toggle("on",n===j))}},f)))));
+      else{const ta=h("textarea",{class:"inp",style:"min-height:62px","aria-label":q});ta.value=draft[i]||"";ta.oninput=()=>{draft[i]=ta.value};out.push(h("div",{class:"ckq"},h("b",null,e+" "+q),ta))}});
+    out.push(h("button",{type:"button",class:"btn",onclick:()=>{if(!draft[0]){toast("One more","Tap a face for how connected you felt");return}
+      if(!WEEKQ.some(([t],i)=>t==="t"&&(draft[i]||"").trim())){toast("Write at least one","Your win, something hard, or a prayer request");return}
+      saveDoc("checkin",{[mk]:{[ME]:{a:WEEKQ.map((x,i)=>x[0]==="r"?draft[i]:(draft[i]||"").trim()),at:Date.now()}}});delete DR["ck"+mk];
+      if(theirs){markSeen("ck:"+wk);confetti(160);toast("Check-in unlocked","See each other's week")}else toast("Sent","It unlocks when "+nm(PARTNER)+" finishes too")}},"Finish my check-in"));
+  }else if(!theirs)out.push(h("div",{class:"lockbox"},emo("🔒",36,false),h("div",null,h("b",null,"Waiting for "+nm(PARTNER)),h("p",{class:"hint",style:"font-size:14px"},"You'll both see the answers once "+nm(PARTNER)+" finishes."))));
+  else{markSeen("ck:"+wk);WEEKQ.forEach(([t,q,e],i)=>{const vals=[ME,PARTNER].map(u=>CK()[mk][u].a[i]);if(t==="t"&&!vals.some(v=>v))return;
+    out.push(h("div",{class:"ckq"},h("b",null,e+" "+q),h("div",{class:"answers reveal"},[ME,PARTNER].map((u,n)=>{const v=vals[n];
+      return h("div",{class:"ans"+(u!==ME?" f":"")},h("span",{class:"who"},u===ME?"You":nm(u)),t==="r"?h("p",{style:"font-size:28px;line-height:1"},FACES[v-1]+" "):h("p",null,v||"—"))}))))})}
+  const lm=addDays(usDay().slice(0,7)+"-01",-1).slice(0,7);
+  out.push(h("button",{type:"button",class:"pc tap",style:"--c:#4b5bc4;margin-top:10px",onclick:()=>recapSheet(+usDay().slice(8)<=7?lm:usDay().slice(0,7))},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly recap"),h("span",{class:"tx"},"See your month together in numbers")),emo("📊",48,true))));
+  const pastW=Object.keys(CK()).filter(k=>k[0]==="w"&&k!==mk).sort().reverse().slice(0,12),pastM=Object.keys(CK()).filter(k=>k[0]!=="w").sort().reverse();
+  if(pastW.length)out.push(h("h2",{style:"font-size:19px"},"Past weeks"),h("div",{class:"chips"},pastW.map(k=>h("button",{type:"button",onclick:()=>weekSheet(k.slice(1))},wkLabel(k.slice(1)).replace("Week of ","")+(CK()[k][ME]&&CK()[k][PARTNER]?" ✓":"")))));
+  if(pastM.length)out.push(h("h2",{style:"font-size:19px"},"Earlier monthly check-ins"),h("div",{class:"chips"},pastM.map(k=>h("button",{type:"button",onclick:()=>checkinSheet(k)},monthName(k)+(CK()[k][ME]&&CK()[k][PARTNER]?" ✓":"")))));
+  return out})}
+
+/* ---------- Monthly recap: the month in numbers, worked out from what you already do ---------- */
+function recapData(mk){const log=S.shared.prayer.log,inM=k=>k&&k.slice(0,7)===mk,ppl=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder);
+  const last=addDays((+mk.slice(5)===12?(+mk.slice(0,4)+1)+"-01":mk.slice(0,4)+"-"+String(+mk.slice(5)+1).padStart(2,"0"))+"-01",-1);
+  const prayed=Object.keys(log).filter(inM).length,bestRun=prayerBest(mk+"-01",last<nightKey(P(ME).tz)?last:nightKey(P(ME).tz));
+  const per=u=>{const p=P(u),days=Object.entries(p.days||{}).filter(([k])=>inM(k));
+    const read=Object.values(BIB().read||{}).reduce((a,pl)=>a+Object.values((pl||{})[u]||{}).filter(inM).length,0);
+    return {tasks:days.reduce((a,[,d])=>a+((d.done||[]).length),0),habits:days.reduce((a,[,d])=>a+((d.habits||[]).length),0),habitDays:days.filter(([,d])=>(d.habits||[]).length).length,read,
+      letters:US.letters.filter(l=>l.from===u&&l.at&&inM(dkey(new Date(l.at)))).length,visions:(p.vision||[]).filter(x=>x.at&&inM(dkey(new Date(x.at)))).length}};
+  const weeks=Object.keys(CK()).filter(k=>k[0]==="w"&&inM(k.slice(1))&&CK()[k][ME]&&CK()[k][PARTNER]).length;
+  return {prayed,bestRun,weeks,ppl,per:Object.fromEntries(ppl.map(u=>[u,per(u)]))}}
+function recapDue(){const d=+usDay().slice(8);if(d>5)return null;const mk=addDays(usDay().slice(0,7)+"-01",-1).slice(0,7);return seen("rc:"+mk)?null:mk}
+function recapSheet(mk){markSeen("rc:"+mk);juSheet("Monthly recap",()=>{const R=recapData(mk),mn=monthName(mk).split(" ")[0];
+  const big=(e,n,l)=>h("div",{class:"rcbig"},emo(e,34,false),h("b",null,String(n)),h("small",null,l));
+  const rows=[["✅","Things done","tasks"],["🌱","Growing me ticks","habits"],["📖","Bible chapters read","read"],["💌","Letters written","letters"],["✨","Visions added","visions"]]
+    .filter(([,,k])=>R.ppl.some(u=>R.per[u][k]));
+  const prev=addDays(mk+"-01",-1).slice(0,7),next=addDays(mk+"-01",40).slice(0,7),cur=usDay().slice(0,7);
+  return [h("div",{class:"bigemo"},emo("📊",60,true)),
+    h("div",{class:"pchead"},h("button",{type:"button",class:"pcnav","aria-label":"Previous month",onclick:()=>recapSheet(prev)},"‹"),h("div",null,h("b",null,monthName(mk))),h("button",{type:"button",class:"pcnav","aria-label":"Next month",disabled:next>cur,onclick:()=>recapSheet(next)},"›")),
+    h("div",{class:"rcgrid"},big("🙏",R.prayed,R.prayed===1?"night prayed together":"nights prayed together"),big("🔥",R.bestRun,"best run of nights"),big("☀️",R.weeks,R.weeks===1?"Sunday check-in":"Sunday check-ins")),
+    rows.length?h("div",{class:"rctable"},h("div",{class:"rcrow rch"},h("span"),R.ppl.map(u=>h("b",{style:"color:"+PCOL(u)[0]},u===ME?"You":plainNm(u)))),
+      rows.map(([e,l,k])=>h("div",{class:"rcrow"},h("span",null,emo(e,20,false),l),R.ppl.map(u=>h("b",null,String(R.per[u][k])))))):h("p",{class:"hint",style:"text-align:center"},"Nothing logged yet for "+mn+"."),
+    h("p",{class:"hint",style:"text-align:center;font-size:14px"},"Worked out from what you both ticked in the app. Weekends off from prayer don't count against you.")]})}
+
 /* ---------- Grow together tiles ---------- */
 function growSection(){
   const H=US.home||{},hm=SHOPITEM[H.home||"apt"],v=nextVisit(),vi=v?VP(v.id):[],cur=SHELF().find(x=>x.id===BK().current&&x.status==="reading")||SHELF().find(x=>x.status==="reading");
-  const ck=checkinState(monthKey()),pp=PP().filter(x=>!x.answered).length,mon=monthName(monthKey()).split(" ")[0];
+  const wck=checkinState("w"+curWk()),pp=PP().filter(x=>!x.answered).length,mon=monthName(monthKey()).split(" ")[0];
   const T=(c,e,name,sub,hot,fn,anim)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,!!anim),h("b",null,name),h("small",{class:"sub"},sub));
   return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎯",30,false),"Do together"),h("div",{class:"tgrid"},
     T("#1f7f78",hm.e,"Our dream home",((H.pets||[]).length+(H.kids||[]).length+(H.garden||[]).length+(H.ride?1:0))?[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("")||"Keep building":"Start building",false,homeSheet),
     T("#c0398a","🎨","Paint together","One canvas",false,paintSheet),
     T("#2d6fb8","🗺️","Plans",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" for the visit":"Plan the visit"):(S.shared.plans.length?S.shared.plans.filter(x=>!x.d).length+" ideas":"Add ideas"),false,plansSheet),
     T("#b9661c","📚","Read together",cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet),
-    T("#3f8a4f","🗓️","Check-in",ck.mine&&ck.theirs?mon+" done ✓":ck.mine?"Waiting for "+nm(PARTNER):ck.theirs?nm(PARTNER)+" is done":mon,!!(ck.theirs&&!ck.mine),()=>checkinSheet())));
+    T("#3f8a4f","☀️","Sunday check-in",wck.mine&&wck.theirs?"This week ✓":wck.mine?"Waiting for "+nm(PARTNER):wck.theirs?nm(PARTNER)+" is done":"Every Sunday",!!(wck.theirs&&!wck.mine),()=>weekSheet())));
 }
 
 
@@ -3525,7 +3591,9 @@ function viewUs(){
   const w=ME,oo=PARTNER,stat=(a,b,doneTxt,todo)=>a&&b?doneTxt:a?"Waiting for "+nm(oo):b?nm(oo)+" is done. Your turn":todo;
   const ttk=gkey(k,gameRound("tot",k)),tA=(tt[w]||[]).length===5,tB=(tt[oo]||[]).length===5,cards=[];let waitN=0;
   US.letters.filter(l=>l.to===ME&&!l.openedAt).slice(0,2).forEach(l=>cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#2d6fb8",onclick:()=>openLetter(l)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Waiting for you"),h("span",{class:"tx"},"A letter from "+nm(l.from))),emo("💌",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},l.openWhen?"Open when "+l.openWhen:"Read anytime"),h("span",{class:"go"},"Open")))));
-  if(checkinDue())cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>checkinSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Monthly check-in · "+monthName(monthKey()).split(" ")[0]),h("span",{class:"tx"},"Look back on the month together")),emo("🗓️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},checkinState(monthKey()).theirs?nm(PARTNER)+" already did theirs":"8 quick questions"),h("span",{class:"go"},"Start"))));
+  if(weekDue()||weekReveal()){const st=checkinState("w"+curWk());cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#3f8a4f",onclick:()=>weekSheet()},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Sunday check-in · "+wkLabel(curWk()).replace("Week of ","")),h("span",{class:"tx"},st.mine?"You both finished. See each other's week":"Look back on the week together")),emo("☀️",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},st.mine?"Unlocked":st.theirs?nm(PARTNER)+" already did theirs":"About 10 minutes"),h("span",{class:"go"},st.mine?"See":"Start"))))}
+  if(backupDue()&&!PREVIEW)cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#2b7bb9",onclick:ev=>backupNow(ev.currentTarget.querySelector(".go"))},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Once a month"),h("span",{class:"tx"},"Back up everything you two have saved")),emo("💾",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},lastBackup()?"Last one "+ago(lastBackup()):"Takes a few seconds"),h("span",{class:"go"},"Back up"))));
+  {const rm=recapDue();if(rm)cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#4b5bc4",onclick:()=>recapSheet(rm)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(rm).split(" ")[0]+" recap"),h("span",{class:"tx"},"Your month together in numbers")),emo("📊",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Prayer, reading, wins"),h("span",{class:"go"},"See"))))}
   if(!qa[w]||(qa[oo]&&!seen("d:"+k)))cards.push(h("button",{type:"button",class:"pc tap",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],56,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered. Your turn":"Answer"))));
   else if(!qa[oo])waitN++;
   if(!tA||(tB&&!seen("g:tot:"+ttk))){const first=gItems(tg)[dailySet("tot",ttk)[0]];
@@ -3661,6 +3729,9 @@ function settingsSheet(){
     h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:()=>{p.name=nm.value.trim()||p.name;p.city=ct.value.trim()||p.city;p.phone=ph.value.trim();
       const t=tzi.value.trim();try{new Intl.DateTimeFormat("en-US",{timeZone:t});p.tz=t}catch(e){}persist();DB.doc("users/"+ME).set({name:p.name,city:p.city,tz:p.tz,cid:CID},{merge:true});render();settingsSheet()}},"Save profile"),
       h("button",{type:"button",class:"quiet",onclick:()=>{tzi.value=Intl.DateTimeFormat().resolvedOptions().timeZone}},"Use this device's time zone")));
+  {const b=US.main.backup||{};body.append(h("div",{class:"lbl"},"Back up our data"),
+    h("p",{class:"hint"},"Saves everything, both of you: days, prayers, letters, visions, projects, savings and photos, into one file. "+(b.at?"Last backup "+ago(b.at)+" by "+(b.by===ME?"you":nm(b.by))+".":"No backup yet.")+" Once a month is plenty."),
+    h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:ev=>backupNow(ev.currentTarget)},"💾 Back up now")))}
   if(!PREVIEW&&PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder)body.append(h("div",{class:"lbl"},"See "+plainNm(PARTNER)+"'s screen"),
     h("p",{class:"hint"},"Opens the whole app exactly as "+plainNm(PARTNER)+" sees it on her phone, every tab. Nothing you tap there saves."),
     h("div",{class:"row"},h("button",{type:"button",class:"ghost",onclick:previewAs},"👀 Preview "+plainNm(PARTNER)+"'s app")));
@@ -3701,6 +3772,24 @@ function renderTimer(){
 setInterval(()=>{if(S.timer)renderTimer()},1000);
 
 /* ---------- shell ---------- */
+/* ---------- backup: every piece of the couple's data in one file ---------- */
+async function backupNow(btn){if(!DB||!CID)return;const lab=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent="Gathering everything…"}
+  try{const out={app:"Our Days",version:APP_VERSION,made:new Date().toISOString(),by:ME,couple:CID,docs:{}};
+    const put=sn=>{if(sn.exists)out.docs[sn.ref.path]=sn.data()};
+    const getD=p=>DB.doc(p).get().then(put).catch(()=>{}),getC=p=>DB.collection(p).get().then(q=>q.docs.forEach(d=>{out.docs[d.ref.path]=d.data()})).catch(()=>{});
+    const base="couples/"+CID,ppl=(MEMBERS.length?MEMBERS:[ME,PARTNER]).filter(Boolean),jobs=[getD(base),getD(base+"/shared/main")];
+    ["main","home","prayer","visits","books","checkin","evening","duel","money","wish","bible","projects","paint"].forEach(n=>jobs.push(getD(base+"/us/"+n)));
+    ["moments","letters","jar","nudges"].forEach(n=>jobs.push(getC(base+"/"+n)));
+    ppl.forEach(u=>{jobs.push(getD(base+"/people/"+u),getC(base+"/people/"+u+"/days"));["photo","avatar","calendar","status"].forEach(x=>jobs.push(getD(base+"/people/"+u+"/extra/"+x)))});
+    await Promise.all(jobs);
+    const n=Object.keys(out.docs).length,name="our-days-backup-"+dkey(new Date())+".json",blob=new Blob([JSON.stringify(out)],{type:"application/json"}),file=new File([blob],name,{type:"application/json"});
+    let shared=false;try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Our Days backup"});shared=true}}catch(e){if(e&&e.name==="AbortError"){if(btn){btn.disabled=false;btn.textContent=lab}return}}
+    if(!shared){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
+    saveUs({backup:{at:Date.now(),by:ME,n}});toast("Backup saved ✓",n+" pieces of your data in one file. Keep it somewhere safe like Files or Google Drive.")}
+  catch(e){console.warn(e);toast("Backup didn't finish","Check your connection and try again.")}
+  if(btn){btn.disabled=false;btn.textContent=lab}}
+const lastBackup=()=>(US.main.backup||{}).at||0;
+const backupDue=()=>Date.now()-lastBackup()>30*864e5;
 /* ---------- preview: see the app exactly as the partner sees it, nothing saves ---------- */
 function blockWrites(){const F=firebase.firestore,ok=()=>Promise.resolve();
   try{["set","update","delete"].forEach(m=>{F.DocumentReference.prototype[m]=ok});
@@ -3756,7 +3845,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-p";
+const APP_VERSION="2026-11-15-q";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
