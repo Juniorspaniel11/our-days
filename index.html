@@ -173,6 +173,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .vplate{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;border-radius:18px;padding:14px 10px;background:linear-gradient(180deg,rgba(255,211,107,.22),rgba(255,211,107,.06));border:1.5px solid #ffd36b;box-shadow:inset 0 0 0 4px rgba(255,211,107,.08)}
 .vplate small{font-size:12px;letter-spacing:.3em;text-transform:uppercase;font-weight:800;color:#ffd36b}
 .vplate b{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:min(27px,6.6vw);line-height:1.15;color:#ffe1a1;white-space:nowrap;text-shadow:0 0 18px rgba(255,211,107,.4)}
+.vk{color:#ffd36b;font-weight:700}.vk.fn{color:#ffe7a8;font-weight:800;background:rgba(255,211,107,.16);border-radius:5px;padding:0 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .vgroup{display:flex;flex-direction:column;gap:8px}
 .vgh{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#ffd36b;margin-top:4px;display:flex;align-items:center;gap:8px}.vgh::after{content:"";flex:1;height:1px;background:rgba(255,211,107,.35)}
 .vcats{display:flex;flex-wrap:wrap;gap:6px}.vcats button{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:5px 11px;font-size:13.5px;font-weight:700;cursor:pointer}.vcats button[aria-pressed="true"]{background:#ffd36b;color:#3a2550;border-color:#ffd36b}
@@ -2983,7 +2984,7 @@ const VCATS=[["faith","Faith","🙏"],["character","Character","🕊️"],["fami
 const vCat=x=>x.c||((/integrity|humility|humble|honest|kind/i.test(x.t))?"character":(/wife|husband|children|family|home|marri/i.test(x.t))?"family":/god|faith|pray|church/i.test(x.t)?"faith":/foundation|needy|poor|disab|give|students who|fees/i.test(x.t)?"impact":/research|lab|career|work|professor|lead/i.test(x.t)?"career":/own|asset|propert|business|invest|wealth|income/i.test(x.t)?"wealth":/health|strong|fit|energy/i.test(x.t)?"health":/learn|skill|read|accent|language/i.test(x.t)?"growth":"life");
 const VH="I am a faithful, patient and present husband. I pray with Fiona, I listen to her, and I put our marriage before my work. She feels loved, safe and honoured every day.",
   VF="I am a present and joyful father. I am home for dinner and I show up for my children's big moments. They know they are loved, they know God, and they learn from me to give.",
-  VFO="The Joel & Fiona Aboagye Foundation serves genuinely needy people in Ghana and the United States. In the United States we help struggling families with food, rent support and job training.",
+  VFO="The Joel & Fiona Aboagye Foundation serves genuinely needy people in Ghana and the United States.",
   VS="Every year our foundation pays full school fees for 100 brilliant but needy students in Ghana, from junior high to university, so no gifted child has to sell on the streets, beg or farm instead of learning. They grow up to mentor the next ones, and the circle keeps growing.",
   VL="I lead my own funded cardiovascular research lab. Our discoveries reach patients, and I mentor young scientists from Ghana and beyond the way I was mentored.";
 const VJOEL=[
@@ -3006,11 +3007,18 @@ const VMERGE=[[VH,"family","💍",["I am a faithful, patient and present husband
   [VL,"career","🔬",["I lead my own funded cardiovascular research lab, and our discoveries reach patients.","I mentor young scientists from Ghana and beyond the way I was mentored."]]];
 function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
   const RN=[[/^My foundation serves genuinely needy people/,"The Joel & Fiona Aboagye Foundation serves genuinely needy people"],[/^Every year my foundation pays/,"Every year our foundation pays"],[/^My foundation gives disabled people/,"Our foundation gives disabled people"],[/fund the foundation\.$/,"fund our foundation."],[/^I use my gifts and resources to lift up people who genuinely need help\.$/,"Through the Joel & Fiona Aboagye Foundation, I use my gifts and resources to lift up people who genuinely need help."]];
+  RN.push([/ In the United States we help struggling families with food, rent support and job training\./,""]);
   p.vision.forEach(x=>RN.forEach(([re,to])=>{if(re.test(x.t)){x.t=x.t.replace(re,to);ch=true}}));
   VMERGE.forEach(([nt,c,e,olds])=>{const hits=p.vision.filter(x=>olds.some(o=>norm(o)===norm(x.t)));if(!hits.length)return;
     const has=p.vision.find(x=>norm(x.t)===norm(nt));const keep=has||hits[0];keep.t=nt;keep.c=c;keep.e=e;
     p.vision=p.vision.filter(x=>x===keep||!hits.includes(x));ch=true});
   if(ch)persist()}
+/* key words in gold */
+const VKEYS=["The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
+function vHi(t){const ks=VKEYS.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
+  const re=new RegExp("("+ks.join("|")+"|\\b\\d[\\d,]*\\b)","gi"),out=[];let last=0,m;
+  while((m=re.exec(t))){if(m.index>last)out.push(t.slice(last,m.index));const w=m[0];out.push(h("span",{class:"vk"+(/foundation/i.test(w)&&/aboagye/i.test(w)?" fn":"")},w));last=m.index+w.length}
+  if(last<t.length)out.push(t.slice(last));return out}
 const VIS_EX=pid=>{const me=(nm(pid)||"").toLowerCase()==="joel",o=partnerOf(pid)&&P(partnerOf(pid))?nm(partnerOf(pid)):"my partner";
   return me?VJOEL:[
   ["family","👨‍👩‍👧","My husband "+o+", our children and I live in our own beautiful home, full of God's peace, love and laughter."],
@@ -3030,7 +3038,7 @@ function visionSection(){const p=P(ME);p.vision=p.vision||[];visionTidy(p);const
   const cc=h("div",{class:"vcats"},VCATS.map(([id,lab,e])=>h("button",{type:"button","aria-pressed":String(id===cat),onclick:ev=>{cat=id;cc.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},emo(e,18,false),lab)));
   const hide=p.visionHide||[],exs=VIS_EX(ME).filter(([c,e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!hide.includes(t));
   const card=(x,ex)=>h("div",{class:"vcard"+(ex?" ex":"")},h("span",{class:"vemo"},emo(x.e||(VCATS.find(z=>z[0]===vCat(x))||VCATS[7])[2],30,false)),
-    h("div",{class:"vtx"},h("b",null,x.t),ex?h("small",null,"Example · ＋ to keep, × to hide"):null),
+    h("div",{class:"vtx"},h("b",null,vHi(x.t)),ex?h("small",null,"Example · ＋ to keep, × to hide"):null),
     ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,c:x.c,at:Date.now()});persist();render();toast("Vision added ✨","")}},"＋"),
         h("button",{type:"button",class:"vx","aria-label":"Hide this example",onclick:()=>{(p.visionHide=p.visionHide||[]).push(x.t);persist();render()}},"×"))
       :h("button",{type:"button",class:"vact","aria-label":"Edit or remove",onclick:()=>visionSheet(x)},"⋯"));
@@ -3701,7 +3709,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-g";
+const APP_VERSION="2026-11-15-h";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
