@@ -173,7 +173,11 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .vplate{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;border-radius:18px;padding:14px 10px;background:linear-gradient(180deg,rgba(255,211,107,.22),rgba(255,211,107,.06));border:1.5px solid #ffd36b;box-shadow:inset 0 0 0 4px rgba(255,211,107,.08)}
 .vplate small{font-size:12px;letter-spacing:.3em;text-transform:uppercase;font-weight:800;color:#ffd36b}
 .vplate b{font-family:"Crimson Pro",Georgia,serif;font-weight:700;font-size:min(27px,6.6vw);line-height:1.15;color:#ffe1a1;white-space:nowrap;text-shadow:0 0 18px rgba(255,211,107,.4)}
-.vk{color:#ffd36b;font-weight:700}.vk.fn{color:#ffe7a8;font-weight:800;background:rgba(255,211,107,.16);border-radius:5px;padding:0 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.vk{color:#ffd36b;font-weight:700}.vmission .vk{font-weight:700}.vk.fn{color:#ffe7a8;font-weight:800;background:rgba(255,211,107,.16);border-radius:5px;padding:0 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.vmission{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;background:none;border:0;border-bottom:1px solid rgba(255,211,107,.3);color:#fff;padding:2px 8px 12px;cursor:pointer;font:inherit}
+.vmission>small{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:800;color:#ffd36b}
+.vmission>span{font-family:"Crimson Pro",Georgia,serif;font-style:italic;font-weight:500;font-size:19.5px;line-height:1.35;color:#fff4dc}
+.vmission.empty>span{font-style:normal;font-size:15px;color:#ffd36b;opacity:.8}
 .vgroup{display:flex;flex-direction:column;gap:8px}
 .vgh{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#ffd36b;margin-top:4px;display:flex;align-items:center;gap:8px}.vgh::after{content:"";flex:1;height:1px;background:rgba(255,211,107,.35)}
 .vcats{display:flex;flex-wrap:wrap;gap:6px}.vcats button{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:5px 11px;font-size:13.5px;font-weight:700;cursor:pointer}.vcats button[aria-pressed="true"]{background:#ffd36b;color:#3a2550;border-color:#ffd36b}
@@ -3017,7 +3021,7 @@ function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
   const before=p.vision.length;p.vision=p.vision.filter(x=>!/^I am Dr\b/i.test((x.t||"").trim()));if(p.vision.length!==before)ch=true;
   if(ch)persist()}
 /* key words in gold */
-const VKEYS=["The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
+const VKEYS=["science, music and faith","heal hearts","lift spirits","open doors","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
 function vHi(t){const ks=VKEYS.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   const re=new RegExp("("+ks.join("|")+"|\\b\\d[\\d,]*\\b)","gi"),out=[];let last=0,m;
   while((m=re.exec(t))){if(m.index>last)out.push(t.slice(last,m.index));const w=m[0];out.push(h("span",{class:"vk"+(/foundation/i.test(w)&&/aboagye/i.test(w)?" fn":"")},w));last=m.index+w.length}
@@ -3052,9 +3056,13 @@ function visionSection(){const p=P(ME);p.vision=p.vision||[];visionTidy(p);const
   return h("section",{class:"vboard",id:"visionBoard"},
     h("div",{class:"vhead"},h("div",null,h("small",null,"Future me"),h("h2",null,"My vision")),h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
     h("div",{class:"vplate"},h("small",null,"I am"),h("b",null,"Dr. "+fn+", PhD")),
+    (()=>{const ms=p.mission!=null?p.mission:((nm(ME)||"").toLowerCase()==="joel"?"I use science, music and faith to heal hearts, lift spirits and open doors for people the world overlooks.":"");
+      return h("button",{type:"button",class:"vmission"+(ms?"":" empty"),"aria-label":"Edit my mission",onclick:()=>missionSheet(ms)},h("small",null,"My mission"),ms?h("span",null,vHi(ms)):h("span",null,"＋ Add one sentence on why you exist"))})(),
     adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,c:cat,e:(VCATS.find(z=>z[0]===cat)||VCATS[7])[2],at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","")}},
       h("small",{class:"vsub"},"Which part of life?"),cc,ti,h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")):null,
     groups)}
+function missionSheet(cur){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"My mission",placeholder:"One sentence on why you exist"});ti.value=cur||"";
+  openSheet("My mission",h("form",{class:"body",onsubmit:e=>{e.preventDefault();p.mission=ti.value.trim();persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")))}
 function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"Edit vision"});ti.value=x.t;
   openSheet("Edit vision",h("div",{class:"tmenu"},
     h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;x.t=t;persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")),
@@ -3711,7 +3719,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-i";
+const APP_VERSION="2026-11-15-j";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
