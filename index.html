@@ -2989,7 +2989,8 @@ function viewFuture(){return [visionSection(me())]}
 const VEMO=["🎓","🤝","🔬","🏡","💍","👨‍👩‍👧","💰","🌍","✈️","🙏","💪","📚","🏆","❤️","✨"];
 const vList=pid=>((P(pid)||{}).vision||[]).filter(x=>x&&x.t);
 const FULLN={joel:"Joel Kofi Aboagye",fiona:"Fiona Antoinette Quarshie"};
-const fullName=pid=>{const p=P(pid)||{};return p.fullName||FULLN[(nm(pid)||"").toLowerCase()]||nm(pid)};
+const plainNm=pid=>{const n=(nm(pid)||"").replace(/[^\p{L}\p{M}\s'.-]/gu,"").replace(/\s+/g," ").trim();return n||nm(pid)||""};
+const fullName=pid=>{const p=P(pid)||{};return p.fullName||FULLN[(plainNm(pid).split(" ")[0]||"").toLowerCase()]||plainNm(pid)};
 const VCATS=[["faith","Faith","🙏"],["character","Character","🕊️"],["family","Family","👨‍👩‍👧"],["health","Health","💪"],["career","Career","🔬"],["impact","Impact","🤝"],["wealth","Wealth","💰"],["growth","Growth","📚"],["life","Life","✨"]];
 const vCat=x=>x.c||((/integrity|humility|humble|honest|kind/i.test(x.t))?"character":(/wife|husband|children|family|home|marri/i.test(x.t))?"family":/god|faith|pray|church/i.test(x.t)?"faith":/foundation|needy|poor|disab|give|students who|fees/i.test(x.t)?"impact":/research|lab|career|work|professor|lead/i.test(x.t)?"career":/own|asset|propert|business|invest|wealth|income/i.test(x.t)?"wealth":/health|strong|fit|energy/i.test(x.t)?"health":/learn|skill|read|accent|language/i.test(x.t)?"growth":"life");
 const VH="I am a faithful, patient and present husband. I pray with Fiona, I listen to her, and I put our marriage before my work. She feels loved, safe and honoured every day.",
@@ -3045,15 +3046,15 @@ function visionSection(pid){pid=pid||ME;const ro=pid!==ME,p=P(pid);if(!ro){p.vis
   const cc=h("div",{class:"vcats"},VCATS.map(([id,lab,e])=>h("button",{type:"button","aria-pressed":String(id===cat),onclick:ev=>{cat=id;cc.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},emo(e,18,false),lab)));
   const hide=p.visionHide||[],exs=(ro&&L.length)?[]:VIS_EX(pid).filter(([c,e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!hide.includes(t));
   const card=(x,ex)=>h("div",{class:"vcard"+(ex?" ex":"")},h("span",{class:"vemo"},emo(x.e||(VCATS.find(z=>z[0]===vCat(x))||VCATS[7])[2],30,false)),
-    h("div",{class:"vtx"},h("b",null,vHi(x.t)),ex?h("small",null,ro?"Example "+nm(pid)+" can keep":"Example · ＋ to keep, × to hide"):null),
+    h("div",{class:"vtx"},h("b",null,vHi(x.t)),ex?h("small",null,ro?"Example "+plainNm(pid)+" can keep":"Example · ＋ to keep, × to hide"):null),
     ro?null:ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,c:x.c,at:Date.now()});persist();render();toast("Vision added ✨","")}},"＋"),
         h("button",{type:"button",class:"vx","aria-label":"Hide this example",onclick:()=>{(p.visionHide=p.visionHide||[]).push(x.t);persist();render()}},"×"))
       :h("button",{type:"button",class:"vact","aria-label":"Edit or remove",onclick:()=>visionSheet(x)},"⋯"));
   const ord=x=>{const i=VJOEL.findIndex(z=>z[2].toLowerCase()===x.t.trim().toLowerCase());return i<0?1000+(x.at||0)/1e13:i};
   const MISSIONX=()=>(()=>{const OLDM="I use science, music and faith to heal hearts, lift spirits and open doors for people the world overlooks.",NEWM="I use science, music and faith to heal hearts, lift spirits and open doors for the poor, the disabled, and the brilliant but needy.";
-      if(!ro&&p.mission===OLDM)p.mission=NEWM;const isJ=(nm(pid)||"").toLowerCase()==="joel",ms=p.mission!=null&&p.mission!==""?p.mission:(isJ?NEWM:"");
+      if(!ro&&p.mission===OLDM)p.mission=NEWM;const isJ=(plainNm(pid)||"").toLowerCase()==="joel",ms=p.mission!=null&&p.mission!==""?p.mission:(isJ?NEWM:"");
       const exM="I use my gifts, my faith and my love to build a home full of peace and to lift up people who genuinely need help.";
-      if(ro)return h("div",{class:"vmission"+(ms?"":" empty")},h("small",null,nm(pid)+"'s mission"),ms?h("span",null,vHi(ms)):h("span",null,"Not written yet"));
+      if(ro)return h("div",{class:"vmission"+(ms?"":" empty")},h("small",null,plainNm(pid)+"'s mission"),ms?h("span",null,vHi(ms)):h("span",null,"Not written yet"));
       if(ms)return h("button",{type:"button",class:"vmission","aria-label":"Edit my mission",onclick:()=>missionSheet(ms)},h("small",null,"My mission"),h("span",null,vHi(ms)));
       return h("button",{type:"button",class:"vmission exm",onclick:()=>missionSheet("")},h("small",null,"My mission"),h("span",{class:"exmt"},"Why do you exist? What do you want your life to do for others?"),h("div",{class:"vbtn solid",style:"margin-top:4px"},"＋ Write my mission"))})();
   const ADDFORM=()=>h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,c:cat,e:(VCATS.find(z=>z[0]===cat)||VCATS[7])[2],at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","")}},
@@ -3071,12 +3072,12 @@ function visionSection(pid){pid=pid||ME;const ro=pid!==ME,p=P(pid);if(!ro){p.vis
     return h("div",{class:"vgroup"},h("span",{class:"vgh"},lab),mine.map(x=>card(x)),ex.map(([c,e,t])=>card({c,e,t},true)))});
   const fn=fullName(pid);
   return h("section",{class:"vboard",id:"visionBoard"},
-    h("div",{class:"vhead"},h("div",null,h("small",null,ro?"Future "+nm(pid):"Future me"),h("h2",null,ro?nm(pid)+"'s vision":"My vision")),ro?null:h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
+    h("div",{class:"vhead"},h("div",null,h("small",null,ro?"Future "+plainNm(pid):"Future me"),h("h2",null,ro?plainNm(pid)+"'s vision":"My vision")),ro?null:h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
     h("div",{class:"vplate"},h("small",null,"I am"),h("b",{style:"font-size:"+vPlateFs("Dr. "+fn+", PhD")},"Dr. "+fn+", PhD")),
     MISSIONX(),
     adding?ADDFORM():null,
     groups,
-    ro&&!L.length&&!exs.length?h("p",{class:"vsub",style:"text-align:center;font-style:italic"},nm(pid)+" hasn't written any visions yet."):null)}
+    ro&&!L.length&&!exs.length?h("p",{class:"vsub",style:"text-align:center;font-style:italic"},plainNm(pid)+" hasn't written any visions yet."):null)}
 function missionSheet(cur){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"My mission",placeholder:"One sentence on why you exist"});ti.value=cur||"";
   openSheet("My mission",h("form",{class:"body",onsubmit:e=>{e.preventDefault();p.mission=ti.value.trim();persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")))}
 function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"Edit vision"});ti.value=x.t;
@@ -3735,7 +3736,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-m";
+const APP_VERSION="2026-11-15-n";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
