@@ -481,7 +481,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 /* tab bar */
 .tabbar{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(calc(100% - 32px),480px);
   background:color-mix(in srgb,var(--card) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--line);border-radius:26px;box-shadow:0 12px 34px rgba(31,24,48,.18);display:grid;grid-template-columns:repeat(4,1fr);padding:6px}
+  border:1px solid var(--line);border-radius:26px;box-shadow:0 12px 34px rgba(31,24,48,.18);display:grid;grid-template-columns:repeat(5,1fr);padding:6px}
 .tabbar button{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;font-size:12.5px;color:var(--muted);border-radius:20px}
 .tabbar svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabbar button[aria-current="page"]{color:var(--ink);font-weight:700;background:color-mix(in srgb,var(--ink) 11%,transparent)}
@@ -1069,6 +1069,7 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
   <button type="button" data-tab="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</button>
   <button type="button" data-tab="projects"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM9 7V5h6v2"/></svg>Projects</button>
   <button type="button" data-tab="us"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Us</button>
+  <button type="button" data-tab="future"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Future</button>
   <button type="button" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>Home</button>
 </nav>
 
@@ -2973,7 +2974,8 @@ function homeDesignSection(){const link=US.main.homeLink||"";
       h("div",{style:"flex:1 1 220px"},inp),h("button",{type:"submit",class:"ghost"},link?"Update":"Save link")),
     !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
 
-function viewHome(){return [visionSection(),savingsSection(),wishSection(),homeDesignSection()]}
+function viewHome(){return [savingsSection(),wishSection(),homeDesignSection()]}
+function viewFuture(){return [visionSection()]}
 
 /* ---------- Future me: vision board ---------- */
 const VEMO=["🎓","🤝","🔬","🏡","💍","👨‍👩‍👧","💰","🌍","✈️","🙏","💪","📚","🏆","❤️","✨"];
@@ -3012,6 +3014,7 @@ function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
   VMERGE.forEach(([nt,c,e,olds])=>{const hits=p.vision.filter(x=>olds.some(o=>norm(o)===norm(x.t)));if(!hits.length)return;
     const has=p.vision.find(x=>norm(x.t)===norm(nt));const keep=has||hits[0];keep.t=nt;keep.c=c;keep.e=e;
     p.vision=p.vision.filter(x=>x===keep||!hits.includes(x));ch=true});
+  const before=p.vision.length;p.vision=p.vision.filter(x=>!/^I am Dr\b/i.test((x.t||"").trim()));if(p.vision.length!==before)ch=true;
   if(ch)persist()}
 /* key words in gold */
 const VKEYS=["The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
@@ -3051,8 +3054,7 @@ function visionSection(){const p=P(ME);p.vision=p.vision||[];visionTidy(p);const
     h("div",{class:"vplate"},h("small",null,"I am"),h("b",null,"Dr. "+fn+", PhD")),
     adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,c:cat,e:(VCATS.find(z=>z[0]===cat)||VCATS[7])[2],at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","")}},
       h("small",{class:"vsub"},"Which part of life?"),cc,ti,h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")):null,
-    groups,
-    h("p",{class:"vsub vtip"},"Present tense. Specific. As if it's already done."))}
+    groups)}
 function visionSheet(x){const p=P(ME),ti=h("textarea",{class:"inp",rows:"3","aria-label":"Edit vision"});ti.value=x.t;
   openSheet("Edit vision",h("div",{class:"tmenu"},
     h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;x.t=t;persist();closeSheet()}},ti,h("button",{type:"submit",class:"primary"},"Save")),
@@ -3670,7 +3672,7 @@ setInterval(()=>{if(S.timer)renderTimer()},1000);
 function go(tab){S.tab=tab;persist();render();window.scrollTo({top:0})}
 function render(){
   if(S.tab==="week")S.tab="today";
-  if((S.tab==="us"||S.tab==="home")&&S.viewAs!==ME)S.viewAs=ME;
+  if((S.tab==="us"||S.tab==="home"||S.tab==="future")&&S.viewAs!==ME)S.viewAs=ME;
   const pid=me(),p=P(pid),o=P(partnerOf(pid)),n=tzNow(p.tz);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.as===pid)));
   document.querySelectorAll(".tabbar button").forEach(b=>{if(b.dataset.tab===S.tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
@@ -3679,14 +3681,14 @@ function render(){
   el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
   const greet=n.min<300?"Still up":n.min<720?"Good morning":n.min<1020?"Good afternoon":n.min<1320?"Good evening":"Good night";
   const RO=pid!==ME;document.body.classList.toggle("ro",RO);document.body.classList.toggle("tab-us",S.tab==="us");
-  el("title").textContent=RO?{today:p.name+"'s day",projects:p.name+"'s projects",us:p.name+" & "+o.name,home:"Our home"}[S.tab]
-    :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home"}[S.tab];
+  el("title").textContent=RO?{today:p.name+"'s day",projects:p.name+"'s projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab]
+    :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab];
   const sl=el("subline");sl.innerHTML="";
   const pidP=partnerOf(ME);
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
     const chip=(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
-      onclick:()=>{if(ph||S.viewAs===id)return;if((S.tab==="us"||S.tab==="home")&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
+      onclick:()=>{if(ph||S.viewAs===id)return;if((S.tab==="us"||S.tab==="home"||S.tab==="future")&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
       h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")));
     const row=h("div",{class:"tzrow"},chip);
     if(!ph&&S.tab!=="us"&&P(pidP)&&!P(pidP).placeholder){const st=statusOf(id),pr=presenceOf(id);
@@ -3698,7 +3700,7 @@ function render(){
   const main=el("main");main.innerHTML="";
   if(RO)main.appendChild(h("div",{class:"robar"},h("span",null,"Viewing "+p.name+"'s plan · read only"),
     h("button",{type:"button",onclick:()=>{S.viewAs=ME;ui.sel=null;ui.weekOff=0;render();window.scrollTo({top:0})}},"Back to mine")));
-  const v={today:viewToday,projects:viewProjects,us:viewUs,home:viewHome}[S.tab]();
+  const v={today:viewToday,projects:viewProjects,us:viewUs,home:viewHome,future:viewFuture}[S.tab]();
   v.filter(Boolean).forEach(x=>main.appendChild(x));
   renderTimer();
 }
@@ -3709,7 +3711,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-h";
+const APP_VERSION="2026-11-15-i";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
