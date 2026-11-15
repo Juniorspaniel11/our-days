@@ -177,6 +177,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--done);flex:none;m
 .vmission{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;background:none;border:0;border-bottom:1px solid rgba(255,211,107,.3);color:#fff;padding:2px 8px 12px;cursor:pointer;font:inherit}
 .vmission>small{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:800;color:#ffd36b}
 .vmission>span{font-family:"Crimson Pro",Georgia,serif;font-style:italic;font-weight:500;font-size:19.5px;line-height:1.35;color:#fff4dc}
+.vmission.exm .exmt{font-family:"Crimson Pro",Georgia,serif;font-style:italic;font-size:18px;line-height:1.35;color:#fff4dc;opacity:.65}.vmission .exl2{font-size:11.5px;letter-spacing:0;text-transform:none;font-weight:600;opacity:.7}.vmission.exm{cursor:default;gap:8px}
 .vmission.empty>span{font-style:normal;font-size:15px;color:#ffd36b;opacity:.8}
 .vgroup{display:flex;flex-direction:column;gap:8px}
 .vgh{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#ffd36b;margin-top:4px;display:flex;align-items:center;gap:8px}.vgh::after{content:"";flex:1;height:1px;background:rgba(255,211,107,.35)}
@@ -1581,7 +1582,7 @@ function todayHero(pid){
       h("div",{class:"dring",style:"--p:"+pc},h("span",null,pc+"%"))),
     list.length?tiles:h("div",{class:"dtiles"},[["Morning quiet time","Morning","todo"],["Read for class","To do · anytime","todo"],["Call "+(partnerOf(pid)&&P(partnerOf(pid))?nm(partnerOf(pid)):"someone")+" 💞","Evening","todo"]].map(([t,sub],i)=>
       h("div",{class:"dt exmp",style:"--tc:"+DPAL[i]},h("button",{type:"button",class:"dtick",disabled:ro,"aria-label":"Add "+t+" to today",onclick:()=>{if(ro)return;addTask(pid,k,t);render();toast("Added for today ✓",t)}},"＋"),
-        h("div",{class:"dtx"},h("small",null,sub),h("b",null,t),h("span",{class:"exl"},ro?"Example · "+nm(pid)+" sees this until adding her own":"Example · tap ＋ to add"))))),
+        h("div",{class:"dtx"},h("small",null,sub),h("b",null,t),h("span",{class:"exl"},ro?"Example · "+nm(pid)+" sees this until adding their own":"Example · tap ＋ to add"))))),
     list.length>MAX?h("span",{class:"dmore"},"+"+(list.length-MAX)+" more not shown"):null,
     ro?null:h("form",{class:"dadd",onsubmit:e=>{e.preventDefault();const v=ai.value.trim();if(!v){ai.focus();return}
       if(at.value){const m=toMin(at.value)+60;p.events.push({id:uid(),title:v,note:"",start:at.value,end:pad(Math.floor(m/60)%24)+":"+pad(m%60),agenda:false,cat:"personal",date:k});persist();render();toast("Added at "+fmt(toMin(at.value))+" ✓",v)}
@@ -2979,7 +2980,7 @@ function homeDesignSection(){const link=US.main.homeLink||"";
     !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
 
 function viewHome(){return [savingsSection(),wishSection(),homeDesignSection()]}
-function viewFuture(){return [visionSection()]}
+function viewFuture(){return [visionSection(me())]}
 
 /* ---------- Future me: vision board ---------- */
 const VEMO=["🎓","🤝","🔬","🏡","💍","👨‍👩‍👧","💰","🌍","✈️","🙏","💪","📚","🏆","❤️","✨"];
@@ -3040,24 +3041,28 @@ function futureBanner(pid){const ro=pid!==ME,L=vList(pid);if(ro&&!L.length)retur
     h("div",{class:"fmbx"},h("small",null,ro?nm(pid)+"'s future":"✨ Future me · say it today"),h("b",null,v?v.t:"I am Dr. "+fullName(pid)),
       h("span",null,L.length?(dn?dn+" of "+L.length+" manifested":L.length+(L.length===1?" vision":" visions")+" · tap to see them all"):"Tap to write your vision")),
     h("span",{class:"fmbe"},emo(v?v.e||kwEmoji(v.t)||"✨":"🎓",44,true)))}
-function visionSection(){const p=P(ME);p.vision=p.vision||[];visionTidy(p);const L=vList(ME),adding=!!ui.visAdd;
+function visionSection(pid){pid=pid||ME;const ro=pid!==ME,p=P(pid);if(!ro){p.vision=p.vision||[];visionTidy(p)}const L=vList(pid),adding=!ro&&!!ui.visAdd;
   let cat="family";const ti=h("textarea",{class:"inp",rows:"3",placeholder:"Write it as if it's already true, and be specific: who, what, where","aria-label":"Your vision"});
   const cc=h("div",{class:"vcats"},VCATS.map(([id,lab,e])=>h("button",{type:"button","aria-pressed":String(id===cat),onclick:ev=>{cat=id;cc.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},emo(e,18,false),lab)));
-  const hide=p.visionHide||[],exs=VIS_EX(ME).filter(([c,e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!hide.includes(t));
+  const hide=p.visionHide||[],exs=(ro&&L.length)?[]:VIS_EX(pid).filter(([c,e,t])=>!L.some(x=>x.t.trim().toLowerCase()===t.toLowerCase())&&!hide.includes(t));
   const card=(x,ex)=>h("div",{class:"vcard"+(ex?" ex":"")},h("span",{class:"vemo"},emo(x.e||(VCATS.find(z=>z[0]===vCat(x))||VCATS[7])[2],30,false)),
-    h("div",{class:"vtx"},h("b",null,vHi(x.t)),ex?h("small",null,"Example · ＋ to keep, × to hide"):null),
-    ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,c:x.c,at:Date.now()});persist();render();toast("Vision added ✨","")}},"＋"),
+    h("div",{class:"vtx"},h("b",null,vHi(x.t)),ex?h("small",null,ro?"Example "+nm(pid)+" can keep":"Example · ＋ to keep, × to hide"):null),
+    ro?null:ex?h("div",{class:"vexa"},h("button",{type:"button",class:"vact","aria-label":"Keep this vision",onclick:()=>{p.vision.push({id:uid(),t:x.t,e:x.e,c:x.c,at:Date.now()});persist();render();toast("Vision added ✨","")}},"＋"),
         h("button",{type:"button",class:"vx","aria-label":"Hide this example",onclick:()=>{(p.visionHide=p.visionHide||[]).push(x.t);persist();render()}},"×"))
       :h("button",{type:"button",class:"vact","aria-label":"Edit or remove",onclick:()=>visionSheet(x)},"⋯"));
   const ord=x=>{const i=VJOEL.findIndex(z=>z[2].toLowerCase()===x.t.trim().toLowerCase());return i<0?1000+(x.at||0)/1e13:i};
   const groups=VCATS.map(([id,lab,e])=>{const mine=L.filter(x=>vCat(x)===id).sort((a,b)=>ord(a)-ord(b)),ex=exs.filter(z=>z[0]===id);if(!mine.length&&!ex.length)return null;
     return h("div",{class:"vgroup"},h("span",{class:"vgh"},lab),mine.map(x=>card(x)),ex.map(([c,e,t])=>card({c,e,t},true)))});
-  const fn=fullName(ME);
+  const fn=fullName(pid);
   return h("section",{class:"vboard",id:"visionBoard"},
-    h("div",{class:"vhead"},h("div",null,h("small",null,"Future me"),h("h2",null,"My vision")),h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
+    h("div",{class:"vhead"},h("div",null,h("small",null,ro?"Future "+nm(pid):"Future me"),h("h2",null,ro?nm(pid)+"'s vision":"My vision")),ro?null:h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
     h("div",{class:"vplate"},h("small",null,"I am"),h("b",null,"Dr. "+fn+", PhD")),
-    (()=>{if(p.mission==="I use science, music and faith to heal hearts, lift spirits and open doors for people the world overlooks.")p.mission="I use science, music and faith to heal hearts, lift spirits and open doors for the poor, the disabled, and the brilliant but needy.";const ms=p.mission!=null?p.mission:((nm(ME)||"").toLowerCase()==="joel"?"I use science, music and faith to heal hearts, lift spirits and open doors for the poor, the disabled, and the brilliant but needy.":"");
-      return h("button",{type:"button",class:"vmission"+(ms?"":" empty"),"aria-label":"Edit my mission",onclick:()=>missionSheet(ms)},h("small",null,"My mission"),ms?h("span",null,vHi(ms)):h("span",null,"＋ Add one sentence on why you exist"))})(),
+    (()=>{const OLDM="I use science, music and faith to heal hearts, lift spirits and open doors for people the world overlooks.",NEWM="I use science, music and faith to heal hearts, lift spirits and open doors for the poor, the disabled, and the brilliant but needy.";
+      if(!ro&&p.mission===OLDM)p.mission=NEWM;const isJ=(nm(pid)||"").toLowerCase()==="joel",ms=p.mission!=null&&p.mission!==""?p.mission:(isJ?NEWM:"");
+      const exM="I use my gifts, my faith and my love to build a home full of peace and to lift up people who genuinely need help.";
+      if(ro)return h("div",{class:"vmission"+(ms?"":" empty")},h("small",null,nm(pid)+"'s mission"),ms?h("span",null,vHi(ms)):h("span",null,"Not written yet"));
+      if(ms)return h("button",{type:"button",class:"vmission","aria-label":"Edit my mission",onclick:()=>missionSheet(ms)},h("small",null,"My mission"),h("span",null,vHi(ms)));
+      return h("div",{class:"vmission exm"},h("small",null,"My mission"),h("span",{class:"exmt"},exM),h("div",{class:"row",style:"gap:8px;justify-content:center"},h("button",{type:"button",class:"vbtn solid",onclick:()=>{p.mission=exM;persist();render();toast("Mission saved ✨","Tap it any time to make it yours")}},"＋ Use this"),h("button",{type:"button",class:"vbtn",onclick:()=>missionSheet("")},"Write my own")),h("small",{class:"exl2"},"Example · one sentence on why you exist"))})(),
     adding?h("form",{class:"vform",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}p.vision.push({id:uid(),t,c:cat,e:(VCATS.find(z=>z[0]===cat)||VCATS[7])[2],at:Date.now()});ui.visAdd=false;persist();render();confetti(60);toast("Vision added ✨","")}},
       h("small",{class:"vsub"},"Which part of life?"),cc,ti,h("button",{type:"submit",class:"vbtn solid"},"Add to my vision")):null,
     groups)}
@@ -3680,7 +3685,7 @@ setInterval(()=>{if(S.timer)renderTimer()},1000);
 function go(tab){S.tab=tab;persist();render();window.scrollTo({top:0})}
 function render(){
   if(S.tab==="week")S.tab="today";
-  if((S.tab==="us"||S.tab==="home"||S.tab==="future")&&S.viewAs!==ME)S.viewAs=ME;
+  if((S.tab==="us"||S.tab==="home")&&S.viewAs!==ME)S.viewAs=ME;
   const pid=me(),p=P(pid),o=P(partnerOf(pid)),n=tzNow(p.tz);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.as===pid)));
   document.querySelectorAll(".tabbar button").forEach(b=>{if(b.dataset.tab===S.tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
@@ -3689,14 +3694,14 @@ function render(){
   el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
   const greet=n.min<300?"Still up":n.min<720?"Good morning":n.min<1020?"Good afternoon":n.min<1320?"Good evening":"Good night";
   const RO=pid!==ME;document.body.classList.toggle("ro",RO);document.body.classList.toggle("tab-us",S.tab==="us");
-  el("title").textContent=RO?{today:p.name+"'s day",projects:p.name+"'s projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab]
+  el("title").textContent=RO?{today:p.name+"'s day",projects:p.name+"'s projects",us:p.name+" & "+o.name,home:"Our home",future:p.name+"'s future"}[S.tab]
     :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab];
   const sl=el("subline");sl.innerHTML="";
   const pidP=partnerOf(ME);
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
     const chip=(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
-      onclick:()=>{if(ph||S.viewAs===id)return;if((S.tab==="us"||S.tab==="home"||S.tab==="future")&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
+      onclick:()=>{if(ph||S.viewAs===id)return;if((S.tab==="us"||S.tab==="home")&&id!==ME)S.tab="today";S.viewAs=id;ui.sel=null;ui.weekOff=0;ui.habitEdit=false;ui.projEdit=null;render();window.scrollTo({top:0})}},
       h("i",{class:id!==ME&&presenceOf(id).on?"on":""},(x.name||"?")[0]),h("b",null,fmt(tzNow(x.tz).min)),h("span",null,x.city||"")));
     const row=h("div",{class:"tzrow"},chip);
     if(!ph&&S.tab!=="us"&&P(pidP)&&!P(pidP).placeholder){const st=statusOf(id),pr=presenceOf(id);
@@ -3719,7 +3724,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-k";
+const APP_VERSION="2026-11-15-l";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
