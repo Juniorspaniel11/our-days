@@ -16,7 +16,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 62
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,6 +30,13 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          LOOP_MIN: "55"
         run: node notify.js
+      # start the next run right away, so checks keep going every few minutes (the hourly schedule is the backup)
+      - name: Keep the loop going
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run notify.yml --ref main --repo ${{ github.repository }} || true
       # GitHub pauses scheduled jobs after 60 days without commits. This keeps it running.
       - uses: liskin/gh-workflow-keepalive@v1

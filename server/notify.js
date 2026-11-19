@@ -10,7 +10,7 @@ const ical = require("node-ical");
 
 const VAPID_PUBLIC = "BMUJsWU9rc_xiWa16ujIUeNcvlDAot-lPoFYKX3hVAjALmPRWXrAgNU8OvTkbmKEdpuBKVUbeOGlO63qk_Gqv24";
 const APP_URL = "https://juniorspaniel11.github.io/our-days/";
-const LOOKBACK_MIN = 25;   // GitHub can start scheduled runs late, so catch anything due in this window
+const LOOKBACK_MIN = 75;   // runs can start late or leave gaps between them; the sent log stops repeats, so a wide window only means nothing is missed
 const AHEAD_MIN = 2;
 const CAL_REFRESH_MIN = 30;
 const CAL_DAYS = 21;
@@ -325,6 +325,15 @@ async function main() {
   const db = admin.firestore();
   const pushOn = !!process.env.VAPID_PRIVATE_KEY;
   if (pushOn) webpush.setVapidDetails(APP_URL, VAPID_PUBLIC, process.env.VAPID_PRIVATE_KEY);
+  /* stay alive and check every few minutes, so notifications arrive within minutes even though GitHub starts this job about hourly */
+  const loopMin = +process.env.LOOP_MIN || 0, endAt = Date.now() + loopMin * 60000, every = 3 * 60000;
+  for (;;) {
+    try { await runOnce(db, pushOn); } catch (e) { console.error("pass failed", e); }
+    if (Date.now() + every > endAt) break;
+    await new Promise(r => setTimeout(r, every));
+  }
+}
+async function runOnce(db, pushOn) {
   const now = Date.now();
   const couples = await db.collection("couples").get();
   let sent = 0;
