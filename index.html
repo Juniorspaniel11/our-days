@@ -572,6 +572,7 @@ html,body{margin:0}
 .bca{display:flex;flex-direction:column;align-items:flex-end;font-weight:700;font-size:15.5px;white-space:nowrap}.bca small{font-weight:500;color:var(--muted);font-size:12.5px}
 .spl{display:flex;flex-direction:column;gap:6px}.spr{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px}
 .spr.done{opacity:.55}.spw{flex:1;min-width:0;display:flex;flex-direction:column}.spw b{font-size:15.5px}.spw small{color:var(--muted);font-size:13px}.spa{font-size:16px;white-space:nowrap}
+.hwx{border:0;background:rgba(127,127,160,.14);color:inherit;border-radius:999px;padding:2px 10px;font:inherit;font-size:13.5px;font-weight:700;margin:2px auto 0;display:inline-block;cursor:pointer}
 .ju.sky{background:radial-gradient(120% 80% at 50% 0%,#2a2f6b 0%,#171a3d 55%,#120f2a 100%);color:#fff;border-radius:24px;padding:14px;border:1px solid rgba(255,255,255,.12);box-shadow:0 14px 34px rgba(20,16,60,.35)}
 .ju.sky .sh{color:#fff;font-size:22px}.skysub{font-size:12.5px;opacity:.7;display:flex;align-items:center;gap:6px}.skysub::before{content:"";width:7px;height:7px;border-radius:50%;background:#5ef0a0;box-shadow:0 0 8px #5ef0a0;animation:skp 2s infinite}
 @keyframes skp{50%{opacity:.35}}
@@ -3795,6 +3796,11 @@ function skyScene(x,st){const W=160,H=70,ax=14,bx=W-14,by=H-6,cx=W/2,ry=H-16,t=s
   const arc=`<path d="M${ax},${by} Q${cx},${by-ry*2} ${bx},${by}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2" stroke-dasharray="2 4"/>`;
   const ground=`<path d="M0,${H} L0,${H-8} Q${W*.25},${H-14} ${W*.5},${H-8} T${W},${H-9} L${W},${H}Z" fill="#000" opacity=".22"/>`;
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" class="skysvg" aria-hidden="true">${stars}${arc}${sun}${clouds}${drops}${flakes}${ground}</svg>`}
+/* weather lives as a small chip under each clock; tap it for both skies */
+function wxChip(u){const p=P(u);if(!p||!p.city)return null;const x=SKY[u]&&SKY[u].city===p.city?SKY[u]:null,err=SKY["err:"+u]&&Date.now()-SKY["err:"+u]<5*6e4;
+  if((!x||Date.now()-x.at>30*6e4)&&!err)setTimeout(()=>loadSky(u),0);if(!x)return null;
+  const st=skyState(x,p.tz),[we]=WMO(x.code),ic=st.ph==="night"&&x.code<=2?"🌙":we;
+  return h("button",{type:"button",class:"hwx tap","aria-label":"Weather in "+p.city+": "+Math.round(x.t)+" degrees. Tap for both skies",onclick:()=>openSheet("Two skies",h("div",{class:"body"},skyCard()))},ic+" "+Math.round(x.t)+"°")}
 function skyCard(){const ppl=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder&&P(u).city);if(!ppl.length)return null;
   ppl.forEach(u=>{const x=SKY[u],fresh=x&&x.city===P(u).city&&Date.now()-x.at<30*6e4,err=SKY["err:"+u]&&Date.now()-SKY["err:"+u]<5*6e4;if(!fresh&&!err)setTimeout(()=>loadSky(u),0)});
   const m=moonInfo(),data=u=>SKY[u]&&SKY[u].city===P(u).city?SKY[u]:null;
@@ -3823,7 +3829,6 @@ function viewUs(){
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(coupleStrip());
   {const bb=bigBanner();if(bb)out.push(bb)}
-  {const sk=skyCard();if(sk)out.push(sk)}
   const pillsEl=h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days")));
@@ -3872,7 +3877,7 @@ function heroSide(u){
     pr.on?h("i",{class:"odot","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
   if(me){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};pic.appendChild(f)}
   const stEl=h(me?"button":"div",{type:me?"button":null,class:"hstatus"+(me?" tap":""),onclick:me?statusSheet:null,"aria-label":me?"Set your status":null},emo(st.e,18,false),h("span",null,st.t),me?h("span",{class:"hedit","aria-hidden":"true"},"✎"):null);
-  return h("div",{class:"hside"},pic,h("b",{class:"hname"},nm(u)),h("small",{class:"hloc"},x.city||""),h("small",{class:"htime"},fmt(n.min)),
+  return h("div",{class:"hside"},pic,h("b",{class:"hname"},nm(u)),h("small",{class:"hloc"},x.city||""),h("small",{class:"htime"},fmt(n.min)),wxChip(u),
     h("small",{class:"hpres"+(pr.on?" on":"")},pr.on?"● Online now":pr.text||"Offline"),stEl);
 }
 function coupleStrip(){
@@ -4082,7 +4087,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-b";
+const APP_VERSION="2026-11-19-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
