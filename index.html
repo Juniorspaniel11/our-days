@@ -648,6 +648,12 @@ html,body{margin:0}
 .caretd{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;background:linear-gradient(135deg,rgba(242,184,75,.2),rgba(226,85,124,.14));border:1px solid rgba(242,184,75,.5);border-radius:18px;padding:12px;color:inherit;font:inherit}
 .caretd>small{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#b9661c}.caretd .hul{background:rgba(255,255,255,.55)}
 :root[data-theme="dark"] .caretd .hul{background:rgba(0,0,0,.2)}
+.ussw{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 6px 20px rgba(40,20,60,.12)}
+.uspg{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;border:0;background:none;border-radius:999px;padding:10px 6px;font:inherit;font-weight:700;font-size:15.5px;color:var(--muted);cursor:pointer;transition:.2s}
+.uspg.on{background:var(--ink);color:var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.18)}.uspe{font-size:18px;line-height:1}
+.uspb{position:absolute;top:4px;right:10px;min-width:9px;height:9px;padding:0 4px;border-radius:999px;background:#e2557c;color:#fff;font-size:10.5px;font-style:normal;line-height:9px;font-weight:800}
+.uspb:not(:empty){height:16px;line-height:16px;min-width:16px;top:-4px;right:-2px}
+.uspb:empty{top:6px;right:8px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1545,7 +1551,7 @@ function nowBanner(pid){
   const agendaBtn=x=>{const a=(p.agenda[x.id]||[]).filter(i=>!i.d).length;return x.agenda?h("button",{type:"button",class:"ghost",onclick:()=>agendaSheet(pid,x)},"Agenda ("+a+")"):null};
   if(cur){head=cur.title;sub="Until "+fmt(cur.e);btns.push(agendaBtn(cur))}
   else if(next&&next.s-n.min<=60){lab="Up next";head=next.title;sub="At "+fmt(next.s)+", in "+(next.s-n.min)+" min";btns.push(agendaBtn(next))}
-  else if((n.min>=22*60||n.min<120)&&!prayed){lab="Tonight";head="Prayer together";sub="10 minutes, whenever you are both ready";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>go("us")},"Open Us"))}
+  else if((n.min>=22*60||n.min<120)&&!prayed){lab="Tonight";head="Prayer together";sub="10 minutes, whenever you are both ready";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>{setUsPage("together");go("us")}},"Open Us"))}
   else if(n.dow===0&&n.min>=17*60){lab="Sunday";head="Plan your week";sub="Pick this week's focus projects and update each next step";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>go("projects")},"Go to projects"))}
   else if(n.min>=20*60){lab="Evening";head="Plan tomorrow";sub="Add tomorrow's tasks, then you're done for the day";btns.push(h("button",{type:"button",class:"ghost",onclick:()=>{ui.sel=addDays(n.key,1);ui.weekOff=0;go("today")}},"Open tomorrow"))}
   else if(open.length){lab="Focus";head=open[0].t;sub=open.length+" task"+(open.length>1?"s":"")+" still open today"}
@@ -1989,7 +1995,6 @@ function takeOverSheet(){const o=PARTNER,L=(P(o)||{}).pcLog||{},nmO=plainNm(o),t
     h("p",{class:"hint",style:"font-size:13px"},"Taking over copies these dates into your own private tracking. From then on only you log them, and "+nmO+" sees only gentle tips, not dates.")))}
 /* one card on Today: what the partner needs and their heads ups */
 function careToday(){const o=PARTNER;if(!o||!P(o)||P(o).placeholder)return null;const on=needOf(o),hu=headsUp(o);if((!on||on[0]==="normal")&&!hu.length)return null;
-  const goCare=()=>{go("us");setTimeout(()=>{const x=el("care");if(x)x.scrollIntoView({behavior:"smooth",block:"start"})},120)};
   return h("button",{type:"button",class:"caretd tap",onclick:goCare},h("small",null,"💛 "+plainNm(o)+" today"),
     on&&on[0]!=="normal"?h("div",{class:"hul"},h("span",{class:"hue"},on[2]),h("span",{class:"hut"},h("b",null,"Needs "+on[1].toLowerCase()),h("small",null,on[3]))):null,
     hu.slice(0,3).map(x=>h("div",{class:"hul"},h("span",{class:"hue"},x.e),h("span",{class:"hut"},h("b",null,x.t),h("small",null,x.tip)))))}
@@ -2000,7 +2005,7 @@ function needCard(){const o=PARTNER,on=needOf(o),mine=needOf(ME);
     h("small",{class:"needq"},mine?"You said: "+mine[2]+" "+mine[1]+" · tap to change":"What do you need today?"),
     h("div",{class:"needc"},NEEDS.map(([k,l,e])=>h("button",{type:"button","aria-pressed":String(!!mine&&mine[0]===k),onclick:()=>setNeed(k)},h("span",null,e),l))))}
 function needBanner(){const on=needOf(PARTNER);if(!on||on[0]==="normal")return null;
-  return h("button",{type:"button",class:"needbn tap",onclick:()=>go("us")},h("span",{class:"neede"},on[2]),h("div",null,h("b",null,plainNm(PARTNER)+" needs "+on[1].toLowerCase()+" today"),h("small",null,on[3])))}
+  return h("button",{type:"button",class:"needbn tap",onclick:goCare},h("span",{class:"neede"},on[2]),h("div",null,h("b",null,plainNm(PARTNER)+" needs "+on[1].toLowerCase()+" today"),h("small",null,on[3])))}
 /* ---------- pause: cool down without walking away ---------- */
 const PZ=()=>US.main.pause||null;
 const pauseLive=()=>{const p=PZ();return p&&!p.ended&&Date.now()<p.until+2*36e5?p:null};
@@ -2057,7 +2062,7 @@ function cyclePartnerSheet(){const u=PARTNER;if(!partnerCycle(u))return;juSheet(
     h("p",{style:"font-size:16.5px;line-height:1.5"},tip),C.w?h("p",{class:"hint"},"This phase runs "+(C.pub.share==="dates"?"until "+longDate(C.w.to):"for a few more days")+"."):null,
     C.pub.share==="dates"&&C.pub.next?h("p",{class:"hint"},"Next period expected around "+longDate(C.pub.next)+(C.pub.len?" · cycle about "+C.pub.len+" days":"")+"."):null,
     h("div",{class:"pzmsg"},"Every body is different and these are estimates. The best way to know how "+nm0+" feels is to ask, and the What we need today card is where she can tell you."),
-    h("button",{type:"button",class:"btn",onclick:()=>{closeSheet();go("us")}},"💛 See what she needs today")]})}
+    h("button",{type:"button",class:"btn",onclick:()=>{closeSheet();goCare()}},"💛 See what she needs today")]})}
 function cycleOwnCard(){const p=P(ME),c=CYC();if(!c.on)return null;const R=cycCalc(c,tzNow(p.tz).key);
   if(!R)return h("button",{type:"button",class:"cycb mine tap",onclick:cycleSheet},h("span",{class:"cyce"},"🌸"),h("div",null,h("small",null,"My cycle"),h("b",null,"Log your period when it starts"),h("span",null,"Tap to add your last start date")));
   const [lab,e]=CPH[R.phase],dl=daysBetween(tzNow(p.tz).key,R.next);
@@ -2810,11 +2815,10 @@ function growSection(){
   const H=US.home||{},hm=SHOPITEM[H.home||"apt"],v=nextVisit(),vi=v?VP(v.id):[],cur=SHELF().find(x=>x.id===BK().current&&x.status==="reading")||SHELF().find(x=>x.status==="reading");
   const wck=checkinState("w"+curWk()),pp=PP().filter(x=>!x.answered).length,mon=monthName(monthKey()).split(" ")[0];
   const T=(c,e,name,sub,hot,fn,anim)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,!!anim),h("b",null,name),h("small",{class:"sub"},sub));
-  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎯",30,false),"Do together"),h("div",{class:"tgrid two"},
+  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎯",30,false),"Do together"),h("div",{class:"tgrid"},
     T("#c0398a","🎨","Paint together","One canvas",false,paintSheet),
     T("#2d6fb8","🗺️","Plans",v?(vi.length?vi.filter(x=>x.d).length+" of "+vi.length+" for the visit":"Plan the visit"):(S.shared.plans.length?S.shared.plans.filter(x=>!x.d).length+" ideas":"Add ideas"),false,plansSheet),
-    T("#b9661c","📚","Reading",(BK().solo||{})[ME]?"You: "+(BK().solo||{})[ME].title:cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):(BK().solo||{})[PARTNER]?nm(PARTNER)+": "+(BK().solo||{})[PARTNER].title:"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet),
-    T("#3f8a4f","☀️","Sunday check-in",wck.mine&&wck.theirs?"This week ✓":wck.mine?"Waiting for "+nm(PARTNER):wck.theirs?nm(PARTNER)+" is done":"Every Sunday",!!(wck.theirs&&!wck.mine),()=>weekSheet())));
+    T("#b9661c","📚","Reading",(BK().solo||{})[ME]?"You: "+(BK().solo||{})[ME].title:cur?(((cur.ch||{})[ME]||0)?"Chapter "+(cur.ch||{})[ME]:"Not started"):(BK().solo||{})[PARTNER]?nm(PARTNER)+": "+(BK().solo||{})[PARTNER].title:"Pick a book",!!(cur&&Object.keys(ANS()).some(id=>id.startsWith("book:"+cur.id+":")&&ANS()[id][PARTNER]&&!ANS()[id][ME])),readSheet)));
 }
 
 
@@ -4116,25 +4120,25 @@ function skyCard(){const ppl=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder&&P(u
     h("div",{class:"skyg"},ppl.map(side)),
     first?h("p",{class:"skyfirst"},"🌇 "+first):null,
     h("div",{class:"skym"},mo,h("div",null,h("b",null,moonLine),h("small",null,ppl.length>1?"The same moon over both of you tonight · "+m.ill+"% lit":"Tonight's moon · "+m.ill+"% lit"))))}
+const usPage=()=>{const p=ui.usPage||(()=>{try{return localStorage.getItem("od-uspage")}catch(e){return null}})();return ["together","care","play"].includes(p)?p:"together"};
+const setUsPage=p=>{ui.usPage=p;try{localStorage.setItem("od-uspage",p)}catch(e){}};
+const goCare=()=>{setUsPage("care");go("us");setTimeout(()=>window.scrollTo({top:0}),60)};
 function viewUs(){
   const o=P(partnerOf(ME)),out=[];
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
-  out.push(coupleStrip());
-  {const bb=bigBanner();if(bb)out.push(bb)}
-  {const pb=pauseBanner();if(pb)out.push(pb)}
-  out.push(careSection());
+  const page=usPage();
   const pillsEl=h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days")));
   const room=h("div",{class:"room"});room.innerHTML=roomSVG();room.appendChild(h("span",{class:"roomcap"},"Tap anything in your room"));
   room.querySelectorAll("[data-obj]").forEach(g=>{const go=()=>OBJ[g.dataset.obj]();g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
-  const top=h("div",{class:"ju"},room);let gotEl=null;
+  const top=h("div",{class:"ju"},room);let gotEl=null;const heartRow=h("div",{class:"ju"});
   const got=US.nudges.find(n=>n.from===PARTNER&&!n.kind);
   const heartBtn=h("button",{type:"button",class:"bigbtn heart tap","aria-label":"Send thinking of you"},svgEl(HEART.replace("currentColor","#fff")),"Thinking of you");
   heartBtn.onclick=()=>{addTo("nudges",{from:ME,at:Date.now()});saveUs({counts:{hearts:INC(1)}});setSeenNudge();hearts(heartBtn);toast("Sent to "+nm(PARTNER),nm(PARTNER)+" gets: "+nm(ME)+" is thinking of you")};
   if(got&&got.at>usSeenNudge()&&Date.now()-got.at<2*864e5)gotEl=(h("button",{type:"button",class:"got tap",onclick:()=>heartBtn.click()},svgEl(HEART),h("div",null,h("b",null,nm(PARTNER)+" is thinking of you"),h("span",null,ago(got.at)+" · tap to send one back"))));
-  top.appendChild(h("div",{class:"actions one"},heartBtn));
+  heartRow.appendChild(h("div",{class:"actions one"},heartBtn));
 
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
@@ -4149,19 +4153,38 @@ function viewUs(){
   {const A0=ANS(),wo=[];enabledTopics().forEach(t=>t.qs.forEach((q,i)=>{const a=A0[t.id+":"+i]||{};if(a[oo]&&!a[w])wo.push({t,i,q,at:a[oo].at||0})}));wo.sort((x,y)=>y.at-x.at);const wq=wo[0];
     if(wq)cards.push(h("button",{type:"button",class:"pc tap",style:"--c:"+wq.t.c,onclick:()=>answerSheet(wq.t.id+":"+wq.i,wq.q,wq.t.name)},h("span",{class:"k"},nm(oo)+" is waiting on you"+(wo.length>1?" · "+wo.length+" questions":"")),h("span",{class:"tx"},wq.q),h("div",{class:"foot"},h("span",{class:"hint"},TOPIC_EMOJI[wq.t.id]+" "+wq.t.name),h("span",{class:"go"},"Answer"))))}
   const wt=waitN?"Waiting on "+nm(oo)+" for "+waitN+(waitN===1?" thing":" things"):"";
-  if(gotEl)out.push(h("div",{class:"ju"},gotEl));
-  out.push(h("section",{class:"ju"},h("div",{class:"tdbox"},h("div",{class:"tdhead"},emo("✨",30,true),h("h2",null,"For you two today"),h("span",{class:"tbadge"+(cards.length?"":" ok")},cards.length?cards.length+" for you":"All done ✓")),cards.length?cards:h("div",{class:"caught"},emo("💞",48,true),h("div",null,h("b",null,"You two are all caught up"),h("small",null,wt?wt+".":"Nothing waiting today. Send a heart or plan the evening."))),
+  const todoBox=(h("section",{class:"ju"},h("div",{class:"tdbox"},h("div",{class:"tdhead"},emo("✨",30,true),h("h2",null,"For you two today"),h("span",{class:"tbadge"+(cards.length?"":" ok")},cards.length?cards.length+" for you":"All done ✓")),cards.length?cards:h("div",{class:"caught"},emo("💞",48,true),h("div",null,h("b",null,"You two are all caught up"),h("small",null,wt?wt+".":"Nothing waiting today. Send a heart or plan the evening."))),
     cards.length&&wt?h("p",{class:"hint"},wt+"."):null)));
-  out.push(faithSection());
-  out.push(eveningCard());
-  out.push(pillsEl);
-  out.push(top);
-  out.push(growSection());
   const tile=(c,e,name,sub,hot,onclick)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick},emo(e,36,false),h("b",null,name),sub);
   const sc=(...kids)=>h("div",{class:"tgrid"},kids);
 
-  out.push(playSection(k));
 
+  /* three short pages instead of one long scroll */
+  const careDot=(()=>{const n=needOf(PARTNER);return !!(n&&n[0]!=="normal")||headsUp(PARTNER).length>0||weekDue()})();
+  const segb=(id,e,l,badge)=>h("button",{type:"button",class:"uspg"+(page===id?" on":""),"aria-pressed":String(page===id),onclick:()=>{setUsPage(id);render();window.scrollTo({top:0})}},h("span",{class:"uspe"},e),l,badge?h("i",{class:"uspb"},badge===true?"":String(badge)):null);
+  out.push(h("nav",{class:"ussw","aria-label":"Us pages"},segb("together","💞","Together",cards.length||false),segb("care","💛","Care",careDot),segb("play","🎲","Play",false)));
+  {const pb=pauseBanner();if(pb)out.push(pb)}
+  if(page==="care"){
+    out.push(careSection());
+    const wck=checkinState("w"+curWk()),T=(c,e,name,sub,hot,fn)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},sub));
+    const lm=addDays(usDay().slice(0,7)+"-01",-1).slice(0,7);
+    out.push(h("section",{class:"ju"},h("h2",{class:"sh"},emo("🌱",28,false),"Grow together"),h("div",{class:"tgrid two"},
+      T("#3f8a4f","☀️","Sunday check-in",wck.mine&&wck.theirs?"This week ✓":wck.mine?"Waiting for "+nm(PARTNER):wck.theirs?nm(PARTNER)+" is done":"Every Sunday",!!(wck.theirs&&!wck.mine),()=>weekSheet()),
+      T("#4b5bc4","📊","Monthly recap","Your month in numbers",false,()=>recapSheet(+usDay().slice(8)<=7?lm:usDay().slice(0,7))))));
+  }else if(page==="play"){
+    out.push(top);
+    out.push(growSection());
+    out.push(playSection(k));
+  }else{
+    out.push(coupleStrip());
+    {const bb=bigBanner();if(bb)out.push(bb)}
+    if(gotEl)out.push(h("div",{class:"ju"},gotEl));
+    out.push(todoBox);
+    out.push(faithSection());
+    out.push(eveningCard());
+    out.push(pillsEl);
+    out.push(heartRow);
+  }
   setTimeout(usTick,0);
   return out;
 }
@@ -4384,7 +4407,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-i";
+const APP_VERSION="2026-11-19-j";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
