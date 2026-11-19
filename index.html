@@ -731,6 +731,37 @@ html,body{margin:0}
 .ovlist{display:flex;flex-direction:column;gap:2px}
 .ovitem{display:flex;gap:10px;align-items:flex-start;text-align:left;background:none;border:0;border-bottom:1px solid rgba(246,211,138,.18);color:#fff;font-family:"Crimson Pro",Georgia,serif;font-size:18.5px;line-height:1.35;font-weight:600;padding:9px 0}
 .ovitem:last-child{border-bottom:0}
+/* ===== each tab is its own world ===== */
+body{--hdr:linear-gradient(135deg,#1d2b64,#3a5bd9 55%,#2aa59a);--acc:#2aa59a}
+body.tab-today{--bg:#eef1fb;--hdr:linear-gradient(135deg,#141b3d,#1d3557 50%,#1f8a8a);--acc:#2aa59a}
+body.tab-projects{--bg:#f6f0e4;--hdr:linear-gradient(135deg,#2b2118,#5a3b22 55%,#b9661c);--acc:#b9661c;background-image:linear-gradient(rgba(120,90,50,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(120,90,50,.06) 1px,transparent 1px);background-size:22px 22px}
+body.tab-us{--bg:#fbeef3;--hdr:linear-gradient(135deg,#4a1942,#8c2f6b 50%,#e2557c);--acc:#e2557c}
+body.tab-home{--bg:#eef4ef;--hdr:linear-gradient(135deg,#102a24,#1f5a48 55%,#c9a24a);--acc:#2f8a68}
+body.tab-future{--bg:#15102b;--hdr:linear-gradient(135deg,#1c1238,#2e1f55 55%,#6b4a2c);--acc:#f6d38a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tab-today{--bg:#0f1426}:root:not([data-theme="light"]) body.tab-projects{--bg:#1a150f}:root:not([data-theme="light"]) body.tab-us{--bg:#1d0f19}:root:not([data-theme="light"]) body.tab-home{--bg:#0d1a16}}
+:root[data-theme="dark"] body.tab-today{--bg:#0f1426}:root[data-theme="dark"] body.tab-projects{--bg:#1a150f}:root[data-theme="dark"] body.tab-us{--bg:#1d0f19}:root[data-theme="dark"] body.tab-home{--bg:#0d1a16}
+/* header band */
+.gut.top header{background:var(--hdr);color:#fff;border-radius:26px;padding:14px 14px 12px;margin-top:6px;box-shadow:0 14px 30px rgba(20,20,50,.22);align-items:flex-start}
+.gut.top header .eyebrow{color:rgba(255,255,255,.82);display:flex;align-items:center;gap:8px}
+.gut.top header h1{color:#fff;font-size:clamp(24px,6.6vw,31px)}
+.tabicon{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.18);font-size:17px;letter-spacing:0}
+.gut.top header .gear{width:40px;height:40px;border-radius:50%;padding:0;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:20px;top:12px;right:12px}
+.gut.top header .eyebrow,.gut.top header h1{padding-right:50px}
+.gut.top header .avatar{width:58px;height:58px;flex:0 0 58px;border:2px solid rgba(255,255,255,.6)}
+.gut.top header .tz{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:#fff}.gut.top header .tz span{color:rgba(255,255,255,.8)}
+.gut.top header .tz.on{background:#fff;color:#1a1a2e}.gut.top header .tz.on span{color:#555}
+.gut.top header .tzst,.gut.top header .tzst .t{color:#fff!important;opacity:1}.gut.top header .tzst .ed{color:rgba(255,255,255,.7)}.gut.top header .tzst{background:rgba(255,255,255,.12);border-radius:999px;padding:2px 8px}
+body.tab-us #subline{display:none}body.tab-us #title{display:block!important}body.tab-us #avatar{display:none}
+.tabbar button[aria-current="page"]{color:var(--acc)!important}
+/* chapters */
+.chapter{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.chaphd{display:flex;align-items:center;gap:10px}
+.chape{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--acc);color:#fff;font-size:19px;box-shadow:0 6px 14px color-mix(in srgb,var(--acc) 40%,transparent)}
+.chaphd b{font-family:var(--fun);font-size:21px;letter-spacing:-.01em}
+.chaphd i{flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 55%,transparent),transparent)}
+.chapter>section>.sechd>h2,.chapter>section>h2.sh,.chapter>section>.sechd>.sh{display:none}
+.chapter{position:relative}.chapter>section>.sechd{position:absolute;top:6px;right:0;margin:0;background:var(--bg);padding-left:8px}
+.chapter>section{margin-top:0}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1252,11 +1283,11 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
   <header>
     <button type="button" class="avatar" id="avatar" aria-label="Photo"></button>
     <div class="htext">
-      <div class="eyebrow" id="eyebrow"></div>
+      <div class="eyebrow"><span id="tabicon" class="tabicon"></span><span id="eyebrow"></span></div>
       <h1 id="title"></h1>
       <div class="tzs" id="subline"></div>
     </div>
-    <button type="button" class="gear" id="gear">Settings</button>
+    <button type="button" class="gear" id="gear" aria-label="Settings">⚙︎</button>
   </header>
 </div></div>
 <div class="gut"><main id="main" class="wrap"></main></div>
@@ -3558,14 +3589,18 @@ function homeDesignSection(){const link=US.main.homeLink||"",H=US.home||{},hm=SH
 function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared 3D home link"});
   openSheet("3D home",h("div",{class:"body"},h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler")),
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});closeSheet();toast(l?"Saved":"Removed","")}},h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"ghost"},"Save"))))}
-function viewHome(){return [visionPoster(),moneySection(),wishSection(),homeDesignSection()]}
+/* a clear chapter header, so moving from one part of a tab to the next is obvious */
+function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},e),h("b",null,title),h("i")),node)}
+function viewHome(){return [visionPoster(),chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection())]}
 /* Our vision: the two of you as one household. Small when closed, a gold list when opened */
-const OURV0=[["family","💍","We are married, and every night we pray together before we sleep."],
-  ["family","🏡","We own our home in the United States and a family house in Ghana, full of God's peace, love and laughter."],
-  ["career","🎓","We are Dr. and Dr. Aboagye: Joel in cardiovascular research, Fiona in hospitality management."],
+const OURV0=[["family","💍","We are married in a church wedding in Ghana with both our families, and every night we pray together before we sleep."],
+  ["career","🎓","By 2030 we are Dr. and Dr. Aboagye: Joel leads a funded cardiovascular research lab, and Fiona's hospitality work is known in Ghana and the United States."],
+  ["family","🏡","We own a 4 bedroom home in Texas with a piano in the living room and a guest room always ready for family from Ghana."],
+  ["family","🏠","Joel's parents live in the comfortable house we built for them in Ghana, and our own family house stands beside it."],
+  ["wealth","💰","We give 10% to God first, save 20% of every paycheck together, and we are debt free."],
   ["impact","🌍","The Joel & Fiona Aboagye Foundation pays full school fees for 100 brilliant but needy students in Ghana every year."],
-  ["family","👨‍👩‍👧","Our children know God, know they are loved, and see us give."],
-  ["faith","⛪","We serve faithfully in our church together."]];
+  ["family","👨‍👩‍👧","Our children speak Twi and English, know God, and see us serve and give."],
+  ["life","✈️","Every year we take one trip just for the two of us, and we spend Christmas with family in Ghana."]];
 const ourVis=()=>(US.main.ourVision||OURV0.map(([c,e,t],i)=>({id:"d"+i,c,e,t,at:i}))).filter(x=>x&&x.t);
 const saveOurVis=L=>saveUs({ourVision:L.map(x=>({id:x.id,c:x.c||"life",e:x.e||"✨",t:x.t,at:x.at||Date.now()}))});
 function ourVisSheet(x){const L=ourVis(),cur=x?L.find(y=>y.id===x.id):null,ti=h("textarea",{class:"inp",rows:"3",placeholder:"We... (say it as if it's already true)","aria-label":"Our vision"});ti.value=cur?cur.t:"";let em=cur?cur.e:"✨";
@@ -3627,7 +3662,7 @@ function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
   const before=p.vision.length;p.vision=p.vision.filter(x=>!/^I am Dr\b/i.test((x.t||"").trim()));if(p.vision.length!==before)ch=true;
   if(ch)persist()}
 /* key words in gold */
-const VKEYS=["science, music and faith","heal hearts","lift spirits","open doors","the poor, the disabled, and the brilliant but needy","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
+const VKEYS=["4 bedroom home","piano","10% to God","20% of every paycheck","debt free","church wedding","By 2030","Twi and English","Christmas","science, music and faith","heal hearts","lift spirits","open doors","the poor, the disabled, and the brilliant but needy","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
 function vHi(t){const ks=VKEYS.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   const re=new RegExp("(?<![A-Za-z])("+ks.join("|")+"|\\b\\d[\\d,]*\\b)(?![A-Za-z])","gi"),out=[];let last=0,m;
   while((m=re.exec(t))){if(m.index>last)out.push(t.slice(last,m.index));const w=m[0];out.push(h("span",{class:"vk"+(/foundation/i.test(w)&&/aboagye/i.test(w)?" fn":"")},w));last=m.index+w.length}
@@ -4258,30 +4293,23 @@ function viewUs(){
 
 
   /* three short pages instead of one long scroll */
-  const careDot=(()=>{const n=needOf(PARTNER);return !!(n&&n[0]!=="normal")||headsUp(PARTNER).length>0||weekDue()})();
+  const careDot=(()=>{const n=needOf(PARTNER);return !!(n&&n[0]!=="normal")||headsUp(PARTNER).length>0})();
   const segb=(id,e,l,badge)=>h("button",{type:"button",class:"uspg"+(page===id?" on":""),"aria-pressed":String(page===id),onclick:()=>{setUsPage(id);render();window.scrollTo({top:0})}},h("span",{class:"uspe"},e),l,badge?h("i",{class:"uspb"},badge===true?"":String(badge)):null);
-  out.push(h("nav",{class:"ussw","aria-label":"Us pages"},segb("together","💞","Together",cards.length||false),segb("care","💛","Care",careDot),segb("play","🎲","Play",false)));
+  out.push(h("nav",{class:"ussw","aria-label":"Us pages"},segb("together","💞","Together",false),segb("care","💛","Care",careDot),segb("play","🎲","Play",false)));
   {const pb=pauseBanner();if(pb)out.push(pb)}
   if(page==="care"){
     out.push(careSection());
-    const wck=checkinState("w"+curWk()),T=(c,e,name,sub,hot,fn)=>h("button",{type:"button",class:"tile tap"+(hot?" hot":""),style:"--c:"+c,onclick:fn},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},sub));
-    const lm=addDays(usDay().slice(0,7)+"-01",-1).slice(0,7);
-    out.push(h("section",{class:"ju"},h("h2",{class:"sh"},emo("🌱",28,false),"Grow together"),h("div",{class:"tgrid two"},
-      T("#3f8a4f","☀️","Sunday check-in",wck.mine&&wck.theirs?"This week ✓":wck.mine?"Waiting for "+nm(PARTNER):wck.theirs?nm(PARTNER)+" is done":"Every Sunday",!!(wck.theirs&&!wck.mine),()=>weekSheet()),
-      T("#4b5bc4","📊","Monthly recap","Your month in numbers",false,()=>recapSheet(+usDay().slice(8)<=7?lm:usDay().slice(0,7))))));
   }else if(page==="play"){
-    out.push(h("section",{class:"ju"},h("button",{type:"button",class:"pc tap qotd",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],52,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered":"Answer")))));
-    out.push(top);
-    out.push(growSection());
-    out.push(playSection(k));
+    out.push(chapter("❓","Today's question",h("section",{class:"ju"},h("button",{type:"button",class:"pc tap qotd",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],52,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered":"Answer"))))));
+    out.push(chapter("🏠","Our room",top));
+    out.push(chapter("🎯","Do together",growSection()));
+    out.push(chapter("🎲","Games",playSection(k)));
   }else{
     out.push(coupleStrip());
     {const bb=bigBanner();if(bb)out.push(bb)}
     if(gotEl)out.push(h("div",{class:"ju"},gotEl));
-    out.push(todoBox);
-    out.push(faithSection());
-    out.push(pillsEl);
-    out.push(heartRow);
+    out.push(chapter("🙏","Pray and read",faithSection()));
+    out.push(chapter("❤️","Thinking of you",h("div",{class:"ju"},pillsEl,heartRow)));
   }
   setTimeout(usTick,0);
   return out;
@@ -4472,9 +4500,10 @@ function render(){
   document.querySelectorAll(".tabbar button").forEach(b=>{if(b.dataset.tab===S.tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   const av=el("avatar");av.innerHTML="";av.appendChild(p.photo?h("img",{src:p.photo,alt:o.name}):h("span",null,o.name[0]));
   av.setAttribute("aria-label",p.photo?o.name+"'s photo, change in settings":"Add "+o.name+"'s photo");
-  el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+  el("eyebrow").textContent=parseKey(n.key).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
   const greet=n.min<300?"Still up":n.min<720?"Good morning":n.min<1020?"Good afternoon":n.min<1320?"Good evening":"Good night";
-  const RO=pid!==ME;document.body.classList.toggle("ro",RO);document.body.classList.toggle("tab-us",S.tab==="us");
+  const RO=pid!==ME;document.body.classList.toggle("ro",RO);["today","projects","us","home","future"].forEach(t=>document.body.classList.toggle("tab-"+t,S.tab===t));
+  {const ti=el("tabicon");if(ti)ti.textContent={today:"☀️",projects:"📚",us:"💞",home:"🏡",future:"✨"}[S.tab]||"";}
   el("title").textContent=RO?{today:p.name+"'s day",projects:p.name+"'s projects",us:p.name+" & "+o.name,home:"Our home",future:p.name+"'s future"}[S.tab]
     :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab];
   const sl=el("subline");sl.innerHTML="";
@@ -4505,7 +4534,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-o";
+const APP_VERSION="2026-11-19-p";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
