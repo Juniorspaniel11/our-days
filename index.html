@@ -2016,11 +2016,8 @@ function cycleSheet(){openSheet("My cycle",(()=>{const c=CYC(),p=P(ME),today=tzN
       h("form",{class:"row",onsubmit:e=>{e.preventDefault();if(dt.value){logPeriod(dt.value);closeSheet()}}},h("div",{style:"flex:1 1 150px"},dt),h("button",{type:"submit",class:"ghost"},"🩸 Period started")),
       (c.starts||[]).length?h("div",{class:"chips"},(c.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button","aria-label":"Remove "+shortDate(k),onclick:()=>{saveCycle({starts:(CYC().starts||[]).filter(x=>x!==k)});closeSheet();setTimeout(cycleSheet,350)}},shortDate(k)+" ×"))):null,
       h("div",{class:"row",style:"align-items:center;gap:8px"},h("span",{class:"hint"},"Period usually lasts"),h("button",{type:"button",class:"ghost",onclick:()=>{saveCycle({plen:Math.max(2,(+c.plen||5)-1)});closeSheet();setTimeout(cycleSheet,350)}},"−"),h("b",null,(+c.plen||5)+" days"),h("button",{type:"button",class:"ghost",onclick:()=>{saveCycle({plen:Math.min(10,(+c.plen||5)+1)});closeSheet();setTimeout(cycleSheet,350)}},"+")),
-      h("p",{class:"hint",style:"margin-bottom:2px"},"What "+plainNm(PARTNER)+" sees"),
-      h("div",{class:"seg"},[["off","Nothing"],["phase","Phase and tips"],["dates","Phase, tips and dates"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String((c.share||"phase")===v),onclick:()=>{saveCycle({share:v});closeSheet();setTimeout(cycleSheet,350)}},l))),
-      h("p",{class:"hint",style:"font-size:13px"},(c.share||"phase")==="off"?plainNm(PARTNER)+" sees nothing about your cycle.":"Shows "+plainNm(PARTNER)+" a gentle card like “A week to be extra gentle” with ideas for how to care for you. "+((c.share||"phase")==="dates"?"Also shows when your next period is expected.":"Never your dates.")),
+      tog((c.share||"phase")!=="off","Share gentle heads ups with "+plainNm(PARTNER),"He gets care tips like \u201CA week to be extra gentle\u201D and a notification when that week starts. Never your dates.",()=>{saveCycle({share:(c.share||"phase")==="off"?"phase":"off",notifyPartner:true});closeSheet();setTimeout(cycleSheet,350)}),
       tog(c.notifyMe!==false,"Remind me before my period","A notification about 2 days before",()=>{saveCycle({notifyMe:c.notifyMe===false});closeSheet();setTimeout(cycleSheet,350)}),
-      (c.share||"phase")!=="off"?tog(c.notifyPartner!==false,"Give "+plainNm(PARTNER)+" a heads up","When your pre period week starts and when your period is due",()=>{saveCycle({notifyPartner:c.notifyPartner===false});closeSheet();setTimeout(cycleSheet,350)}):null,
       confirmBtn("Delete all my cycle data",()=>{DB.doc("couples/"+CID+"/people/"+ME+"/extra/cycle").delete().catch(syncErr);DB.doc("couples/"+CID+"/people/"+ME+"/extra/cyclePub").set({share:"off",windows:[],date:today}).catch(()=>{});closeSheet();toast("Deleted","Your cycle data is gone")}),
       h("p",{class:"hint",style:"font-size:12.5px"},"Only start dates are stored. Predictions are estimates, not medical advice."))}
   return body})())}
@@ -4312,7 +4309,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-f";
+const APP_VERSION="2026-11-19-g";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
