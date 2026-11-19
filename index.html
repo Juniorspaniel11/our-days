@@ -636,6 +636,18 @@ html,body{margin:0}
 .cycb small{display:block;font-size:12.5px;font-weight:700;color:#c0398a;text-transform:uppercase;letter-spacing:.04em}.cycb b{display:block;font-size:17px}.cycb span:not(.cyce){display:block;font-size:13.5px;color:var(--muted);line-height:1.35}
 .cyce{font-size:30px;line-height:1}.cycb.ph-pre{border-color:rgba(123,95,207,.5);background:linear-gradient(135deg,rgba(123,95,207,.18),rgba(75,91,196,.12))}.cycb.ph-period{border-color:rgba(226,85,124,.5)}
 .cycx{flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}.cycb.mine .fbtn{flex:0 0 auto;white-space:nowrap}
+.ju.care{gap:10px}
+.carep{background:linear-gradient(135deg,rgba(242,184,75,.16),rgba(226,85,124,.12));border:1px solid rgba(242,184,75,.45);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.carehd{display:flex;align-items:center;gap:10px}.carehd .mav{flex:0 0 44px;width:44px;height:44px;font-size:15px}.carehd small{color:var(--muted);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.carehd b{display:block;font-size:18px;line-height:1.25}
+.caretip{margin:0;font-size:14.5px;line-height:1.4}
+.hul{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:left;width:100%;font:inherit;color:inherit}
+.hue{font-size:22px;line-height:1.1}.hut{display:flex;flex-direction:column;min-width:0}.hut b{font-size:15px;line-height:1.3}.hut small{color:var(--muted);font-size:13px;line-height:1.35}
+.carem{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:6px}.carem .cycb{margin-top:6px}
+.careact{display:grid;grid-template-columns:1fr 1fr;gap:8px}.careact .bigbtn{font-size:15px;padding:12px 10px}
+.cycbtn{background:linear-gradient(135deg,#c0398a,#e2557c)!important;color:#fff!important}
+.caretd{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;background:linear-gradient(135deg,rgba(242,184,75,.2),rgba(226,85,124,.14));border:1px solid rgba(242,184,75,.5);border-radius:18px;padding:12px;color:inherit;font:inherit}
+.caretd>small{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#b9661c}.caretd .hul{background:rgba(255,255,255,.55)}
+:root[data-theme="dark"] .caretd .hul{background:rgba(0,0,0,.2)}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1941,6 +1953,35 @@ const needOf=u=>{const p=P(u),n=p&&p.need;if(!n||!n.k)return null;return n.date=
 function setNeed(k){if(!DB||!CID)return;const p=P(ME),nd=NEEDS.find(x=>x[0]===k);DB.doc("couples/"+CID+"/people/"+ME+"/extra/need").set({k,date:tzNow(p.tz).key,at:Date.now()}).catch(syncErr);
   if(k!=="normal")addTo("nudges",{from:ME,at:Date.now(),kind:"need",title:plainNm(ME)+" needs "+nd[1].toLowerCase()+" today "+nd[2],body:nd[3]});
   P(ME).need={k,date:tzNow(p.tz).key,at:Date.now()};render();toast(k==="normal"?"Got it":"Sent to "+plainNm(PARTNER),k==="normal"?"":plainNm(PARTNER)+" will know what helps today")}
+/* ---------- heads ups worked out from each person's own day: deadlines, packed days, late nights, cycle ---------- */
+function headsUp(u){const p=P(u);if(!p||p.placeholder)return [];const t=tzNow(p.tz).key,out=[],nm0=plainNm(u);
+  if(u===PARTNER){const C=partnerCycle(u);if(C)out.push({e:CPH[C.ph][1],t:CPH[C.ph][2],tip:CPH[C.ph][3].split(". ")[0]+".",k:"cyc",open:cyclePartnerSheet})}
+  else{const c=CYC();if(c.on&&(c.share||"phase")!=="off"){const R=cycCalc(c,t);if(R)out.push({e:CPH[R.phase][1],t:CPH[R.phase][2],tip:"From your cycle",k:"cyc"})}}
+  try{countdownsFor(u).filter(c=>c.src!=="shared"&&c.kind!=="visit").map(c=>({c,n:daysBetween(t,c.date)})).filter(x=>x.n>=0&&x.n<=3).slice(0,2).forEach(({c,n})=>
+    out.push({e:"⏳",t:c.title+(n===0?" is today":n===1?" is tomorrow":" in "+n+" days"),tip:n===0?"Send some strength today.":"Encouragement helps more than plans right now.",k:"dl"}))}catch(e){}
+  try{const it=itemsFor(u,t).filter(x=>!x.allDay&&!x.skip),mins=it.reduce((a,x)=>a+Math.max(0,(x.e||0)-(x.s||0)),0);
+    if(it.length>=5||mins>=420)out.push({e:"📅",t:"Packed day: "+it.length+" things"+(mins>=60?", about "+Math.round(mins/60)+" hours":""),tip:"Keep calls short and sweet. Check in at the end of the day.",k:"busy"})}catch(e){}
+  const pr=p.presence;if(u!==ME&&pr&&pr.late===t)out.push({e:"🌙",t:"Up late last night",tip:"A gentle, easy morning helps.",k:"late"});
+  return out}
+function careSection(){const o=PARTNER,on=needOf(o),mine=needOf(ME),hu=headsUp(o),myhu=headsUp(ME),nmO=plainNm(o);
+  const line=x=>h(x.open?"button":"div",{type:x.open?"button":null,class:"hul"+(x.open?" tap":""),onclick:x.open||null},h("span",{class:"hue"},x.e),h("span",{class:"hut"},h("b",null,x.t),x.tip?h("small",null,x.tip):null));
+  return h("section",{class:"ju care",id:"care"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("💛",28,false),"Looking after each other")),
+    h("div",{class:"carep"},h("div",{class:"carehd"},initialEl(o),h("div",null,h("small",null,"How to love "+nmO+" today"),h("b",null,on&&on[0]!=="normal"?on[2]+" Needs "+on[1].toLowerCase():on?"🙂 Normal day":nmO+" hasn't picked a need yet"))),
+      on&&on[0]!=="normal"?h("p",{class:"caretip"},on[3]):null,
+      hu.length?hu.map(line):!on?h("p",{class:"hint",style:"margin:4px 0 0;font-size:14px"},"No heads ups today. Ask how "+nmO+"'s day is going."):null),
+    h("div",{class:"carem"},h("small",{class:"needq"},"Today I need"),
+      h("div",{class:"needc"},NEEDS.map(([k,l,e])=>h("button",{type:"button","aria-pressed":String(!!mine&&mine[0]===k),onclick:()=>setNeed(k)},h("span",null,e),l))),
+      cycleOwnCard(),
+      h("small",{class:"needq",style:"margin-top:8px"},"What "+nmO+" sees about you today"),
+      myhu.length?myhu.map(line):h("p",{class:"hint",style:"margin:0;font-size:13.5px"},"Nothing special. Your deadlines, packed days and late nights show here on their own.")),
+    h("div",{class:"careact"},h("button",{type:"button",class:"bigbtn pzbtn tap",onclick:pauseSheet},h("span",{style:"font-size:20px"},"⏸"),"Need a pause"),
+      h("button",{type:"button",class:"bigbtn cycbtn tap",onclick:cycleSheet},h("span",{style:"font-size:20px"},"🌸"),CYC().on?"My cycle":"Track my cycle")))}
+/* one card on Today: what the partner needs and their heads ups */
+function careToday(){const o=PARTNER;if(!o||!P(o)||P(o).placeholder)return null;const on=needOf(o),hu=headsUp(o);if((!on||on[0]==="normal")&&!hu.length)return null;
+  const goCare=()=>{go("us");setTimeout(()=>{const x=el("care");if(x)x.scrollIntoView({behavior:"smooth",block:"start"})},120)};
+  return h("button",{type:"button",class:"caretd tap",onclick:goCare},h("small",null,"💛 "+plainNm(o)+" today"),
+    on&&on[0]!=="normal"?h("div",{class:"hul"},h("span",{class:"hue"},on[2]),h("span",{class:"hut"},h("b",null,"Needs "+on[1].toLowerCase()),h("small",null,on[3]))):null,
+    hu.slice(0,3).map(x=>h("div",{class:"hul"},h("span",{class:"hue"},x.e),h("span",{class:"hut"},h("b",null,x.t),h("small",null,x.tip)))))}
 function needCard(){const o=PARTNER,on=needOf(o),mine=needOf(ME);
   return h("section",{class:"ju needs"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("💛",28,false),"What we need today")),
     on&&on[0]!=="normal"?h("div",{class:"needo"},h("span",{class:"neede"},on[2]),h("div",null,h("b",null,plainNm(o)+" needs "+on[1].toLowerCase()),h("small",null,on[3]))):
@@ -2006,6 +2047,8 @@ function cycleOwnCard(){const p=P(ME),c=CYC();if(!c.on)return null;const R=cycCa
   return h("div",{class:"cycb mine ph-"+R.phase},h("span",{class:"cyce"},e),h("button",{type:"button",class:"cycx",onclick:cycleSheet},h("small",null,"My cycle · day "+R.day+(R.guess?" · learning":"")),h("b",null,lab),
       h("span",null,R.late?"Period may be "+R.late+(R.late===1?" day":" days")+" late":dl===0?"Period expected today":"Period in about "+dl+(dl===1?" day":" days"))),
     h("button",{type:"button",class:"fbtn on",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to log";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🩸 Started today"}},4000);return}logPeriod(tzNow(p.tz).key)}},"🩸 Started today"))}
+/* her own cycle shows on Today only when her period is close, so she can log it fast */
+function cycleDueCard(){const c=CYC();if(!c.on)return null;const R=cycCalc(c,tzNow(P(ME).tz).key);if(!R)return null;const dl=daysBetween(tzNow(P(ME).tz).key,R.next);return dl<=2||R.late?cycleOwnCard():null}
 function logPeriod(k){const c=CYC(),st=(c.starts||[]).filter(x=>Math.abs(daysBetween(x,k))>10);st.push(k);saveCycle({on:true,starts:st.sort().slice(-24)});toast("Logged 🌸","Period started "+shortDate(k))}
 function cycleSheet(){openSheet("My cycle",(()=>{const c=CYC(),p=P(ME),today=tzNow(p.tz).key,R=c.on?cycCalc(c,today):null;
   const body=h("div",{class:"body"});
@@ -2026,9 +2069,8 @@ function viewToday(){
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
     isT&&pid===ME?pauseBanner():null,
-    isT&&pid===ME?needBanner():null,
-    isT&&pid===ME?cycleCardPartner():null,
-    isT&&pid===ME?cycleOwnCard():null,
+    isT&&pid===ME?careToday():null,
+    isT&&pid===ME?cycleDueCard():null,
     isT?todayHero(pid):null,
     isT?growMe(pid):null,
     pid===ME?bigBanner():null,
@@ -2789,7 +2831,8 @@ function homeSheet(){juSheet("Our dream home",()=>{
 
 
 /* ---------- Online presence ---------- */
-function presenceBeat(state){if(!DB||!CID||!ME)return;DB.doc("couples/"+CID+"/people/"+ME+"/extra/presence").set({at:Date.now(),state}).catch(()=>{})}
+function presenceBeat(state){if(!DB||!CID||!ME)return;const n=tzNow(P(ME).tz),o={at:Date.now(),state};if(state==="online"&&n.min>=30&&n.min<=270)o.late=n.key;
+  DB.doc("couples/"+CID+"/people/"+ME+"/extra/presence").set(o,{merge:true}).catch(()=>{})}
 setInterval(()=>{if(!document.hidden)presenceBeat("online")},60000);
 document.addEventListener("visibilitychange",()=>presenceBeat(document.hidden?"away":"online"));
 addEventListener("pagehide",()=>presenceBeat("away"));
@@ -4048,7 +4091,7 @@ function viewUs(){
   out.push(coupleStrip());
   {const bb=bigBanner();if(bb)out.push(bb)}
   {const pb=pauseBanner();if(pb)out.push(pb)}
-  out.push(needCard());
+  out.push(careSection());
   const pillsEl=h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days")));
@@ -4059,7 +4102,7 @@ function viewUs(){
   const heartBtn=h("button",{type:"button",class:"bigbtn heart tap","aria-label":"Send thinking of you"},svgEl(HEART.replace("currentColor","#fff")),"Thinking of you");
   heartBtn.onclick=()=>{addTo("nudges",{from:ME,at:Date.now()});saveUs({counts:{hearts:INC(1)}});setSeenNudge();hearts(heartBtn);toast("Sent to "+nm(PARTNER),nm(PARTNER)+" gets: "+nm(ME)+" is thinking of you")};
   if(got&&got.at>usSeenNudge()&&Date.now()-got.at<2*864e5)gotEl=(h("button",{type:"button",class:"got tap",onclick:()=>heartBtn.click()},svgEl(HEART),h("div",null,h("b",null,nm(PARTNER)+" is thinking of you"),h("span",null,ago(got.at)+" · tap to send one back"))));
-  top.appendChild(h("div",{class:"actions"},heartBtn,h("button",{type:"button",class:"bigbtn pzbtn tap",onclick:pauseSheet},h("span",{style:"font-size:22px"},"⏸"),"Need a pause")));
+  top.appendChild(h("div",{class:"actions one"},heartBtn));
 
   const dq=dailyQ(k),qa=ANS()["d:"+k]||{},ph=dailyPhotos(k),tg=gameById("tot"),tt=GM("tot")[gkey(k,gameRound("tot",k))]||{};
   const av=done=>h("div",{class:"avs"},[ME,PARTNER].map(x=>h("i",{class:done(x)?"on":""},(nm(x)[0]||"?"))));
@@ -4309,7 +4352,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-g";
+const APP_VERSION="2026-11-19-h";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});

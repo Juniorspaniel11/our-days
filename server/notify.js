@@ -216,6 +216,24 @@ async function cycleEvents(db, cid, members, people, now) {
   }
   return out;
 }
+/* ---------- heads up to the partner when one of you has a deadline close: 2 days before and on the day, 9 AM partner time ---------- */
+function deadlineHeadsUps(members, people, now) {
+  const out = [], lo = now - LOOKBACK_MIN * 60000, hi = now + AHEAD_MIN * 60000;
+  for (const u of members) {
+    const p = people[u], o = members.find(x => x !== u), op = people[o]; if (!p || !o || !op) continue;
+    if (((op.settings && op.settings.notif) || {}).partner === false) continue;
+    const tz = validTz(p.tz) ? p.tz : "America/Chicago", otz = validTz(op.tz) ? op.tz : tz, today = parts(now, tz).key, ot = parts(now, otz).key, at9 = wallToMs(ot, 540, otz);
+    if (!(at9 > lo && at9 <= hi)) continue;
+    const nm = String(p.name || "Your partner").replace(/[^\p{L}\p{M}\s'.-]/gu, "").trim() || "Your partner";
+    const own = (p.countdowns || []).filter(c => c.date && c.kind !== "visit").concat((p.projects || []).filter(x => x.target && !x.done).map(x => ({ title: x.title, date: x.target })));
+    for (const c of own) {
+      const n = daysBetween(today, c.date);
+      if (n === 2) out.push({ to: o, key: "hu:" + u + ":" + c.date + ":" + c.title + ":2", at: now, title: nm + " has " + c.title + " in 2 days ⏳", body: "Encouragement helps more than plans right now." });
+      if (n === 0) out.push({ to: o, key: "hu:" + u + ":" + c.date + ":" + c.title + ":0", at: now, title: nm + "'s " + c.title + " is today", body: "Send some strength today 💪" });
+    }
+  }
+  return out;
+}
 
 /* ---------- things one of you sent the other (Us tab) ---------- */
 async function socialEvents(db, cid, members, people, now) {
@@ -307,6 +325,7 @@ async function main() {
     try { social = await socialEvents(db, cid, members, people, now); } catch (e) { console.warn("us events", e.message); }
     let cyc = [];
     try { cyc = await cycleEvents(db, cid, members, people, now); } catch (e) { console.warn("cycle events", e.message); }
+    try { cyc = cyc.concat(deadlineHeadsUps(members, people, now)); } catch (e) { console.warn("heads ups", e.message); }
     for (const uid of members) {
       const person = people[uid]; if (!person) continue;
       const tz = validTz(person.tz) ? person.tz : "America/Chicago";
@@ -357,5 +376,5 @@ async function main() {
   console.log("done, notifications sent:", sent);
 }
 
-module.exports = { socialEvents, cycleEvents, cycCalc, cyclePubFor, dueNotifications, fetchCalendar, wallToMs, parts };
+module.exports = { socialEvents, cycleEvents, deadlineHeadsUps, cycCalc, cyclePubFor, dueNotifications, fetchCalendar, wallToMs, parts };
 if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });
