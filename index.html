@@ -563,6 +563,23 @@ html,body{margin:0}
 .fmx b{font-size:16px;line-height:1.25}.fmx small{font-size:12.5px;opacity:.75;line-height:1.3;margin-top:1px}
 .fmadd .fmt{border-style:dashed}
 .vnow{display:inline-block;margin-top:6px;font-size:13px;font-weight:700;color:#f6d38a;background:rgba(246,211,138,.13);border:1px solid rgba(246,211,138,.4);border-radius:999px;padding:3px 10px;line-height:1.35}
+.mseg{align-self:flex-start;margin:2px 0 4px}.mseg button{padding:6px 16px;font-size:15px}
+.btot{display:flex;align-items:center;justify-content:space-between;gap:12px}.btot>div{display:flex;flex-direction:column}.btot b{font-size:28px;line-height:1.15}.btot small{color:var(--muted);font-size:14px}
+.gbar.mbar{height:10px}.gbar.over i,.bcr.over .gbar i{background:#e0902b!important}
+.bcl{display:flex;flex-direction:column;gap:6px}
+.bcr{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px;text-align:left;width:100%}
+.bcr.over{border-color:#e0902b}.bcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.bcn b{font-size:15.5px}
+.bca{display:flex;flex-direction:column;align-items:flex-end;font-weight:700;font-size:15.5px;white-space:nowrap}.bca small{font-weight:500;color:var(--muted);font-size:12.5px}
+.spl{display:flex;flex-direction:column;gap:6px}.spr{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px}
+.spr.done{opacity:.55}.spw{flex:1;min-width:0;display:flex;flex-direction:column}.spw b{font-size:15.5px}.spw small{color:var(--muted);font-size:13px}.spa{font-size:16px;white-space:nowrap}
+.ju.sky{background:linear-gradient(160deg,#1b2350,#3a2c64 60%,#5a3a5e);color:#fff;border-radius:22px;padding:14px;border:1px solid rgba(255,255,255,.12)}
+.ju.sky .sh{color:#fff}.skyg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.skys{display:flex;flex-direction:column;gap:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--pc);border-radius:16px;padding:10px 12px;min-width:0}
+.skyn{font-weight:700;font-size:13px;color:var(--pc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skyt{display:flex;align-items:center;gap:6px}.skyt b{font-size:34px;line-height:1.1;font-weight:700}.skyload{opacity:.6}
+.skyl{font-size:13.5px;opacity:.88;line-height:1.3}.skyl.sun{opacity:1;margin-top:2px}
+.skym{display:flex;align-items:center;gap:12px;margin-top:10px;background:rgba(255,255,255,.07);border-radius:14px;padding:8px 12px}
+.skymo{font-size:34px;line-height:1}.skym b{display:block;font-size:16px}.skym small{opacity:.8;font-size:13px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3042,13 +3059,71 @@ function goalCard(g){const sv=goalSaved(g.id),pc=g.target>0?Math.min(100,Math.ro
       h("b",{class:a.amt<0?"neg":""},show?(a.amt<0?"−":"+")+money(Math.abs(a.amt)):"••••"),a.by===ME?h("button",{type:"button",class:"x","aria-label":"Remove entry",onclick:()=>saveMoney({adds:{[a.id]:DEL()}})},"×"):null)):h("p",{class:"hint"},"Nothing added yet."),
       h("button",{type:"button",class:"link",onclick:()=>addMoneySheet(g,true)},"Take money out")))}
   return c}
-function savingsSection(){const gs=goals(),tot=gs.reduce((s,g)=>s+goalSaved(g.id),0),show=unlocked();
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Saving together"),
-      h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Turn lock off":"🔒 Unlock"):"🔒 Lock")),
-    h("div",{class:"savetot"},emo("🫙",44,true),h("div",null,h("span",{class:"k"},"Saved together"),h("b",null,show?money(tot):"••••"))),
-    h("div",{class:"goals"},gs.map(goalCard)),
-    h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(null)},"+ New goal"))}
-
+/* ---------- Our money: budget, savings goals and shared expenses. Amounts and labels only ---------- */
+const BCATS=[["home","Rent and bills","🏠"],["food","Groceries","🛒"],["out","Eating out","🍽️"],["move","Transport","🚗"],["give","Church and giving","🙏"],["fun","Dates and fun","💞"],["fam","Family back home","🇬🇭"],["other","Other","✨"]];
+const looksSensitive=t=>/\d[\d \-]{10,}\d/.test(t||"")||/\b(password|passcode|pin|routing|account number|card number|cvv|ssn)\b/i.test(t||"");
+const noSensitive=(...ts)=>{if(ts.some(looksSensitive)){toast("Not saved","Keep it to amounts and labels. No account, card or login details here.");return false}return true};
+const mKey=()=>usDay().slice(0,7);
+function bcats(){const c=(MONEY().budget||{}).cats||{};return BCATS.map(([id,name,e],i)=>({id,name,e,order:i,limit:0,...(c[id]||{})})).concat(Object.entries(c).filter(([id])=>!BCATS.some(b=>b[0]===id)).map(([id,x])=>({id,order:50,limit:0,...x}))).filter(x=>!x.removed).sort((a,b)=>a.order-b.order)}
+const spendIn=(mk,cat)=>Object.entries(MONEY().spend||{}).map(([id,x])=>({id,...x})).filter(x=>x.mk===mk&&(!cat||x.cat===cat)).sort((a,b)=>b.at-a.at);
+const spentIn=(mk,cat)=>spendIn(mk,cat).reduce((s,x)=>s+(+x.amt||0),0);
+const amtIn=v=>{const n=parseFloat(String(v).replace(/[$,\s]/g,""));return isFinite(n)&&n>0?Math.round(n*100)/100:0};
+const money2=n=>"$"+(+n).toLocaleString("en-US",{minimumFractionDigits:Math.round(n)===n?0:2,maximumFractionDigits:2});
+function splitItems(){return Object.entries(MONEY().split||{}).map(([id,x])=>({id,...x})).filter(x=>!x.removed).sort((a,b)=>b.at-a.at)}
+/* positive: partner owes me */
+function splitBalance(){return splitItems().filter(x=>!x.settled).reduce((s,x)=>{const part=x.share==="for"?x.amt:x.amt/2;return s+(x.paid===ME?part:-part)},0)}
+function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?money2(v):"••••";
+  const segb=(id,lab)=>h("button",{type:"button","aria-pressed":String(tab===id),onclick:()=>{ui.monTab=id;render()}},lab);
+  const lockLink=h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Turn lock off":"🔒 Unlock"):"🔒 Lock");
+  let pane;
+  if(tab==="budget"){const mk=mKey(),cs=bcats(),lim=cs.reduce((a,c)=>a+(+c.limit||0),0),sp=spentIn(mk),pc=lim?Math.min(100,Math.round(sp/lim*100)):0;
+    const lm=addDays(mk+"-01",-1).slice(0,7),lsp=spentIn(lm);
+    pane=[h("div",{class:"btot"},h("div",null,h("span",{class:"k"},monthName(mk).split(" ")[0]+" spending"),h("b",null,M(sp)),h("small",null,lim?"of "+M(lim)+" planned"+(show&&sp>lim?" · "+money2(sp-lim)+" over":""):"Set a monthly amount for each category")),
+        h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log")),
+      lim?h("div",{class:"gbar mbar"+(sp>lim?" over":"")},h("i",{style:"width:"+pc+"%"})):null,
+      h("div",{class:"bcl"},cs.map(c=>{const s2=spentIn(mk,c.id),l=+c.limit||0,p2=l?Math.min(100,Math.round(s2/l*100)):0;if(!l&&!s2&&!ui.monAll)return null;
+        return h("button",{type:"button",class:"bcr tap"+(l&&s2>l?" over":""),onclick:()=>catSheet(c)},emo(c.e,26,false),h("span",{class:"bcn"},h("b",null,c.name),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"}))),h("span",{class:"bca"},M(s2),l?h("small",null,"of "+M(l)):null))})),
+      h("button",{type:"button",class:"link",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show only categories in use":"Show all categories · set amounts"),
+      lsp?h("p",{class:"hint",style:"font-size:14px"},monthName(lm).split(" ")[0]+": "+M(lsp)+" spent"):null]}
+  else if(tab==="split"){const bal=splitBalance(),it=splitItems(),open=it.filter(x=>!x.settled);
+    const line=Math.abs(bal)<0.005?"You're all square 🤝":bal>0?nm(PARTNER)+" owes you "+M(bal):"You owe "+nm(PARTNER)+" "+M(-bal);
+    pane=[h("div",{class:"btot"},h("div",null,h("span",{class:"k"},"Shared expenses"),h("b",{style:"font-size:22px"},line),h("small",null,open.length?open.length+(open.length===1?" expense":" expenses")+" not settled":"Log what one of you paid for both")),
+        h("button",{type:"button",class:"ghost",onclick:splitSheet},"+ Add")),
+      open.length?h("div",{class:"row"},confirmBtn("Settle up ✓",()=>{const o={};open.forEach(x=>{o[x.id]={settled:true,settledAt:Date.now(),settledBy:ME}});saveMoney({split:o});confetti(80);toast("Settled","You're all square")})):null,
+      h("div",{class:"spl"},it.slice(0,ui.monMore?40:6).map(x=>h("div",{class:"spr"+(x.settled?" done":"")},h("span",{class:"spw"},h("b",null,x.what),h("small",null,(x.paid===ME?"You":nm(x.paid))+" paid · "+(x.share==="for"?"for "+(x.paid===ME?nm(PARTNER):"you"):"split 50/50")+" · "+new Date(x.at).toLocaleDateString("en-US",{month:"short",day:"numeric"})+(x.settled?" · settled":""))),
+        h("b",{class:"spa"},M(x.amt)),!x.settled&&x.by===ME?h("button",{type:"button",class:"x","aria-label":"Remove "+x.what,onclick:()=>saveMoney({split:{[x.id]:{removed:true}}})},"×"):null))),
+      it.length>6?h("button",{type:"button",class:"link",onclick:()=>{ui.monMore=!ui.monMore;render()}},ui.monMore?"Show fewer":"Show all"):null]}
+  else{const gs=goals(),tot=gs.reduce((a,g)=>a+goalSaved(g.id),0);
+    pane=[h("div",{class:"savetot"},emo("🫙",44,true),h("div",null,h("span",{class:"k"},"Saved together"),h("b",null,show?money(tot):"••••"))),
+      h("div",{class:"goals"},gs.map(goalCard)),h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(null)},"+ New goal")]}
+  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our money"),lockLink),
+    h("div",{class:"seg mseg"},segb("budget","Budget"),segb("save","Savings"),segb("split","Split")),
+    ...pane,h("p",{class:"hint",style:"font-size:12.5px"},"Amounts and labels only. Never bank logins, account or card numbers."))}
+function spendSheet(cat){let c=cat?cat.id:(ui.lastCat||"food");juSheet("Log spending",()=>{
+  const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount, e.g. 24.50","aria-label":"Amount"}),n=h("input",{type:"text",class:"inp",placeholder:"What for (optional)","aria-label":"What for"});
+  const chips=h("div",{class:"chips"},bcats().map(x=>h("button",{type:"button","aria-pressed":String(x.id===c),onclick:ev=>{c=x.id;chips.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},x.e+" "+x.name)));
+  setTimeout(()=>a.focus(),80);
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();const v=amtIn(a.value);if(!v){toast("Amount needed","Type how much you spent");return}if(!noSensitive(n.value))return;
+      ui.lastCat=c;saveMoney({spend:{[uid()]:{cat:c,amt:v,note:n.value.trim(),by:ME,at:Date.now(),mk:mKey()}}});closeSheet();toast("Logged",money2(v)+" · "+(bcats().find(x=>x.id===c)||{}).name)}},
+    h("p",{class:"hint"},"Which category?"),chips,a,n,h("button",{type:"submit",class:"primary"},"Save"))})}
+function catSheet(c0){juSheet(c0.name,()=>{const c=bcats().find(x=>x.id===c0.id)||c0,mk=mKey(),L=spendIn(mk,c.id),show=unlocked();
+  const lim=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Monthly amount","aria-label":"Monthly amount for "+c.name});lim.value=c.limit||"";
+  return [h("div",{class:"bigemo"},emo(c.e,56,true)),
+    h("p",{class:"q",style:"text-align:center"},(show?money2(spentIn(mk,c.id)):"••••")+" spent in "+monthName(mk).split(" ")[0]+(c.limit?" of "+(show?money2(c.limit):"••••"):"")),
+    h("button",{type:"button",class:"btn",onclick:()=>spendSheet(c)},"+ Log spending"),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=lim.value.trim()===""?0:amtIn(lim.value);saveMoney({budget:{cats:{[c.id]:{name:c.name,e:c.e,order:c.order,limit:v}}}});toast("Saved",v?c.name+": "+money2(v)+" a month":"No set amount")}},
+      h("div",{style:"flex:1 1 160px"},lim),h("button",{type:"submit",class:"ghost"},"Set monthly amount")),
+    L.length?h("div",{class:"spl"},L.map(x=>h("div",{class:"spr"},h("span",{class:"spw"},h("b",null,x.note||c.name),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+new Date(x.at).toLocaleDateString("en-US",{month:"short",day:"numeric"}))),
+      h("b",{class:"spa"},show?money2(x.amt):"••••"),x.by===ME?h("button",{type:"button",class:"x","aria-label":"Remove","onclick":()=>saveMoney({spend:{[x.id]:DEL()}})},"×"):null))):h("p",{class:"hint",style:"text-align:center"},"Nothing logged here this month.")]})}
+function splitSheet(){let paid=ME,share="half";juSheet("Shared expense",()=>{
+  const w=h("input",{type:"text",class:"inp",placeholder:"What was it? e.g. Flights to Vegas","aria-label":"What"}),a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount","aria-label":"Amount"});
+  const pick=(opts,get,set)=>{const box=h("div",{class:"seg"},opts.map(([v,l])=>h("button",{type:"button","aria-pressed":String(get()===v),onclick:ev=>{set(v);box.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},l)));return box};
+  setTimeout(()=>w.focus(),80);
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();const v=amtIn(a.value);if(!w.value.trim()){w.focus();return}if(!v){toast("Amount needed","");return}if(!noSensitive(w.value))return;
+      saveMoney({split:{[uid()]:{what:w.value.trim(),amt:v,paid,share,by:ME,at:Date.now(),settled:false}}});closeSheet();toast("Added",share==="for"?(paid===ME?nm(PARTNER)+" owes you "+money2(v):"You owe "+nm(PARTNER)+" "+money2(v)):"Split 50/50 · "+money2(v/2)+" each")}},
+    w,a,h("p",{class:"hint"},"Who paid?"),pick([[ME,"You"],[PARTNER,nm(PARTNER)]],()=>paid,v=>{paid=v}),
+    h("p",{class:"hint"},"How should it be split?"),pick([["half","Split 50/50"],["for","All for the other"]],()=>share,v=>{share=v}),
+    h("button",{type:"submit",class:"primary"},"Add"))})}
 function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x])=>({id,...x})).sort((a,b)=>a.at-b.at),mine=all.filter(x=>x.owner===ME),hers=all.filter(x=>x.owner===PARTNER);
   const ti=h("input",{type:"text",class:"inp",placeholder:"Something you'd love"}),ln=h("input",{type:"url",class:"inp",placeholder:"Link (optional)"});
   const pic=t=>emo("🎁",30,false);
@@ -3079,7 +3154,7 @@ function homeDesignSection(){const link=US.main.homeLink||"";
       h("div",{style:"flex:1 1 220px"},inp),h("button",{type:"submit",class:"ghost"},link?"Update":"Save link")),
     !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
 
-function viewHome(){return [savingsSection(),wishSection(),homeDesignSection()]}
+function viewHome(){return [moneySection(),wishSection(),homeDesignSection()]}
 function viewFuture(){return [visionSection(me())]}
 
 /* ---------- Future me: vision board ---------- */
@@ -3635,12 +3710,45 @@ function questionsSheet(){juSheet("Ask each other",()=>{const A=ANS(),tops=enabl
     h("div",{class:"tgrid"},tops.map(t=>{const n=t.qs.filter((q,i)=>bothAnswered(t.id+":"+i)).length,pc=Math.round(n/t.qs.length*100),wt=t.qs.filter((q,i)=>{const a=A[t.id+":"+i]||{};return a[oo]&&!a[w]}).length;
       return tile(t.c,TOPIC_EMOJI[t.id],t.name,wt?h("small",{class:"sub"},wt+" for you"):h("div",{class:"jbar"},h("span",null,h("i",{style:"width:"+pc+"%"}))),wt>0,()=>topicSheet(t))})),
     h("button",{type:"button",class:"btn gh",onclick:topicsSettingsSheet},"Choose topics")]})}
+/* ---------- Two skies: weather, sunset and the moon over both of you (Open-Meteo, moon worked out here) ---------- */
+const SYN=29.530588853,MREF=Date.UTC(2000,0,6,18,14);
+function moonInfo(t){t=t||Date.now();const a=((((t-MREF)/864e5)%SYN)+SYN)%SYN,f=a/SYN,ill=Math.round((1-Math.cos(2*Math.PI*f))/2*100);
+  const N=[["New moon","🌑"],["Waxing crescent","🌒"],["First quarter","🌓"],["Waxing gibbous","🌔"],["Full moon","🌕"],["Waning gibbous","🌖"],["Last quarter","🌗"],["Waning crescent","🌘"]],i=Math.floor((f*8+0.5)%8);
+  const toFull=((SYN/2-a)%SYN+SYN)%SYN,toNew=SYN-a;return {age:a,ill,name:N[i][0],e:N[i][1],toFull,toNew}}
+const WMO=c=>c===0?["☀️","Clear"]:c<=2?["🌤️","Partly cloudy"]:c===3?["☁️","Cloudy"]:c<=48?["🌫️","Foggy"]:c<=57?["🌦️","Drizzle"]:c<=67?["🌧️","Rain"]:c<=77?["❄️","Snow"]:c<=82?["🌧️","Showers"]:c<=86?["🌨️","Snow showers"]:["⛈️","Storms"];
+const SKY={},SKYKEY="od-sky-v1";let SKYBUSY={};
+try{Object.assign(SKY,JSON.parse(localStorage.getItem(SKYKEY)||"{}"))}catch(e){}
+async function loadSky(u){const p=P(u);if(!p||!p.city||SKYBUSY[u])return;SKYBUSY[u]=true;
+  try{let g=SKY["g:"+p.city+"|"+p.tz];
+    if(!g){const r=await fetch("https://geocoding-api.open-meteo.com/v1/search?count=5&language=en&format=json&name="+encodeURIComponent(p.city.split(",")[0].trim()));const j=await r.json();
+      const R=j.results||[],x=R.find(z=>z.timezone===p.tz)||R[0];if(!x)throw new Error("no place");g={lat:x.latitude,lon:x.longitude};SKY["g:"+p.city+"|"+p.tz]=g}
+    const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+g.lat+"&longitude="+g.lon+"&current=temperature_2m,weather_code,is_day&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=fahrenheit&forecast_days=1");
+    if(!r.ok)throw new Error("weather "+r.status);const d=await r.json();
+    SKY[u]={at:Date.now(),city:p.city,t:d.current.temperature_2m,code:d.current.weather_code,day:d.current.is_day,hi:d.daily.temperature_2m_max[0],lo:d.daily.temperature_2m_min[0],rise:d.daily.sunrise[0],set:d.daily.sunset[0],now:d.current.time};
+    try{localStorage.setItem(SKYKEY,JSON.stringify(SKY))}catch(e){}
+    if(S.tab==="us")render()}catch(e){console.warn("sky",e);SKY["err:"+u]=Date.now()}
+  SKYBUSY[u]=false}
+const hm12=iso=>{const [hh,mm]=iso.slice(11,16).split(":").map(Number);return ((hh%12)||12)+":"+String(mm).padStart(2,"0")+(hh<12?" AM":" PM")};
+function skyCard(){const ppl=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder&&P(u).city);if(!ppl.length)return null;
+  ppl.forEach(u=>{const x=SKY[u],fresh=x&&x.city===P(u).city&&Date.now()-x.at<30*6e4,err=SKY["err:"+u]&&Date.now()-SKY["err:"+u]<5*6e4;if(!fresh&&!err)setTimeout(()=>loadSky(u),0)});
+  const m=moonInfo(),side=u=>{const x=SKY[u]&&SKY[u].city===P(u).city?SKY[u]:null,c=PCOL(u)[0],[we,wl]=x?WMO(x.code):["",""];
+    const nowK=x?tzNow(P(u).tz):null,nowM=nowK?nowK.min:0,setM=x?(+x.set.slice(11,13))*60+(+x.set.slice(14,16)):0,left=setM-nowM;
+    const sunTxt=!x?"":left>0&&left<180?"Sunset in "+(left>=60?Math.floor(left/60)+"h ":"")+(left%60)+"m":left>0?"Sunset "+hm12(x.set):x.day?"Sunset "+hm12(x.set):"Sun set at "+hm12(x.set);
+    return h("div",{class:"skys",style:"--pc:"+c},h("small",{class:"skyn"},(u===ME?"You":plainNm(u))+" · "+P(u).city.split(",")[0]),
+      x?h("div",{class:"skyt"},h("span",{class:"skye"},emo(x.day?we:(x.code<=2?"🌙":we),40,false)),h("b",null,Math.round(x.t)+"°")):h("div",{class:"skyt"},h("b",{class:"skyload"},SKY["err:"+u]?"—":"…")),
+      x?h("span",{class:"skyl"},wl+" · H "+Math.round(x.hi)+"° L "+Math.round(x.lo)+"°"):h("span",{class:"skyl"},SKY["err:"+u]?"Weather unavailable":"Checking the sky"),
+      x?h("span",{class:"skyl sun"},"🌇 "+sunTxt):null)};
+  const ff=Math.round(m.toFull),moonLine=m.ill>=98?"Full moon tonight":ff<=7&&m.toFull<SYN/2&&m.age<SYN/2?"Full moon in "+(ff<=1?"a day":ff+" days"):m.name+" · "+m.ill+"% lit";
+  return h("section",{class:"ju sky"},h("div",{class:"sechd"},h("h2",{class:"sh"},emo("🌌",28,false),"Two skies")),
+    h("div",{class:"skyg"},ppl.map(side)),
+    h("div",{class:"skym"},h("span",{class:"skymo"},m.e),h("div",null,h("b",null,moonLine),h("small",null,ppl.length>1?"The same moon over both of you tonight":"Tonight's moon"))))}
 function viewUs(){
   const o=P(partnerOf(ME)),out=[];
   if(!o||o.placeholder){out.push(...usPartner());out.push(usPlans());return out}
   const k=usDay(),st=prayerStreak(),days=togetherDays(),v=nextVisit();
   out.push(coupleStrip());
   {const bb=bigBanner();if(bb)out.push(bb)}
+  {const sk=skyCard();if(sk)out.push(sk)}
   const pillsEl=h("div",{class:"ju"},h("div",{class:"jpills"},
     h("button",{type:"button",class:"jpill tap",onclick:prayerSheet,"aria-label":"Prayer streak"},svgEl(ICON.moon("#f2b84b").replace('style="padding:6px"','')),String(st)),
     h("button",{type:"button",class:"jpill tap",onclick:()=>days==null?datesSheet():gardenSheet()},svgEl(ICON.heart("#e2557c")),days==null?"Set your date":days.toLocaleString()+" days")));
@@ -3899,7 +4007,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-15-s";
+const APP_VERSION="2026-11-19-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
