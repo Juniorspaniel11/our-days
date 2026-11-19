@@ -214,6 +214,19 @@ async function cycleEvents(db, cid, members, people, now) {
     if (otoday === R.preStart) out.push({ to: o, key: "cyc:pre:" + R.preStart, at: now, title: nm + "'s pre period week starts today 🌙", body: "A week to be extra gentle: patience, lighter plans, more reassurance." });
     if (otoday === R.next) out.push({ to: o, key: "cyc:per:" + R.next, at: now, title: nm + "'s period may start today", body: "Comfort helps: warmth, rest, easy plans and gentle check ins." });
   }
+  /* a cycle one of you logs for the other (used only while she isn't sharing her own) */
+  for (const u of members) {
+    const snap = await db.doc(`couples/${cid}/people/${u}/extra/partnerCycle`).get(); if (!snap.exists) continue;
+    const L = snap.data(), o = members.find(x => x !== u); if (!L.on || !o || !(L.starts || []).length) continue;
+    const own = await db.doc(`couples/${cid}/people/${o}/extra/cycle`).get();
+    if (own.exists && own.data().on && (own.data().share || "off") !== "off") continue;
+    const p = people[u] || {}, op = people[o] || {}, tz = validTz(p.tz) ? p.tz : "America/Chicago", otz = validTz(op.tz) ? op.tz : tz;
+    const nm = String(op.name || "Your partner").replace(/[^\p{L}\p{M}\s'.-]/gu, "").trim() || "Your partner";
+    const R = cycCalc(L, parts(now, otz).key); if (!R) continue;
+    const t = parts(now, tz).key, at9 = wallToMs(t, 540, tz); if (!(at9 > lo && at9 <= hi)) continue;
+    if (t === R.preStart) out.push({ to: u, key: "cyc:pre:" + R.preStart, at: now, title: nm + "'s pre period week starts today 🌙", body: "A week to be extra gentle: patience, lighter plans, more reassurance." });
+    if (t === R.next) out.push({ to: u, key: "cyc:per:" + R.next, at: now, title: nm + "'s period may start today", body: "Comfort helps: warmth, rest, easy plans and gentle check ins." });
+  }
   return out;
 }
 /* ---------- heads up to the partner when one of you has a deadline close: 2 days before and on the day, 9 AM partner time ---------- */
