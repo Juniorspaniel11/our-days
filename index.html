@@ -687,6 +687,21 @@ html,body{margin:0}
 .cysheet .rolltg{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff}.cysheet .chips button{background:rgba(255,255,255,.12);color:#fff;border:0}
 .pzrow{display:flex;gap:14px;justify-content:center;margin:6px 0}.pzround{width:86px;height:86px;border-radius:50%;border:0;background:linear-gradient(135deg,#4b5bc4,#7b5fcf);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(75,91,196,.35);font:inherit}
 .pzround b{font-family:var(--fun);font-size:32px;line-height:1}.pzround small{font-size:12px;opacity:.9}
+.mhero.dark{background:radial-gradient(120% 70% at 100% 0%,rgba(95,208,196,.35),transparent 60%),linear-gradient(155deg,#141b3d,#1d3557 55%,#185a63);color:#fff;border-radius:28px;padding:16px;box-shadow:0 18px 40px rgba(20,27,61,.3)}
+.mhero.dark .mring{color:#fff}.mhero.dark .mrc small,.mhero.dark .mhx small{color:rgba(255,255,255,.8)}.mhero.dark .mhx b{color:#5fe0c8}.mhero.dark .mhx b.over{color:#ffb35c}.mhero.dark .k{color:#9fe8dc}
+.billrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
+.billrow .billr{flex:0 0 138px;flex-direction:column;align-items:flex-start;gap:4px;scroll-snap-align:start;border-top:4px solid var(--bc)}
+.billrow .billr .spa{font-size:18px}.billrow .billr .bcn small{white-space:nowrap}
+.gifts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.gift{display:flex;flex-direction:column;gap:6px;border-radius:18px;padding:12px;background:var(--gc);color:#fff;min-height:118px;border:0;text-align:left;font:inherit;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.gift.got{opacity:.6}.gife{font-size:28px;line-height:1}.gift b{font-size:16px;line-height:1.25;flex:1}
+.gift.add{background:transparent;border:2px dashed var(--line);color:var(--muted);align-items:center;justify-content:center}.gift.add .gife{font-size:30px}
+.gifa{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.gifb{background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:999px;padding:4px 10px;font:inherit;font-size:13px;font-weight:700;text-decoration:none}.gifb.on{background:#fff;color:#2a1a22}.gifa small{font-size:12.5px;opacity:.9}
+.ju .tdbox{background:radial-gradient(120% 70% at 100% 0%,rgba(242,184,75,.32),transparent 60%),linear-gradient(155deg,#2b1a3f,#4b2a5f 55%,#7a3b4f)!important;color:#fff;border:0!important;box-shadow:0 18px 40px rgba(43,26,63,.35)}
+.ju .tdbox h2{color:#fff}.ju .tdbox .hint{color:rgba(255,255,255,.8)}
+.ju .tdbox .pc{background:var(--c)!important;color:#fff!important;border-left:0!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.ju .tdbox .pc .k{color:rgba(255,255,255,.85)}.ju .tdbox .pc .hint{color:rgba(255,255,255,.85)}.ju .tdbox .pc .go{color:#fff;border-color:rgba(255,255,255,.7)}
+.ju .tdbox .pc .tx{font-size:19px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3431,16 +3446,16 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
     const BL=bills(),today=usDay();
     const due=moneySummaryDue();
     pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
-      h("div",{class:"mhero"},ring,h("div",{class:"mhx"},h("span",{class:"k"},monthName(mk).split(" ")[0]),
+      h("div",{class:"mhero dark"},ring,h("div",{class:"mhx"},h("span",{class:"k"},monthName(mk).split(" ")[0]),
         h("b",{class:leftv<0?"over":""},lim?(leftv>=0?M(leftv)+" left":M(-leftv)+" over"):"No plan yet"),
         h("small",null,lim?(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1;return (upv?"after "+M(upv)+" in bills still to come · ":"")+dl+(dl===1?" day":" days")+" to go"+(leftv>0&&show?" · about "+money2(Math.floor(leftv/dl))+" a day":"")})():"Tap a category to set a monthly amount"),
         h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending"))),
       h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills"),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
-        BL.length?BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
+        BL.length?h("div",{class:"billrow"},BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
           const c=bcats().find(x=>x.id===b.cat)||{e:"✨",id:"other"};
           return h("button",{type:"button",class:"billr tap"+(paid?" paid":"")+(!paid&&!skip&&!notyet&&dleft<=3?" soon":""),style:"--bc:"+bcol(c),onclick:()=>billSheet(b)},h("span",{class:"bci"},emo(c.e,20,false)),
             h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd)+" · in "+dleft+" days")),
-            h("b",{class:"spa"},M(b.amt)))})
+            h("b",{class:"spa"},M(b.amt)))}))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
       h("div",{class:"bcl"},cs.map(c=>{const s2=spentIn(mk,c.id),cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;if(!(+c.limit)&&!s2&&!ui.monAll)return null;
         return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
@@ -3497,36 +3512,26 @@ function splitSheet(){let paid=ME,share="half";juSheet("Shared expense",()=>{
     w,a,h("p",{class:"hint"},"Who paid?"),pick([[ME,"You"],[PARTNER,nm(PARTNER)]],()=>paid,v=>{paid=v}),
     h("p",{class:"hint"},"How should it be split?"),pick([["half","Split 50/50"],["for","All for the other"]],()=>share,v=>{share=v}),
     h("button",{type:"submit",class:"primary"},"Add"))})}
-function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x])=>({id,...x})).sort((a,b)=>a.at-b.at),mine=all.filter(x=>x.owner===ME),hers=all.filter(x=>x.owner===PARTNER);
-  const ti=h("input",{type:"text",class:"inp",placeholder:"Something you'd love"}),ln=h("input",{type:"url",class:"inp",placeholder:"Link (optional)"});
-  const pic=t=>emo("🎁",30,false);
-  const item=(x,theirs)=>h("div",{class:"wish"+(theirs&&x.got?" got":"")},pic(x.title),h("div",{class:"wtx"},h("b",null,x.title),x.link?h("small",null,"Has a link"):null,
-      theirs&&x.got?h("small",{class:"gotit"},x.got===ME?"You're getting this 🤫":"Taken care of"):null),
-    x.link?h("a",{class:"link",href:x.link,target:"_blank",rel:"noopener"},"Open"):null,
-    theirs?(!x.got||x.got===ME?h("button",{type:"button",class:"fbtn"+(x.got===ME?" on":""),onclick:()=>saveWish({items:{[x.id]:{got:x.got===ME?null:ME,gotAt:Date.now()}}})},x.got===ME?"Undo":"I'll get it"):null)
-      :h("button",{type:"button",class:"x","aria-label":"Remove",onclick:()=>saveWish({items:{[x.id]:DEL()}})},"×"));
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Wish lists"),h("span",{class:"hint"},"For birthdays and surprises")),
-    h("div",{class:"wcol"},h("h3",null,nm(PARTNER)+"'s wishes"),hers.length?hers.map(x=>item(x,true)):h("p",{class:"hint"},nm(PARTNER)+" hasn't added any yet."),
-      h("p",{class:"hint",style:"font-size:12.5px"},"Tap I'll get it and "+nm(PARTNER)+" will never see it was claimed.")),
-    h("div",{class:"wcol"},h("h3",null,"Your wishes"),mine.map(x=>item(x,false)),
-      h("form",{class:"wadd",onsubmit:e=>{e.preventDefault();if(!ti.value.trim())return;let l=ln.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;
-        saveWish({items:{[uid()]:{owner:ME,title:ti.value.trim(),link:l,at:Date.now(),got:null}}});ti.value="";ln.value=""}},
-        h("div",{style:"flex:2 1 180px"},ti),h("div",{style:"flex:2 1 180px"},ln),h("button",{type:"submit",class:"ghost"},"Add"))))}
-
-function homeDesignSection(){const link=US.main.homeLink||"";
-  const inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared Planner 5D or Homestyler link"});
-  const H=US.home||{},hm=SHOPITEM[H.home||"apt"],bits=[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,5).join("");
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our dream home")),
-    h("button",{type:"button",class:"pc tap",style:"--c:#c0398a",onclick:homeSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},H.name||"Build it together"),
-      h("span",{class:"tx"},bits?"Your home, "+bits:"Pick the house, pets, kids and garden")),emo(hm.e,56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Just for fun"),h("span",{class:"go"},"Open"))),
-    h("div",{class:"pc",style:"--c:#1f7f78"},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},link?"Your 3D home":"Design it in 3D"),
-        h("span",{class:"tx"},link?"Open it and keep building together":"Build your future home room by room, then walk through it in 3D")),emo("🏡",56,true)),
-      link?h("div",{class:"row"},h("a",{class:"btn",href:link,target:"_blank",rel:"noopener"},"Open our home")):
-        h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler"))),
-    h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});toast(l?"Home link saved":"Link removed",l?nm(PARTNER)+" can open it from here too":"")}},
-      h("div",{style:"flex:1 1 220px"},inp),h("button",{type:"submit",class:"ghost"},link?"Update":"Save link")),
-    !link?h("p",{class:"hint",style:"font-size:13px"},"Start a project, share it with "+nm(PARTNER)+" using its Share button, then paste the link here so you both open the same home in one tap."):null)}
-
+function wishSection(){const W=WISH().items||{},all=Object.entries(W).map(([id,x])=>({id,...x})).sort((a,b)=>a.at-b.at),mine=all.filter(x=>x.owner===ME),hers=all.filter(x=>x.owner===PARTNER),nmO=plainNm(PARTNER);
+  const tile=(x,theirs,i)=>h("div",{class:"gift"+(theirs&&x.got?" got":""),style:"--gc:"+DPAL[(i*3+2)%DPAL.length]},h("span",{class:"gife"},theirs&&x.got===ME?"🤫":"🎁"),h("b",null,x.title),
+    h("div",{class:"gifa"},x.link?h("a",{class:"gifb",href:x.link,target:"_blank",rel:"noopener"},"Open"):null,
+      theirs?(!x.got||x.got===ME?h("button",{type:"button",class:"gifb"+(x.got===ME?" on":""),onclick:()=>saveWish({items:{[x.id]:{got:x.got===ME?null:ME,gotAt:Date.now()}}})},x.got===ME?"Undo":"I'll get it"):h("small",null,"Taken care of"))
+      :h("button",{type:"button",class:"gifb","aria-label":"Remove",onclick:()=>saveWish({items:{[x.id]:DEL()}})},"Remove")));
+  const addTile=h("button",{type:"button",class:"gift add tap",onclick:wishAddSheet},h("span",{class:"gife"},"＋"),h("b",null,"Add a wish"));
+  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🎁",28,false),"Wish lists"),
+    h("small",{class:"cyh"},nmO+"'s wishes"),hers.length?h("div",{class:"gifts"},hers.map((x,i)=>tile(x,true,i))):h("p",{class:"hint",style:"margin:0"},"Nothing yet"),
+    h("small",{class:"cyh",style:"margin-top:6px"},"Your wishes"),h("div",{class:"gifts"},mine.map((x,i)=>tile(x,false,i+3)),addTile))}
+function wishAddSheet(){openSheet("Add a wish",(()=>{const ti=h("input",{type:"text",class:"inp",placeholder:"Something you'd love"}),ln=h("input",{type:"url",class:"inp",placeholder:"Link (optional)"});setTimeout(()=>ti.focus(),80);
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();if(!ti.value.trim())return;let l=ln.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;
+    saveWish({items:{[uid()]:{owner:ME,title:ti.value.trim(),link:l,at:Date.now(),got:null}}});closeSheet();toast("Added 🎁","")}},ti,ln,h("button",{type:"submit",class:"primary"},"Add"))})())}
+function homeDesignSection(){const link=US.main.homeLink||"",H=US.home||{},hm=SHOPITEM[H.home||"apt"],bits=[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("");
+  const T=(c,e,name,sub,fn)=>h("button",{type:"button",class:"tile tap",style:"--c:"+c,onclick:fn},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},sub));
+  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🏡",28,false),"Our dream home"),h("div",{class:"tgrid two"},
+    T("#c0398a",hm.e,H.name||"Build it",bits||"House, pets, kids",homeSheet),
+    T("#1f7f78","🧊","3D home",link?"Open it":"Design it",()=>link?window.open(link,"_blank","noopener"):home3dSheet())))}
+function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared 3D home link"});
+  openSheet("3D home",h("div",{class:"body"},h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler")),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});closeSheet();toast(l?"Saved":"Removed","")}},h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"ghost"},"Save"))))}
 function viewHome(){return [moneySection(),wishSection(),homeDesignSection()]}
 function viewFuture(){return [visionSection(me())]}
 
@@ -4451,7 +4456,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-k";
+const APP_VERSION="2026-11-19-l";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
