@@ -178,6 +178,45 @@ async function fetchCalendar(urls, tz) {
 const shortUrl = u => u.replace(/^https?:\/\//, "").slice(0, 40) + "…";
 function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
 
+/* ---------- cycle heads ups: only if the owner turned tracking on, and partner ones only if she shares ---------- */
+function cycCalc(c, today) {
+  const st = (c.starts || []).slice().sort(); if (!st.length) return null;
+  const gaps = []; for (let i = 1; i < st.length; i++) { const g = daysBetween(st[i - 1], st[i]); if (g >= 20 && g <= 45) gaps.push(g); }
+  const g6 = gaps.slice(-6), len = g6.length ? Math.round(g6.reduce((a, b) => a + b, 0) / g6.length) : 28, last = st[st.length - 1];
+  const plen = Math.min(10, Math.max(2, +c.plen || 5)), next = addDays(last, len), late = today >= next ? daysBetween(next, today) : 0;
+  const win = S0 => { const O = addDays(S0, len - 14); return [["period", S0, addDays(S0, plen - 1)], ["follicular", addDays(S0, plen), addDays(O, -2)], ["ovulation", addDays(O, -1), addDays(O, 1)], ["luteal", addDays(O, 2), addDays(S0, len - 8)], ["pre", addDays(S0, len - 7), addDays(S0, len - 1)]].filter(w => w[1] <= w[2]); };
+  return { len, last, next, late, day: daysBetween(last, today) + 1, preStart: addDays(last, len - 7), windows: [...win(last), ...win(next)] };
+}
+/* same shared view the app writes: phase only = next 7 days clipped, dates = full calendar, off = nothing */
+function cyclePubFor(c, today) {
+  const share = c.on ? (c.share || "off") : "off", R = c.on ? cycCalc(c, today) : null, wk = addDays(today, 6);
+  const windows = !R || share === "off" ? [] : share === "dates" ? R.windows.filter(w => w[2] >= today).map(w => ({ p: w[0], from: w[1], to: w[2] }))
+    : R.windows.filter(w => w[2] >= today && w[1] <= wk).map(w => ({ p: w[0], from: w[1] < today ? today : w[1], to: w[2] > wk ? wk : w[2] }));
+  return { share, windows, next: R && share === "dates" ? R.next : null, late: R && share !== "off" ? R.late : 0, day: R && share === "dates" ? R.day : null, len: R && share === "dates" ? R.len : null, date: today, notifyPartner: c.notifyPartner !== false };
+}
+async function cycleEvents(db, cid, members, people, now) {
+  const out = [], lo = now - LOOKBACK_MIN * 60000, hi = now + AHEAD_MIN * 60000;
+  for (const u of members) {
+    const snap = await db.doc(`couples/${cid}/people/${u}/extra/cycle`).get(); if (!snap.exists) continue;
+    const c = snap.data(); if (!c.on) continue;
+    const p = people[u] || {}, o = members.find(x => x !== u), op = people[o] || {}, nm = (p.name || "Your partner").replace(/[^\p{L}\p{M}\s'.-]/gu, "").trim() || "Your partner";
+    const tz = validTz(p.tz) ? p.tz : "America/Chicago", otz = validTz(op.tz) ? op.tz : tz;
+    const today = parts(now, tz).key, R = cycCalc(c, today); if (!R) continue;
+    const pubRef = db.doc(`couples/${cid}/people/${u}/extra/cyclePub`), pub = (await pubRef.get()).data() || {};
+    if (pub.date !== today && pubRef.set) await pubRef.set(cyclePubFor(c, today));
+    const at9 = wallToMs(today, 540, tz);
+    if (c.notifyMe !== false && at9 > lo && at9 <= hi && daysBetween(today, R.next) === 2)
+      out.push({ to: u, key: "cyc:me:" + R.next, at: now, title: "Your period may start in about 2 days 🌸", body: "A gentle reminder from Our Days." });
+    const share = c.share || "phase";
+    if (!o || share === "off" || c.notifyPartner === false) continue;
+    const otoday = parts(now, otz).key, oat9 = wallToMs(otoday, 540, otz);
+    if (!(oat9 > lo && oat9 <= hi)) continue;
+    if (otoday === R.preStart) out.push({ to: o, key: "cyc:pre:" + R.preStart, at: now, title: nm + "'s pre period week starts today 🌙", body: "A week to be extra gentle: patience, lighter plans, more reassurance." });
+    if (otoday === R.next) out.push({ to: o, key: "cyc:per:" + R.next, at: now, title: nm + "'s period may start today", body: "Comfort helps: warmth, rest, easy plans and gentle check ins." });
+  }
+  return out;
+}
+
 /* ---------- things one of you sent the other (Us tab) ---------- */
 async function socialEvents(db, cid, members, people, now) {
   const lo = now - LOOKBACK_MIN * 60000, out = [];
@@ -266,6 +305,8 @@ async function main() {
     for (const uid of members) { const s = await db.doc(`couples/${cid}/people/${uid}`).get(); if (s.exists) people[uid] = s.data(); }
     let social = [];
     try { social = await socialEvents(db, cid, members, people, now); } catch (e) { console.warn("us events", e.message); }
+    let cyc = [];
+    try { cyc = await cycleEvents(db, cid, members, people, now); } catch (e) { console.warn("cycle events", e.message); }
     for (const uid of members) {
       const person = people[uid]; if (!person) continue;
       const tz = validTz(person.tz) ? person.tz : "America/Chicago";
@@ -294,6 +335,7 @@ async function main() {
       for (const k of [addDays(today, -1), today, addDays(today, 1)]) { const s = await db.doc(`couples/${cid}/people/${uid}/days/${k}`).get(); if (s.exists) days[k] = s.data(); }
       const due = dueNotifications({ now, uid, person, partner, days, shared, cal });
       if (((person.settings && person.settings.notif) || {}).partner !== false) due.push(...social.filter(n => n.to === uid));
+      due.push(...cyc.filter(n => n.to === uid));
       if (user.testPushAt && now - user.testPushAt < 60 * 60000) due.push({ key: "test:" + user.testPushAt, at: now, title: "Our Days", body: "Notifications are working on this device." });
       const logRef = db.doc(`users/${uid}/private/notifyLog`);
       const log = ((await logRef.get()).data() || {}).sent || {};
@@ -315,5 +357,5 @@ async function main() {
   console.log("done, notifications sent:", sent);
 }
 
-module.exports = { socialEvents, dueNotifications, fetchCalendar, wallToMs, parts };
+module.exports = { socialEvents, cycleEvents, cycCalc, cyclePubFor, dueNotifications, fetchCalendar, wallToMs, parts };
 if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });
