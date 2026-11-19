@@ -619,6 +619,9 @@ html,body{margin:0}
 .rolltg .sw{flex:0 0 46px;height:28px;border-radius:999px;background:rgba(127,127,160,.3);position:relative;transition:.2s}
 .rolltg .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .rolltg.on .sw{background:#2a9d8f}.rolltg.on .sw::after{left:21px}
+.msr{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(128,128,160,.2);font-size:14.5px}.msr:last-child{border-bottom:0}
+.msr span:first-child{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.msr b{min-width:64px;text-align:right}
+.pcnav.lt{width:40px;height:40px;border-radius:50%;border:1px solid var(--line)!important;background:var(--card)!important;color:var(--ink)!important;font-size:22px;cursor:pointer}.pcnav.lt:disabled{opacity:.3}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1520,6 +1523,17 @@ function nowBanner(pid){
   else{head="A clear stretch";sub="Add a task or start a focus session"}
   return h("div",{class:"now"},h("span",{class:"lbl"},lab),h("b",null,head),h("span",null,sub),btns.filter(Boolean).length?h("div",{class:"row"},btns.filter(Boolean)):null);
 }
+/* next US public holiday (Nager.Date), cached for a day */
+const HOLE={"Thanksgiving Day":"🦃","Christmas Day":"🎄","New Year's Day":"🎆","Independence Day":"🎆","Juneteenth National Independence Day":"✊🏾","Martin Luther King, Jr. Day":"✊🏾","Memorial Day":"🇺🇸","Labor Day":"🛠️","Veterans Day":"🎖️","Columbus Day":"🧭","Presidents Day":"🇺🇸","Washington's Birthday":"🇺🇸","Good Friday":"✝️"};
+let HOLS=null,HOLBUSY=false;try{HOLS=JSON.parse(localStorage.getItem("od-hol-v1")||"null")}catch(e){}
+async function loadHols(){if(HOLBUSY)return;HOLBUSY=true;try{const r=await fetch("https://date.nager.at/api/v3/NextPublicHolidays/US");if(!r.ok)throw 0;
+  const L=(await r.json()).filter(x=>x.global&&(x.types||[]).includes("Public")).map(x=>({date:x.date,name:x.localName||x.name}));
+  HOLS={at:Date.now(),list:L};try{localStorage.setItem("od-hol-v1",JSON.stringify(HOLS))}catch(e){}if(S.tab==="today")render()}catch(e){}HOLBUSY=false}
+function nextHoliday(today){if(!HOLS||Date.now()-HOLS.at>864e5)setTimeout(loadHols,0);if(!HOLS)return null;return HOLS.list.find(x=>x.date>=today)||null}
+function holidaysSheet(){const t=usDay(),L=(HOLS&&HOLS.list||[]).filter(x=>x.date>=t).slice(0,8);
+  openSheet("US holidays",h("div",{class:"body"},h("p",{class:"hint"},"Days off coming up. A good time to plan a visit or a call."),
+    L.map(x=>h("div",{class:"spr"},h("span",{style:"font-size:24px"},HOLE[x.name]||"🇺🇸"),h("span",{class:"spw"},h("b",null,x.name),h("small",null,longDate(x.date))),h("b",{class:"spa"},(n=>n===0?"Today":n===1?"Tomorrow":n+" days")(daysBetween(t,x.date))))),
+    h("p",{class:"hint",style:"font-size:12.5px"},"From Nager.Date")))}
 function countdownStrip(pid){
   const p=P(pid),t=tzNow(p.tz).key,all=[];
   p.projects.filter(x=>x.pinned&&!x.target&&!x.done).forEach(x=>all.push({pin:true,proj:x,title:x.title,col:"#2b2350",open:()=>pinProjSheet(pid,x)}));
@@ -1528,6 +1542,8 @@ function countdownStrip(pid){
     const type=c.src==="project"?"project":(CDT[c.kind]?c.kind:"other");
     all.push({c,n,proj,title:c.title,col:proj?colorOf(pid,proj):c.color||null,
       kick:proj&&proj.pinned?"Priority":c.src==="shared"&&c.by&&c.by!==pid?"From "+P(c.by).name:CDT[type][0],open:()=>proj?pinProjSheet(pid,proj):countdownSheet(pid,c)})});
+  {const hol=nextHoliday(t);if(hol){const n=daysBetween(t,hol.date),it={c:{date:hol.date,title:hol.name,kind:"holiday",e:HOLE[hol.name]||"🇺🇸"},n,title:hol.name,col:"#3a4a8c",kick:"US holiday",open:holidaysSheet};
+    let ix=all.findIndex(x=>!x.pin&&x.c&&x.c.date>hol.date);if(ix<0)ix=all.length;all.splice(ix,0,it)}}
   const used=new Set(all.filter(x=>x.col).map(x=>x.col));let pi=0;
   all.forEach(x=>{if(x.col)return;let tries=0;while(used.has(PAL[pi%PAL.length])&&tries<PAL.length){pi++;tries++}x.col=PAL[pi%PAL.length];used.add(x.col);pi++});
   const big=all.slice(0,2),rest=all.slice(2);
@@ -1537,13 +1553,13 @@ function countdownStrip(pid){
     ?h("button",{type:"button",class:"cd pin",style:"--cdc:"+it.col,onclick:it.open},h("span",{class:"kick",style:"color:#ffd27a"},"Priority · no deadline"),
       h("span",{class:"ttl"},it.title),h("span",{class:"dt"},it.proj.next?"Next: "+it.proj.next:"Tap to add the next step"))
     :h("button",{type:"button",class:"cd",style:"--cdc:"+it.col,onclick:it.open},
-      it.n<=7?h("span",{class:"soonchip"},it.n===0?"Today":"This week"):null,h("span",{class:"cdemo"},emo(kwEmoji(it.title)||CD_EMOJI[it.c.src==="project"?"project":(CDT[it.c.kind]?it.c.kind:"other")],34,false)),h("span",{class:"kick"},it.kick),
+      it.n<=7?h("span",{class:"soonchip"},it.n===0?"Today":"This week"):null,h("span",{class:"cdemo"},emo(it.c.e||kwEmoji(it.title)||CD_EMOJI[it.c.src==="project"?"project":(CDT[it.c.kind]?it.c.kind:"other")],34,false)),h("span",{class:"kick"},it.kick),
       h("span",{class:"num"},it.n===0?"Today":String(it.n)),it.n===0?null:h("span",{class:"unit"},it.n===1?"day left":"days left"),
       h("span",{class:"ttl"},it.title),h("span",{class:"dt"},shortDate(it.c.date))))));
   if(rest.length){
     const shown=ui.cdAll?rest:rest.slice(0,4),list=h("div",{class:"cdlist"});
     shown.forEach(it=>list.appendChild(h("button",{type:"button",class:"cdrow",style:"--cdc:"+it.col,onclick:it.open},
-      h("span",{class:"ttl"},h("span",{class:"inemo"},emo(kwEmoji(it.title)||(it.pin?"📌":CD_EMOJI[it.c&&CDT[it.c.kind]?it.c.kind:"other"]),22,false)),it.title,h("small",null,it.pin?"Priority · no deadline":it.kick+" · "+longDate(it.c.date))),
+      h("span",{class:"ttl"},h("span",{class:"inemo"},emo((it.c&&it.c.e)||kwEmoji(it.title)||(it.pin?"📌":CD_EMOJI[it.c&&CDT[it.c.kind]?it.c.kind:"other"]),22,false)),it.title,h("small",null,it.pin?"Priority · no deadline":it.kick+" · "+longDate(it.c.date))),
       it.pin?h("span",{class:"n"},"Pinned"):h("span",{class:"n"},it.n===0?"Today":String(it.n),it.n===0?null:h("small",null,it.n===1?"day left":"days left")))));
     if(rest.length>4)list.appendChild(h("button",{type:"button",class:"link",style:"align-self:flex-start",onclick:()=>{ui.cdAll=!ui.cdAll;render()}},ui.cdAll?"Show less":"Show "+(rest.length-4)+" more"));
     sec.appendChild(list);
@@ -2598,8 +2614,9 @@ function recapSheet(mk){markSeen("rc:"+mk);juSheet("Monthly recap",()=>{const R=
     .filter(([,,k])=>R.ppl.some(u=>R.per[u][k]));
   const prev=addDays(mk+"-01",-1).slice(0,7),next=addDays(mk+"-01",40).slice(0,7),cur=usDay().slice(0,7);
   return [h("div",{class:"bigemo"},emo("📊",60,true)),
-    h("div",{class:"pchead"},h("button",{type:"button",class:"pcnav","aria-label":"Previous month",onclick:()=>recapSheet(prev)},"‹"),h("div",null,h("b",null,monthName(mk))),h("button",{type:"button",class:"pcnav","aria-label":"Next month",disabled:next>cur,onclick:()=>recapSheet(next)},"›")),
+    h("div",{class:"pchead"},h("button",{type:"button",class:"pcnav lt","aria-label":"Previous month",onclick:()=>recapSheet(prev)},"‹"),h("div",null,h("b",null,monthName(mk))),h("button",{type:"button",class:"pcnav lt","aria-label":"Next month",disabled:next>cur,onclick:()=>recapSheet(next)},"›")),
     h("div",{class:"rcgrid"},big("🙏",R.prayed,R.prayed===1?"night prayed together":"nights prayed together"),big("🔥",R.bestRun,"best run of nights"),big("☀️",R.weeks,R.weeks===1?"Sunday check-in":"Sunday check-ins")),
+    (()=>{const MM=moneyMonth(mk);if(!MM.n&&!MM.saved)return null;return h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f;margin:4px 0 10px",onclick:()=>moneySummarySheet(mk)},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Money"),h("span",{class:"tx"},unlocked()?money2(MM.tot)+" spent · "+money2(MM.saved)+" saved together":"Tap to see it")),emo("💸",44,true)))})(),
     rows.length?h("div",{class:"rctable"},h("div",{class:"rcrow rch"},h("span"),R.ppl.map(u=>h("b",{style:"color:"+PCOL(u)[0]},u===ME?"You":plainNm(u)))),
       rows.map(([e,l,k])=>h("div",{class:"rcrow"},h("span",null,emo(e,20,false),l),R.ppl.map(u=>h("b",null,String(R.per[u][k])))))):h("p",{class:"hint",style:"text-align:center"},"Nothing logged yet for "+mn+"."),
     h("p",{class:"hint",style:"text-align:center;font-size:14px"},"Worked out from what you both ticked in the app. Weekends off from prayer don't count against you.")]})}
@@ -3153,6 +3170,22 @@ const ruleKey=t=>(t||"").toLowerCase().replace(/[^a-z0-9 ]/g," ").trim().replace
 function guessCat(note){const k=ruleKey(note);if(!k)return null;const R=MONEY().rules||{};if(R[k])return R[k];
   const first=k.split("_")[0];if(first.length<3)return null;const hit=Object.keys(R).find(x=>x.split("_")[0]===first);if(hit)return R[hit];
   const B=bills().find(b=>ruleKey(b.name)===k);return B?B.cat:null}
+/* ---------- the month in money ---------- */
+function moneyMonth(mk){const cs=bcats(),sp=spendIn(mk),tot=sp.reduce((a,x)=>a+(+x.amt||0),0),plan=cs.reduce((a,c)=>a+Math.max(0,availIn(c,mk)),0);
+  const byCat=cs.map(c=>({c,v:spentIn(mk,c.id)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v),billsPaid=sp.filter(x=>x.bill);
+  const inM=at=>at&&dkey(new Date(at)).slice(0,7)===mk,saved=Object.values(MONEY().adds||{}).filter(a=>inM(a.at)).reduce((a,x)=>a+(+x.amt||0),0);
+  const settled=splitItems().filter(x=>x.settled&&inM(x.settledAt)).reduce((a,x)=>a+(x.share==="for"?x.amt:x.amt/2),0);
+  const who=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder).map(u=>[u,sp.filter(x=>x.by===u).reduce((a,x)=>a+(+x.amt||0),0)]);
+  return {tot,plan,byCat,bills:billsPaid.length,billsAmt:billsPaid.reduce((a,x)=>a+(+x.amt||0),0),saved,settled,who,n:sp.length}}
+function moneySummarySheet(mk){juSheet("Money summary",()=>{const R=moneyMonth(mk),show=unlocked(),M=v=>show?money2(v):"••••",cur=mKey(),prev=addDays(mk+"-01",-1).slice(0,7),next=nextMk(mk);
+  const big=(e,v,l)=>h("div",{class:"rcbig"},emo(e,30,false),h("b",{style:"font-size:22px"},v),h("small",null,l));
+  const diff=R.plan?R.plan-R.tot:null,max=R.byCat.length?R.byCat[0].v:1;
+  return [h("div",{class:"pchead"},h("button",{type:"button",class:"pcnav lt","aria-label":"Previous month",onclick:()=>moneySummarySheet(prev)},"‹"),h("div",null,h("b",null,monthName(mk))),h("button",{type:"button",class:"pcnav lt","aria-label":"Next month",disabled:next>cur,onclick:()=>moneySummarySheet(next)},"›")),
+    R.n||R.saved?h("p",{class:"q",style:"text-align:center;margin:4px 0"},diff==null?"You spent "+M(R.tot)+".":diff>=0?(mk===cur?"So far "+M(R.tot)+" spent, "+M(diff)+" still in the plan.":"You stayed "+M(diff)+" under plan 🎉"):"You went "+M(-diff)+" over plan."):h("p",{class:"hint",style:"text-align:center"},"Nothing logged for "+monthName(mk).split(" ")[0]+"."),
+    h("div",{class:"rcgrid"},big("💸",M(R.tot),"spent"),big("🫙",M(R.saved),"saved together"),big("🔁",String(R.bills),R.bills===1?"bill paid":"bills paid")),
+    R.byCat.length?h("div",{class:"rctable"},h("b",{style:"padding:6px 0 2px"},"Where it went"),R.byCat.slice(0,6).map(x=>h("div",{class:"msr"},h("span",null,emo(x.c.e,20,false),x.c.name),h("span",{class:"gbar"},h("i",{style:"width:"+Math.round(x.v/max*100)+"%;background:"+bcol(x.c)})),h("b",null,M(x.v))))):null,
+    R.who.some(([,v])=>v)?h("p",{class:"hint",style:"text-align:center;font-size:14px"},"Logged by "+R.who.map(([u,v])=>(u===ME?"you":plainNm(u))+" "+M(v)).join(" · ")+(R.settled?" · "+M(R.settled)+" settled between you":"")):null]})}
+function moneySummaryDue(){const d=+usDay().slice(8);if(d>7)return null;const lm=addDays(mKey()+"-01",-1).slice(0,7);return moneyMonth(lm).n&&!seen("ms:"+lm)?lm:null}
 function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?money2(v):"••••";
   const segb=(id,lab)=>h("button",{type:"button","aria-pressed":String(tab===id),onclick:()=>{ui.monTab=id;render()}},lab);
   const lockLink=h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Turn lock off":"🔒 Unlock"):"🔒 Lock");
@@ -3163,7 +3196,9 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
     ring.append(h("div",{class:"mrc"},h("b",null,show?money(sp):"••••"),h("small",null,lim?(show?Math.round(sp/lim*100)+"% of "+money(lim):"of ••••"):"spent")));
     const leftv=lim-sp-upv;
     const BL=bills(),today=usDay();
-    pane=[h("div",{class:"mhero"},ring,h("div",{class:"mhx"},h("span",{class:"k"},monthName(mk).split(" ")[0]),
+    const due=moneySummaryDue();
+    pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
+      h("div",{class:"mhero"},ring,h("div",{class:"mhx"},h("span",{class:"k"},monthName(mk).split(" ")[0]),
         h("b",{class:leftv<0?"over":""},lim?(leftv>=0?M(leftv)+" left":M(-leftv)+" over"):"No plan yet"),
         h("small",null,lim?(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1;return (upv?"after "+M(upv)+" in bills still to come · ":"")+dl+(dl===1?" day":" days")+" to go"+(leftv>0&&show?" · about "+money2(Math.floor(leftv/dl))+" a day":"")})():"Tap a category to set a monthly amount"),
         h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending"))),
@@ -3179,7 +3214,7 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
           h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
           h("span",{class:"bca"},M(s2),l||+c.limit?h("small",null,"of "+M(l)):null))})),
       h("button",{type:"button",class:"link",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show only categories in use":"Show all categories · set amounts"),
-      lsp?h("p",{class:"hint",style:"font-size:14px"},monthName(lm).split(" ")[0]+": "+M(lsp)+" spent"):null]}
+      h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" so far"),lsp?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]+" summary"):null)]}
   else if(tab==="split"){const bal=splitBalance(),it=splitItems(),open=it.filter(x=>!x.settled);
     const line=Math.abs(bal)<0.005?"You're all square 🤝":bal>0?nm(PARTNER)+" owes you "+M(bal):"You owe "+nm(PARTNER)+" "+M(-bal);
     const from=bal>0?PARTNER:ME,to=bal>0?ME:PARTNER,sq=Math.abs(bal)<0.005;
@@ -3817,7 +3852,16 @@ function questionsSheet(){juSheet("Ask each other",()=>{const A=ANS(),tops=enabl
     h("button",{type:"button",class:"btn gh",onclick:topicsSettingsSheet},"Choose topics")]})}
 /* ---------- Two skies: weather, sunset and the moon over both of you (Open-Meteo, moon worked out here) ---------- */
 const SYN=29.530588853,MREF=Date.UTC(2000,0,6,18,14);
-function moonInfo(t){t=t||Date.now();const a=((((t-MREF)/864e5)%SYN)+SYN)%SYN,f=a/SYN,ill=Math.round((1-Math.cos(2*Math.PI*f))/2*100);
+/* CycleCalcs gives the precise moon; cached for 6 hours, with the formula below as the offline fallback */
+let MOONCC=null,MOONBUSY=false;try{MOONCC=JSON.parse(localStorage.getItem("od-moon-v1")||"null")}catch(e){}
+async function loadMoon(){if(MOONBUSY)return;MOONBUSY=true;try{const r=await fetch("https://www.cyclecalcs.com/v2/moon?lat=33.21&lon=-97.13");if(!r.ok)throw 0;const d=(await r.json()).data;
+  const full=(d.next_phases||[]).find(x=>x.code==="full_moon"),nw=(d.next_phases||[]).find(x=>x.code==="new_moon");
+  MOONCC={at:Date.now(),name:d.phase.name,ill:Math.round(d.phase.illumination_percent),age:d.phase.age_days,full:full?Date.parse(full.instant):null,nw:nw?Date.parse(nw.instant):null};
+  try{localStorage.setItem("od-moon-v1",JSON.stringify(MOONCC))}catch(e){}}catch(e){MOONCC=MOONCC||null}MOONBUSY=false}
+function moonInfo(t){if(!t){if(!MOONCC||Date.now()-MOONCC.at>6*36e5)setTimeout(loadMoon,0);
+    if(MOONCC&&Date.now()-MOONCC.at<36*36e5){const age=MOONCC.age+(Date.now()-MOONCC.at)/864e5,loc=moonInfo(Date.now());
+      return Object.assign({},loc,{age,ill:Date.now()-MOONCC.at<6*36e5?MOONCC.ill:loc.ill,name:Date.now()-MOONCC.at<6*36e5?MOONCC.name:loc.name,toFull:MOONCC.full&&MOONCC.full>Date.now()?(MOONCC.full-Date.now())/864e5:loc.toFull,src:"cyclecalcs"})}}
+  t=t||Date.now();const a=((((t-MREF)/864e5)%SYN)+SYN)%SYN,f=a/SYN,ill=Math.round((1-Math.cos(2*Math.PI*f))/2*100);
   const N=[["New moon","🌑"],["Waxing crescent","🌒"],["First quarter","🌓"],["Waxing gibbous","🌔"],["Full moon","🌕"],["Waning gibbous","🌖"],["Last quarter","🌗"],["Waning crescent","🌘"]],i=Math.floor((f*8+0.5)%8);
   const toFull=((SYN/2-a)%SYN+SYN)%SYN,toNew=SYN-a;return {age:a,ill,name:N[i][0],e:N[i][1],toFull,toNew}}
 const WMO=c=>c===0?["☀️","Clear"]:c<=2?["🌤️","Partly cloudy"]:c===3?["☁️","Cloudy"]:c<=48?["🌫️","Foggy"]:c<=57?["🌦️","Drizzle"]:c<=67?["🌧️","Rain"]:c<=77?["❄️","Snow"]:c<=82?["🌧️","Showers"]:c<=86?["🌨️","Snow showers"]:["⛈️","Storms"];
@@ -4151,7 +4195,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-d";
+const APP_VERSION="2026-11-19-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
