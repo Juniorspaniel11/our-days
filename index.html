@@ -734,12 +734,12 @@ html,body{margin:0}
 /* ===== each tab is its own world ===== */
 body{--hdr:linear-gradient(135deg,#1d2b64,#3a5bd9 55%,#2aa59a);--acc:#2aa59a}
 body.tab-today{--bg:#eef1fb;--hdr:linear-gradient(135deg,#141b3d,#1d3557 50%,#1f8a8a);--acc:#2aa59a}
-body.tab-projects{--bg:#f6f0e4;--hdr:linear-gradient(135deg,#2b2118,#5a3b22 55%,#b9661c);--acc:#b9661c;background-image:linear-gradient(rgba(120,90,50,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(120,90,50,.06) 1px,transparent 1px);background-size:22px 22px}
+body.tab-projects{--bg:#f1f4f7;--hdr:linear-gradient(135deg,#102a43,#1f4e79 55%,#2f7f9a);--acc:#2a6f97;background-image:linear-gradient(rgba(40,80,120,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(40,80,120,.05) 1px,transparent 1px);background-size:22px 22px}
 body.tab-us{--bg:#f3f1f7;--hdr:linear-gradient(135deg,#231a3d,#4b3b86 55%,#7a62c9);--acc:#6f58d6}
 body.tab-home{--bg:#eef4ef;--hdr:linear-gradient(135deg,#102a24,#1f5a48 55%,#c9a24a);--acc:#2f8a68}
 body.tab-future{--bg:#15102b;--hdr:linear-gradient(135deg,#1c1238,#2e1f55 55%,#6b4a2c);--acc:#f6d38a}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tab-today{--bg:#0f1426}:root:not([data-theme="light"]) body.tab-projects{--bg:#1a150f}:root:not([data-theme="light"]) body.tab-us{--bg:#121019}:root:not([data-theme="light"]) body.tab-home{--bg:#0d1a16}}
-:root[data-theme="dark"] body.tab-today{--bg:#0f1426}:root[data-theme="dark"] body.tab-projects{--bg:#1a150f}:root[data-theme="dark"] body.tab-us{--bg:#121019}:root[data-theme="dark"] body.tab-home{--bg:#0d1a16}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tab-today{--bg:#0f1426}:root:not([data-theme="light"]) body.tab-projects{--bg:#0e141b}:root:not([data-theme="light"]) body.tab-us{--bg:#121019}:root:not([data-theme="light"]) body.tab-home{--bg:#0d1a16}}
+:root[data-theme="dark"] body.tab-today{--bg:#0f1426}:root[data-theme="dark"] body.tab-projects{--bg:#0e141b}:root[data-theme="dark"] body.tab-us{--bg:#121019}:root[data-theme="dark"] body.tab-home{--bg:#0d1a16}
 /* header band */
 .gut.top header{background:var(--hdr);color:#fff;border-radius:26px;padding:14px 14px 12px;margin-top:6px;box-shadow:0 14px 30px rgba(20,20,50,.22);align-items:flex-start}
 .gut.top header .eyebrow{color:rgba(255,255,255,.82);display:flex;align-items:center;gap:8px}
@@ -2287,12 +2287,12 @@ setInterval(()=>{if(pauseLive()&&(S.tab==="us"||S.tab==="today")&&!document.quer
 const CYC=()=>(P(ME)||{}).cycle||{};
 const saveCycle=o=>{if(!DB||!CID)return;DB.doc("couples/"+CID+"/people/"+ME+"/extra/cycle").set(o,{merge:true}).then(()=>setTimeout(()=>cyclePublish(true),300)).catch(syncErr)};
 function cycCalc(c,today){const st=(c.starts||[]).slice().sort();if(!st.length)return null;
-  const gaps=[];for(let i=1;i<st.length;i++){const g=daysBetween(st[i-1],st[i]);if(g>=20&&g<=45)gaps.push(g)}const g6=gaps.slice(-6);
-  const auto=g6.length?Math.round(g6.reduce((a,b)=>a+b,0)/g6.length):28,len=+c.clen?Math.min(45,Math.max(20,+c.clen)):auto,plen=Math.min(10,Math.max(2,+c.plen||5)),last=st[st.length-1];
+  const last=st[st.length-1],gaps=[];for(let i=1;i<st.length;i++){const g=daysBetween(st[i-1],st[i]);if(g>=20&&g<=45)gaps.push(g)}const g6=gaps.slice(-6);
+  const auto0=g6.length?Math.round(g6.reduce((a,b)=>a+b,0)/g6.length):28,auto=auto0,len0=+c.clen?Math.min(45,Math.max(20,+c.clen)):auto,nA=c.nextAt&&c.nextAt>last?daysBetween(last,c.nextAt):0,len=nA>=15&&nA<=60?nA:len0,plen=Math.min(10,Math.max(2,+c.plen||5));
   const day=daysBetween(last,today)+1,next=addDays(last,len),late=today>=next?daysBetween(next,today):0;
   const win=S0=>{const O=addDays(S0,len-14);return [["period",S0,addDays(S0,plen-1)],["follicular",addDays(S0,plen),addDays(O,-2)],["ovulation",addDays(O,-1),addDays(O,1)],["luteal",addDays(O,2),addDays(S0,len-8)],["pre",addDays(S0,len-7),addDays(S0,len-1)]].filter(w=>w[1]<=w[2])};
   const windows=[...win(last),...win(next)];let phase=(windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0];if(late>0)phase="late";
-  return {len,plen,last,day,next,late,phase,windows,n:st.length,guess:!g6.length&&!+c.clen,auto,fixed:!!+c.clen}}
+  return {len,plen,last,day,next,late,phase,windows,n:st.length,guess:!g6.length&&!+c.clen&&!(nA>=15&&nA<=60),auto,fixed:!!+c.clen,nextSet:nA>=15&&nA<=60}}
 const CPH={period:["Cozy days","🌸","Cozy days","Soft, slow and pampered."],
   follicular:["Glow up","✨","Glow up week","Energy's back. Plan something fun."],
   ovulation:["Main character","☀️","Main character days","Bright and social. Go out."],
@@ -2339,9 +2339,10 @@ function careCycle(){const o=PARTNER,nmO=plainNm(o);if(!o||!P(o)||P(o).placehold
   const dIn=cw?daysBetween(cw[1],today)+1:0,tot=cw?daysBetween(cw[1],cw[2])+1:0,toNext=daysBetween(today,R.next);
   const sub=ph==="period"?"Day "+dIn+" of "+tot:R.late?R.late+(R.late===1?" day":" days")+" late":"Period in "+toNext+(toNext===1?" day":" days");
   const phOf=k=>{const w=R.windows.find(w=>k>=w[1]&&k<=w[2]);return w?w[0]:k<R.last?"pre":"late"};
-  const wk=h("div",{class:"cwk"},Array.from({length:7},(_,n)=>addDays(today,n-3)).map(k=>{const p=phOf(k),d=parseKey(k),past=k<=today&&!ro,st=(L.starts||[]).includes(k);
-    return h(past?"button":"div",{type:past?"button":null,class:"cwd"+(k===today?" now":"")+(past?" tap":""),style:"--pc:"+PHC[p],
-      onclick:past?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){wk.querySelectorAll(".arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap again","to log "+shortDate(k)+" as the first day");return}log(k)}:null},
+  const setNext=k=>{const g=daysBetween(R.last,k);if(g<15||g>60){toast("That's "+g+" days after her last start","A next period is usually 21 to 45 days later. Tap a day further ahead, or use Edit");return}save({nextAt:k});P(ME).pcLog=Object.assign({},L,{nextAt:k});toast("Next period set 🌸",shortDate(k));render()};
+  const wk=h("div",{class:"cwk"},Array.from({length:7},(_,n)=>addDays(today,n-3)).map(k=>{const p=phOf(k),d=parseKey(k),ok=!ro,st=(L.starts||[]).includes(k)||k===R.next,fut=k>today;
+    return h(ok?"button":"div",{type:ok?"button":null,class:"cwd"+(k===today?" now":"")+(ok?" tap":""),style:"--pc:"+PHC[p],
+      onclick:ok?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){wk.querySelectorAll(".arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap again",fut?"to set "+shortDate(k)+" as when her next period starts":"to log "+shortDate(k)+" as the first day");return}fut?setNext(k):log(k)}:null},
       h("small",null,k===today?"Today":d.toLocaleDateString("en-US",{weekday:"narrow"})),h("b",null,String(d.getDate())),h("i",null,st?"🌸":""))}));
   const ring=cycleRing(R,112,today);
   return h("section",{class:"cyc2",style:"--pc:"+PHC[ph]},
@@ -2386,7 +2387,7 @@ function cycleOwnCard(){const p=P(ME),c=CYC();if(!c.on)return null;const t=tzNow
   if(!R)return h("button",{type:"button",class:"chero mini tap",onclick:cycleSheet},h("div",{class:"chtop"},h("div",{class:"chtx"},h("small",null,"My cycle"),h("b",null,"Add your last period"),h("span",null,"One tap to start")),h("span",{class:"chemo"},"🌸")));
   const dl=daysBetween(t,R.next);
   return h("div",{class:"chero mini"},h("div",{class:"chtop"},h("div",{class:"chtx"},h("small",null,"My cycle"),h("b",null,R.late?"Period due":dl===0?"Period today":"Period in "+dl+" days"),h("span",null,CPH[R.phase][0])),cycleRing(R,72,t)),
-    h("button",{type:"button",class:"cystart tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to log";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🩸 Started today"}},4000);return}logPeriod(t)}},"🩸 Started today"))}
+    h("button",{type:"button",class:"cystart tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to log";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🌸 Started today"}},4000);return}logPeriod(t)}},"🌸 Started today"))}
 function cycleDueCard(){const c=CYC();if(!c.on)return null;const R=cycCalc(c,tzNow(P(ME).tz).key);if(!R)return null;const dl=daysBetween(tzNow(P(ME).tz).key,R.next);return dl<=2||R.late?cycleOwnCard():null}
 function logPeriod(k){const c=CYC(),st=(c.starts||[]).filter(x=>Math.abs(daysBetween(x,k))>10);st.push(k);saveCycle({on:true,starts:st.sort().slice(-24)});toast("Logged 🌸","Period started "+shortDate(k))}
 /* ---------- cycle sheets: a ring, one big button, details tucked away ---------- */
@@ -2394,27 +2395,27 @@ function cycVisual(R,today,logFn,who,ed){const out=[];
   const other=h("input",{type:"date",class:"inp cydate",max:today,"aria-label":"Pick the start date"});other.onchange=()=>{if(other.value)logFn(other.value)};
   const otherBtn=h("button",{type:"button",class:"cyother tap",onclick:()=>{other.style.display="block";try{other.showPicker()}catch(e){other.focus()}}},"📅 Another day");
   if(!R){out.push(h("div",{class:"cyhero"},h("span",{class:"cyhe",style:"font-size:64px;line-height:1"},"🌸"),h("b",null,"When did "+who+" last period start?")),
-      h("button",{type:"button",class:"cystart big tap",onclick:()=>logFn(today)},"🩸 Today"),otherBtn,other);return out}
+      h("button",{type:"button",class:"cystart big tap",onclick:()=>logFn(today)},"🌸 Today"),otherBtn,other);return out}
   const ph=R.late?"late":(R.windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0],cw=R.windows.find(w=>today>=w[1]&&today<=w[2]);
   const left=cw?daysBetween(today,cw[2]):0,phOf=k=>{const w=R.windows.find(w=>k>=w[1]&&k<=w[2]);return w?w[0]:k<R.last?"pre":"late"};
   const plain=R.late?"Her period may be "+R.late+(R.late===1?" day":" days")+" late":ph==="period"?"Day "+R.day+" of her period"+(left?" · ends in about "+left+(left===1?" day":" days"):" · last day"):CPH[ph][2]+(left?" · "+(left+1)+" more days":" · last day");
   const days=Array.from({length:14},(_,n)=>addDays(today,n-4));
-  const strip=h("div",{class:"cystrip"},days.map((k,n)=>{const p=phOf(k),d=parseKey(k),first=n===0||phOf(addDays(k,-1))!==p,past=k<=today,isNow=k===today;
+  const strip=h("div",{class:"cystrip"},days.map((k,n)=>{const p=phOf(k),d=parseKey(k),first=n===0||phOf(addDays(k,-1))!==p,isNow=k===today,fut=k>today,past=!fut||!!ed;
     const el=h(past?"button":"div",{type:past?"button":null,class:"cyd"+(isNow?" now":"")+(past?" tap":"")+(k<today?" was":""),style:"--pc:"+PHC[p],"aria-label":past?"Period started "+shortDate(k):null,
-      onclick:past?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){strip.querySelectorAll(".cyd.arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap "+shortDate(k)+" again","to mark it as the day her period started");return}logFn(k)}:null},
+      onclick:past?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){strip.querySelectorAll(".cyd.arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap "+shortDate(k)+" again",fut?"to set it as when the next period starts":"to mark it as the day the period started");return}if(fut){const g=daysBetween(R.last,k);if(g<15||g>60){toast("That's "+g+" days after the last start","A next period is usually 21 to 45 days later");return}ed.save({nextAt:k});ed.re()}else logFn(k)}:null},
       h("small",null,isNow?"Today":d.toLocaleDateString("en-US",{weekday:"short"})),h("b",null,String(d.getDate())),h("i"),h("span",{class:"cyde"},first?CPH[p][1]:""));return el}));
   const used=[...new Set(days.map(phOf))];
-  const logBtn=h("button",{type:"button",class:"cyother tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to confirm";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🩸 New period started today"}},4000);return}logFn(today)}},"🩸 New period started today");
+  const logBtn=h("button",{type:"button",class:"cyother tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to confirm";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🌸 New period started today"}},4000);return}logFn(today)}},"🌸 New period started today");
   out.push(h("div",{class:"cyhero"},cycleRing(R,170,today),h("b",{style:"color:"+PHC[ph]},CPH[ph][1]+" "+CPH[ph][0]),h("span",null,plain),
-      h("span",{style:"opacity:.75;font-size:13.5px"},"Next period around "+parseKey(R.next).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+(R.guess?" (a guess until you log a second month)":""))),
-    h("small",{class:"cyh",style:"color:#fff;opacity:.8"},"Next 2 weeks · tap a past day to mark a period start"),strip,
+      h("span",{style:"opacity:.75;font-size:13.5px"},"Next period around "+parseKey(R.next).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+(R.nextSet?" (set by you)":R.guess?" (a guess until you log a second month)":""))),
+    h("small",{class:"cyh",style:"color:#fff;opacity:.8"},"Next 2 weeks · tap a day to log a start or set the next one"),strip,
     h("div",{class:"cyleg"},used.map(p=>h("span",{style:"--pc:"+PHC[p]},h("i"),CPH[p][1]+" "+CPH[p][0]+" · "+CPH[p][3]))),
     ed?h("div",{class:"cyadj"},h("b",null,"✏️ Adjust"),
-      h("div",{class:"cyst"},h("span",null,"🩸 Period lasts"),h("button",{type:"button",class:"tap","aria-label":"Shorter period",onclick:()=>{ed.save({plen:Math.max(2,R.plen-1)});ed.re()}},"−"),h("b",null,R.plen+" days"),h("button",{type:"button",class:"tap","aria-label":"Longer period",onclick:()=>{ed.save({plen:Math.min(10,R.plen+1)});ed.re()}},"+")),
+      h("div",{class:"cyst"},h("span",null,"🌸 Period lasts"),h("button",{type:"button",class:"tap","aria-label":"Shorter period",onclick:()=>{ed.save({plen:Math.max(2,R.plen-1)});ed.re()}},"−"),h("b",null,R.plen+" days"),h("button",{type:"button",class:"tap","aria-label":"Longer period",onclick:()=>{ed.save({plen:Math.min(10,R.plen+1)});ed.re()}},"+")),
       h("div",{class:"cyst"},h("span",null,"🔁 Cycle is"),h("button",{type:"button",class:"tap","aria-label":"Shorter cycle",onclick:()=>{ed.save({clen:Math.max(20,R.len-1)});ed.re()}},"−"),h("b",null,R.len+" days"),h("button",{type:"button",class:"tap","aria-label":"Longer cycle",onclick:()=>{ed.save({clen:Math.min(45,R.len+1)});ed.re()}},"+")),
       R.fixed?h("button",{type:"button",class:"lnk",onclick:()=>{ed.save({clen:0});ed.re()}},R.n>1?"Use her real average ("+R.auto+" days)":"Back to the usual 28"):h("small",null,R.n>1?"Worked out from the dates you logged":"Usual 28 until you log a second month"),
       h("small",{style:"margin-top:4px"},"Period starts you logged (tap × to remove):"),
-      h("div",{class:"cychips"},(ed.L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button",class:"tap","aria-label":"Remove "+shortDate(k),onclick:()=>{ed.save({starts:(ed.L.starts||[]).filter(x=>x!==k)});ed.re()}},"🩸 "+shortDate(k)+"  ×")))):null,
+      h("div",{class:"cychips"},(ed.L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button",class:"tap","aria-label":"Remove "+shortDate(k),onclick:()=>{ed.save({starts:(ed.L.starts||[]).filter(x=>x!==k)});ed.re()}},"🌸 "+shortDate(k)+"  ×")))):null,
     h("div",{class:"cylog"},h("small",null,"When a new period starts, log it here:"),h("div",{class:"row",style:"justify-content:center;gap:8px"},logBtn,otherBtn),other));
   return out}
 const cycKnobs=(L,save,re)=>[(L.starts||[]).length?h("div",{class:"chips"},(L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button","aria-label":"Remove "+shortDate(k),onclick:()=>{save({starts:(L.starts||[]).filter(x=>x!==k)});re()}},shortDate(k)+" ×"))):null,
@@ -3857,7 +3858,7 @@ function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url"
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});closeSheet();toast(l?"Saved":"Removed","")}},h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"ghost"},"Save"))))}
 /* a clear chapter header, so moving from one part of a tab to the next is obvious */
 function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},e),h("b",null,title),h("i")),node)}
-function viewHome(){return [ui.ovOpen?visionPoster():null,chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection())]}
+function viewHome(){return [ui.ovOpen?visionPoster():null,chapter("💰","Our money",moneySection()),chapter("🏡","Dream home",homeDesignSection())]}
 /* The Aboagye home: one vision statement and the pillars you live by */
 const HOME0={stmt:"A home that belongs to God, where love is spoken every day, and where our science, music and faith lift the poor, the disabled, and the brilliant but needy.",
   pillars:[{id:"p1",e:"🙏",t:"God first",d:"We pray together every night. Big decisions start on our knees."},
@@ -4799,7 +4800,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-h";
+const APP_VERSION="2026-11-20-i";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
