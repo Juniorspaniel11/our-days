@@ -828,6 +828,7 @@ body.tab-us .gut.top{display:none}
 .bca.ok>b{color:#1a9e7a}.bca.ov>b{color:#d9622b}.bca>b{font-size:16px;white-space:nowrap}
 .bills.inc{background:color-mix(in srgb,#1a9e7a 7%,var(--card))}
 .incflow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;padding:8px 10px;border-radius:12px;background:color-mix(in srgb,#1a9e7a 12%,transparent);font-size:14px;font-weight:700}.incflow i{font-style:normal;opacity:.6}.incflow b{color:#1a9e7a}
+.mh2 .ghost{background:rgba(255,255,255,.18)!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3617,6 +3618,11 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
             h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd))),
             h("b",{class:"spa"},M(b.amt)))}))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
+      h("div",{class:"billh",style:"margin-top:14px"},h("b",null,"🗂️ Categories"),h("small",{class:"billtot"},"tap one to set its amount")),
+      h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;
+        return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
+          h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),ub?h("small",{class:"carry"},"incl. "+M(ub)+" in bills due later"):null,cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
+          l||+c.limit?h("span",{class:"bca"+(s2>l?" ov":" ok")},h("b",null,s2>l?M(s2-l)+" over":M(l-s2)+" left"),h("small",null,M(s2)+" of "+M(l))):h("span",{class:"bca"},M(s2),h("small",null,"tap to set amount")))})),
       h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" so far"),lsp?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]+" summary"):null)]}
   else if(tab==="split"){const bal=splitBalance(),it=splitItems(),open=it.filter(x=>!x.settled);
     const line=Math.abs(bal)<0.005?"You're all square 🤝":bal>0?nm(PARTNER)+" owes you "+M(bal):"You owe "+nm(PARTNER)+" "+M(-bal);
@@ -4631,7 +4637,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-x";
+const APP_VERSION="2026-11-19-y";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
