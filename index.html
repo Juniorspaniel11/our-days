@@ -891,9 +891,28 @@ body.tab-us .gut.top{display:none}
 .lv2e{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;flex:0 0 auto}
 .lv2t{flex:1;font-size:16px;font-weight:700;line-height:1.3;color:var(--ink)}
 .lv2k{width:34px;height:34px;border-radius:50%;flex:0 0 auto;border:2px solid #d9cfe3;background:#fff;color:#fff;font-weight:900;font-size:17px;cursor:pointer}
-.lv2i.ok{opacity:.6}.lv2i.ok .lv2t{text-decoration:line-through}.lv2i.ok .lv2k{background:#16a37f;border-color:#16a37f}
+.lv2i.ok{opacity:.6}.lv2i.ok .lv2t{text-decoration:line-through}.lv2i.ok .lv2k{background:#16a37f!important;border-color:#16a37f!important}
 .lv2easy{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:#fff4e6;color:#7a4a12;font-size:15px}.lv2easy b{color:#b5650d}.lv2easy>span:first-child{font-size:22px}
 .lv2next{font-size:14px;font-weight:700;color:var(--muted);padding:0 4px}
+.lv2e.t0{background:#ffe1ec}.lv2e.t1{background:#ece5ff}.lv2e.t2{background:#dcf6ef}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme="light"]) .cyc2 .cwd{background:#2a2235;color:#f3eef8}.cyc2 .cwd small{color:#b9adc8}.cyc2 .cwd.now,.cyc2 .cwd.arm{background:#3a3048;outline-color:#f3eef8}
+:root:not([data-theme="light"]) .c2top .cring g>circle:first-child{stroke:#3a3048}.c2chip{color:color-mix(in srgb,var(--pc) 55%,#fff)}
+:root:not([data-theme="light"]) .cyc2 .cfq button{background:#3a1f2c;color:#ffb3cd;border-color:#6b2c48}
+:root:not([data-theme="light"]) .lv2c{background:#2f2840;color:#cfc4dc}.lv2i{background:#231d2e;border-color:#352c44}
+:root:not([data-theme="light"]) .lv2e.t0{background:#4a2333}.lv2e.t1{background:#33295a}.lv2e.t2{background:#1d4239}
+:root:not([data-theme="light"]) .lv2k{background:#1b1625;border-color:#5a4d6b}
+:root:not([data-theme="light"]) .lv2easy{background:#3a2a17;color:#f5d9b4}.lv2easy b{color:#ffb35c}
+:root:not([data-theme="light"]) .bills>.billh>b{color:color-mix(in srgb,var(--mc) 55%,#fff)}
+}
+:root[data-theme="dark"] .cyc2 .cwd{background:#2a2235;color:#f3eef8}.cyc2 .cwd small{color:#b9adc8}.cyc2 .cwd.now,.cyc2 .cwd.arm{background:#3a3048;outline-color:#f3eef8}
+:root[data-theme="dark"] .c2top .cring g>circle:first-child{stroke:#3a3048}.c2chip{color:color-mix(in srgb,var(--pc) 55%,#fff)}
+:root[data-theme="dark"] .cyc2 .cfq button{background:#3a1f2c;color:#ffb3cd;border-color:#6b2c48}
+:root[data-theme="dark"] .lv2c{background:#2f2840;color:#cfc4dc}.lv2i{background:#231d2e;border-color:#352c44}
+:root[data-theme="dark"] .lv2e.t0{background:#4a2333}.lv2e.t1{background:#33295a}.lv2e.t2{background:#1d4239}
+:root[data-theme="dark"] .lv2k{background:#1b1625;border-color:#5a4d6b}
+:root[data-theme="dark"] .lv2easy{background:#3a2a17;color:#f5d9b4}.lv2easy b{color:#ffb35c}
+:root[data-theme="dark"] .bills>.billh>b{color:color-mix(in srgb,var(--mc) 55%,#fff)}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2293,7 +2312,7 @@ function careGuide(C,nmO){const ph=C.ph||C.phase,G=CARE[ph];if(!G)return null;co
   const TINT=["#ffe1ec","#ece5ff","#dcf6ef"];
   return h("section",{class:"lv2",style:"--pc:"+PHC[ph]},
     h("div",{class:"lv2h"},h("div",null,h("b",null,"Love her well today"),h("small",null,G.feel)),h("span",{class:"lv2c"},done.length+"/"+G.do.length)),
-    h("div",{class:"lv2list"},G.do.map(([e,t],n)=>{const ok=done.includes(n);return h("div",{class:"lv2i"+(ok?" ok":"")},h("span",{class:"lv2e",style:"background:"+TINT[n%3]},emo(e,30,!ok)),h("span",{class:"lv2t"},t),
+    h("div",{class:"lv2list"},G.do.map(([e,t],n)=>{const ok=done.includes(n);return h("div",{class:"lv2i"+(ok?" ok":"")},h("span",{class:"lv2e t"+(n%3)},emo(e,30,!ok)),h("span",{class:"lv2t"},t),
       h("button",{type:"button",class:"lv2k tap","aria-pressed":String(ok),"aria-label":ok?"Mark not done":"Mark done",onclick:ev=>tick(n,ev.currentTarget)},ok?"✓":""))})),
     h("div",{class:"lv2easy"},h("span",null,"🙅"),h("span",null,h("b",null,"Go easy on "),G.easy)),
     upNext?h("div",{class:"lv2next"},"Up next: "+upNext[0]+" "+upNext[1]+" "+upNext[2]):null,
@@ -4775,7 +4794,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-f";
+const APP_VERSION="2026-11-20-g";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
