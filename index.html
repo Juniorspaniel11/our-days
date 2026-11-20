@@ -941,6 +941,13 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mtl{font-size:13px;color:var(--muted)}.mtl b{color:var(--ink);font-size:14.5px}.mt.add .mtl{color:var(--mc);font-weight:700}
 .mh2key{display:flex;gap:14px;font-size:13px;font-weight:700;opacity:.95}.mh2key span{display:flex;align-items:center;gap:5px}.mh2key span::before{content:"";width:9px;height:9px;border-radius:3px}.mh2key .b::before{background:#b9a6ff}.mh2key .s::before{background:#ffcf5c}.mh2key .l::before{background:#7dffcf}
 .mh2foot{justify-content:flex-end!important}.mh2foot>span:empty{display:none}
+.libg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.libt{position:relative;border-radius:20px;background:var(--card);border:1px solid var(--line);box-shadow:0 6px 16px rgba(20,10,40,.06);overflow:hidden}
+.libt::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--lc)}
+.libmain{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 12px 12px;width:100%;border:0;background:none;font:inherit;color:var(--ink);text-align:left;text-decoration:none;cursor:pointer}
+.libmain b{font-size:16px;letter-spacing:-.01em}.libmain small{font-size:13px;color:var(--muted)}.libt.add .libmain small{color:var(--lc);font-weight:700}
+.libi{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--lc) 16%,transparent);margin-bottom:4px}
+.libed{position:absolute;top:10px;right:8px;width:32px;height:32px;border-radius:50%;border:0;background:color-mix(in srgb,var(--ink) 8%,transparent);font-size:14px;cursor:pointer}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -4631,6 +4638,7 @@ function viewUs(){
     {const bb=bigBanner();if(bb)out.push(bb)}
     if(gotEl)out.push(h("div",{class:"ju"},gotEl));
     out.push(chapter("🙏","Pray and read",faithSection()));
+    out.push(chapter("📚","Our library",librarySection()));
   }
   setTimeout(usTick,0);
   return out;
@@ -4642,6 +4650,22 @@ function heroSide(u){
   const pic=h("div",{class:"lvpic",style:"--c:"+c},ph?h("img",{src:ph,alt:""}):h("span",null,(plainNm(u)[0]||"?")),pr.on?h("i",{class:"lvon","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
   if(me){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};pic.appendChild(f)}
   return h("div",{class:"lvside"},pic,h("b",{class:"lvname"},plainNm(u)),h("span",{class:"lvtime"},fmt(n.min)),h("small",{class:"lvcity"},x.city||""),wxChip(u))}
+/* ---------- our library: links saved privately in us/main.library (not in the public code) ---------- */
+const LIB0=[{id:"videos",e:"▶️",t:"Our videos",d:"YouTube playlist",c:"#e0352b"},{id:"books",e:"📚",t:"Our books",d:"Google Drive folder",c:"#1a73e8"}];
+const libLinks=()=>US.main.library||{};
+function libOk(u){try{const x=new URL(u);return x.protocol==="https:"}catch(e){return false}}
+function libSheet(it){const L=libLinks(),cur=L[it.id]||{},inp=h("input",{type:"url",class:"inp",inputmode:"url",placeholder:"Paste the link (https://…)","aria-label":"Link"});inp.value=cur.url||"";
+  const nm=h("input",{type:"text",class:"inp",placeholder:it.t,"aria-label":"Name"});nm.value=cur.t||"";
+  openSheet((cur.url?"Edit ":"Add ")+it.t.toLowerCase(),h("form",{class:"body",onsubmit:e=>{e.preventDefault();const u=inp.value.trim();if(!libOk(u)){toast("That doesn't look like a link","It should start with https://");inp.focus();return}
+      saveUs({library:Object.assign({},L,{[it.id]:{url:u,t:nm.value.trim()||"",at:Date.now()}})});closeSheet();toast("Saved 📚","Only you two can see it")}},
+    h("p",{class:"hint",style:"margin:0"},"Saved privately. Only you and "+plainNm(PARTNER)+" can see it."),inp,nm,h("button",{type:"submit",class:"primary"},"Save"),
+    cur.url?confirmBtn("Remove link",()=>{const n=Object.assign({},L);delete n[it.id];saveUs({library:n});closeSheet()}):null))}
+function librarySection(){const L=libLinks();
+  return h("section",{class:"ju"},h("div",{class:"libg"},LIB0.map(it=>{const cur=L[it.id],has=cur&&libOk(cur.url);
+    return h("div",{class:"libt"+(has?"":" add"),style:"--lc:"+it.c},
+      h(has?"a":"button",has?{class:"libmain tap",href:cur.url,target:"_blank",rel:"noopener noreferrer"}:{type:"button",class:"libmain tap",onclick:()=>libSheet(it)},
+        h("span",{class:"libi"},emo(it.e,30,false)),h("b",null,(cur&&cur.t)||it.t),h("small",null,has?it.d+" ↗":"Tap to add the link")),
+      has?h("button",{type:"button",class:"libed tap","aria-label":"Edit "+it.t,onclick:()=>libSheet(it)},"✏️"):null)})))}
 function coupleStrip(){
   const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
   if(v){const J=US.main.journey||{};let from=J[v.id];if(!from){from=today;if(DB)saveUs({journey:{[v.id]:today}})}
@@ -4855,7 +4879,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-k";
+const APP_VERSION="2026-11-20-l";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
