@@ -939,6 +939,8 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mt>b{font-size:16px;letter-spacing:-.01em}.mti{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--mc) 16%,transparent)}
 .mtbar{width:100%;height:8px;border-radius:9px;background:color-mix(in srgb,var(--mc) 14%,transparent);overflow:hidden;margin:3px 0}.mtbar i{display:block;height:100%;border-radius:9px;background:var(--mc)}
 .mtl{font-size:13px;color:var(--muted)}.mtl b{color:var(--ink);font-size:14.5px}.mt.add .mtl{color:var(--mc);font-weight:700}
+.mh2key{display:flex;gap:14px;font-size:13px;font-weight:700;opacity:.95}.mh2key span{display:flex;align-items:center;gap:5px}.mh2key span::before{content:"";width:9px;height:9px;border-radius:3px}.mh2key .b::before{background:#b9a6ff}.mh2key .s::before{background:#ffcf5c}.mh2key .l::before{background:#7dffcf}
+.mh2foot{justify-content:flex-end!important}.mh2foot>span:empty{display:none}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3804,8 +3806,8 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
           h("div",{class:"mh2big"},h("b",null,leftv>=0?M(leftv):M(-leftv)),h("span",null,leftv>=0?"left to spend":"over the plan")),
           leftv>0?h("small",{class:"mh2day"},"That's about "+(show?money2(Math.floor(leftv/dl)):"••")+" a day"):h("small",{class:"mh2day"},"Bills and spending are more than the plan"),
           h("div",{class:"mh2bar"},h("i",{class:"b",style:"width:"+pc(billsM)+"%"}),h("i",{class:"s",style:"width:"+pc(other)+"%"}),h("i",{class:"l",style:"width:"+pc(leftv)+"%"})),
-          h("div",{class:"mh2leg"},[["b","🔁 Bills",billsM],["s","🛒 Spent",other],["l",leftv>=0?"✅ Left":"⚠️ Over",Math.abs(leftv)]].map(([c,l,v])=>h("div",{class:c},h("small",null,l),h("b",null,M(v))))),
-          h("div",{class:"mh2foot"},h("span",null,(INC?"Money in ":"Monthly plan ")+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
+          h("div",{class:"mh2key"},h("span",{class:"b"},"Bills"),h("span",{class:"s"},"Spent "+M(other)),h("span",{class:"l"},leftv>=0?"Left":"Over")),
+          h("div",{class:"mh2foot"},INC?h("span"):h("span",null,"Monthly plan "+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
       :h("div",{class:"mh2 empty"},emo("💰",56,true),h("b",{class:"mh2t"},"Start with what comes in"),h("small",{class:"mh2day"},"Add your monthly income. Bills and spending come out of it, and you'll see what's left."),
           h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"primary",onclick:()=>incomeSheet(null)},"💵 Add income"),h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log spending"))),
       (()=>{const pct=(a,b)=>b>0?Math.min(100,Math.round(a/b*100)):0,go=sel=>{const t=document.querySelector(sel);if(t)t.scrollIntoView({behavior:sheetRM()?"auto":"smooth",block:"start"})};
@@ -3813,14 +3815,14 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
           h("button",{type:"button",class:"mt tap",style:"--mc:#7b6cf6",onclick:()=>go(".bills:not(.inc):not(.cats)")},h("span",{class:"mti"},emo("🔁",22,false)),h("b",null,"Bills"),
             h("div",{class:"mtbar"},h("i",{style:"width:"+pct(paidB,billsM)+"%"})),h("span",{class:"mtl"},h("b",null,M(paidB))," paid"),h("span",{class:"mtl"},h("b",null,M(upv))," to go")),
           INC?h("button",{type:"button",class:"mt tap",style:"--mc:#16a37f",onclick:()=>go(".bills.inc")},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),
-            h("div",{class:"mtbar"},h("i",{style:"width:"+pct(used,INC)+"%"})),h("span",{class:"mtl"},h("b",null,M(INC))," a month"),h("span",{class:"mtl"},h("b",null,M(Math.max(0,leftv)))," still free"))
+            h("div",{class:"mtbar"},h("i",{style:"width:"+pct(used,INC)+"%"})),h("span",{class:"mtl"},h("b",null,M(INC))," a month"),h("span",{class:"mtl"},h("b",null,pct(used,INC)+"%")," already used"))
           :h("button",{type:"button",class:"mt tap add",style:"--mc:#16a37f",onclick:()=>incomeSheet(null)},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),h("span",{class:"mtl"},"Add your income to see what's free")))})(),
       (()=>{const IL=incomes(),ub=bills().filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0);
-        return h("div",{class:"bills inc"},h("div",{class:"billh"},h("b",null,"💵 Money in",IL.length?h("small",{class:"billtot"}," "+M(INC)+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>incomeSheet(null)},"+ Add income")),
+        return h("div",{class:"bills inc"},h("div",{class:"billh"},h("b",null,"💵 Money in"),h("button",{type:"button",class:"lnk",onclick:()=>incomeSheet(null)},"+ Add income")),
           IL.length?h("div",{class:"billrow"},IL.map(x=>h("button",{type:"button",class:"billr tap",style:"--bc:#1a9e7a",onclick:()=>incomeSheet(x)},h("span",{class:"bci"},emo("💵",20,false)),
             h("span",{class:"bcn"},h("b",null,x.name),h("small",null,x.by===ME?"Yours":plainNm(x.by)+"'s")),h("b",{class:"spa",style:"color:#1a9e7a"},"+ "+M(x.amt)))))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Stipend, pay, side gigs. Add each one once."),
-          IL.length?h("div",{class:"incflow"},h("span",null,"💵 "+M(INC)),h("i",null,"−"),h("span",null,"🔁 "+M(ub)+" bills"),h("i",null,"="),h("b",null,M(INC-ub)+" for everything else")):null)})(),
+          null)})(),
       h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills",BL.length?h("small",{class:"billtot"}," "+M(BL.filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0))+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
         BL.length?h("div",{class:"billrow"},BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
           const c=bcats().find(x=>x.id===b.cat)||{e:"✨",id:"other"};
@@ -4434,8 +4436,8 @@ function roomSVG(){
     <rect class="hit" x="40" y="176" width="88" height="90" rx="12" fill="#fff8ec" stroke="${E}" stroke-width="4"/>
     <path d="M40 188 a12 12 0 0 1 12 -12 h64 a12 12 0 0 1 12 12 v12 h-88z" fill="#e2557c" stroke="${E}" stroke-width="4"/>
     ${[60,84,108].map(x=>`<rect x="${x-3}" y="168" width="6" height="16" rx="3" fill="#fff" stroke="${E}" stroke-width="2.5"/>`).join("")}
-    <text x="84" y="240" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="34" fill="#3a2430">${vd==null?"+":vd}</text>
-    <text x="84" y="257" text-anchor="middle" font-family="DM Sans, sans-serif" font-weight="700" font-size="11" fill="#8a6070">${vd==null?"ADD A VISIT":"DAYS TO VISIT"}</text>
+    <text x="84" y="240" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="34" fill="#3a2430">${vd==null?"+":+v.date.slice(8)}</text>
+    <text x="84" y="257" text-anchor="middle" font-family="DM Sans, sans-serif" font-weight="700" font-size="11" fill="#8a6070">${vd==null?"ADD A VISIT":parseKey(v.date).toLocaleDateString("en-US",{month:"short"}).toUpperCase()+" · VISIT"}</text>
   </g>
   <rect x="200" y="262" width="140" height="10" rx="4" fill="var(--shelf)" stroke="${E}" stroke-width="3"/>
   <g data-obj="letters" tabindex="0" role="button" aria-label="Letterbox: love letters${unread?", "+unread+" unopened":""}">
@@ -4620,7 +4622,7 @@ function viewUs(){
   if(page==="care"){
     out.push(careSection());
   }else if(page==="play"){
-    out.push(chapter("❓","Today's question",h("section",{class:"ju"},h("button",{type:"button",class:"pc tap qotd",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Question of the day"),h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],52,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered":"Answer"))))));
+    out.push(chapter("❓","Today's question",h("section",{class:"ju"},h("button",{type:"button",class:"pc tap qotd",style:"--c:#5b3b8c",onclick:()=>answerSheet("d:"+k,dq.q,"Question of the day")},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"tx"},dq.q)),emo(TOPIC_EMOJI[dq.tid],52,true)),h("div",{class:"foot"},av(x=>qa[x]),h("span",{class:"go"},qa[w]?"See answers":qa[oo]?nm(oo)+" answered":"Answer"))))));
     out.push(chapter("🏠","Our room",top));
     out.push(chapter("🎯","Do together",growSection()));
     out.push(chapter("🎲","Games",playSection(k)));
@@ -4826,7 +4828,7 @@ function render(){
     :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab];
   const sl=el("subline");sl.innerHTML="";
   const pidP=partnerOf(ME);
-  if(S.tab==="home"){if(!ui.ovOpen)sl.appendChild(visionPoster(true))}else
+  if(S.tab==="home"){if(!ui.ovOpen)sl.appendChild(visionPoster(true))}else if(S.tab==="projects"){}else
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
     const chip=(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
@@ -4853,7 +4855,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-j";
+const APP_VERSION="2026-11-20-k";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
