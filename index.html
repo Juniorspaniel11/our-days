@@ -826,6 +826,8 @@ body.tab-us .gut.top{display:none}
 .mh2.empty{align-items:center;text-align:center;gap:6px}.mh2t{font-size:20px}
 .ovbar.hdr{margin-top:6px;background:rgba(0,0,0,.22);box-shadow:none;backdrop-filter:blur(4px)}
 .bca.ok>b{color:#1a9e7a}.bca.ov>b{color:#d9622b}.bca>b{font-size:16px;white-space:nowrap}
+.bills.inc{background:color-mix(in srgb,#1a9e7a 7%,var(--card))}
+.incflow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;padding:8px 10px;border-radius:12px;background:color-mix(in srgb,#1a9e7a 12%,transparent);font-size:14px;font-weight:700}.incflow i{font-style:normal;opacity:.6}.incflow b{color:#1a9e7a}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3522,6 +3524,17 @@ function splitBalance(){return splitItems().filter(x=>!x.settled).reduce((s,x)=>
 const nextMk=mk=>addDays(mk+"-01",40).slice(0,7);
 function carryIn(c,mk){if(!c.roll||!c.rollFrom||c.rollFrom>=mk)return 0;let k=c.rollFrom,carry=0,n=0;while(k<mk&&n++<60){carry+=(+c.limit||0)-spentIn(k,c.id);k=nextMk(k)}return Math.round(carry*100)/100}
 const availIn=(c,mk)=>(+c.limit||0)+carryIn(c,mk);
+/* ---------- money in: stipends, pay, anything that comes in each month. Amounts and labels only ---------- */
+function incomes(){return Object.entries(MONEY().income||{}).map(([id,x])=>({id,...x})).filter(x=>!x.removed&&x.name).sort((a,b)=>(a.at||0)-(b.at||0))}
+const incomeTotal=()=>incomes().reduce((a,x)=>a+(+x.amt||0),0);
+function incomeSheet(i0){let who=i0?i0.by||ME:ME;juSheet(i0?"Edit income":"Money coming in",()=>{
+  const n=h("input",{type:"text",class:"inp",placeholder:"Name, e.g. Stipend, Job, Side gig","aria-label":"Income name"});n.value=i0?i0.name:"";
+  const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount each month (after tax)","aria-label":"Amount"});a.value=i0?i0.amt:"";
+  const people=[ME,PARTNER].filter(u=>P(u)&&!P(u).placeholder),wc=h("div",{class:"chips"},people.map(u=>h("button",{type:"button","aria-pressed":String(u===who),onclick:ev=>{who=u;wc.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},u===ME?"Me":plainNm(u))));
+  return [h("form",{class:"body",onsubmit:e=>{e.preventDefault();const nm0=n.value.trim(),v=amtIn(a.value);if(!nm0){n.focus();return}if(!v){toast("Amount needed","");return}if(!noSensitive(nm0))return;
+      saveMoney({income:{[i0?i0.id:uid()]:{name:nm0,amt:v,by:who,at:i0?i0.at||Date.now():Date.now()}}});closeSheet();toast(i0?"Updated":"Added 💵",nm0+" · "+money2(v)+" a month")}},
+    n,a,h("p",{class:"hint"},"Whose is it?"),wc,h("button",{type:"submit",class:"primary"},i0?"Save":"Add")),
+    i0?confirmBtn("Remove",()=>{saveMoney({income:{[i0.id]:{removed:true}}});closeSheet()}):null]})}
 /* ---------- recurring bills: set once, logged on their day each month with a fixed id so two phones never double log ---------- */
 function bills(){return Object.entries(MONEY().bills||{}).map(([id,x])=>({id,...x})).filter(x=>!x.removed&&x.name).sort((a,b)=>a.day-b.day)}
 const billSid=(b,mk)=>"bill_"+b.id+"_"+mk;
@@ -3574,10 +3587,10 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
   const segb=(id,lab)=>h("button",{type:"button","aria-pressed":String(tab===id),onclick:()=>{ui.monTab=id;render()}},lab);
   const lockLink=h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Turn lock off":"🔒 Unlock"):"🔒 Lock");
   let pane;
-  if(tab==="budget"){setTimeout(autoBills,0);const mk=mKey(),cs=bcats(),lim=cs.reduce((a,c)=>a+Math.max(0,availIn(c,mk)),0),sp=spentIn(mk);
+  if(tab==="budget"){setTimeout(autoBills,0);const mk=mKey(),cs=bcats();let lim=cs.reduce((a,c)=>a+Math.max(0,availIn(c,mk)),0),sp=spentIn(mk);
     const lm=addDays(mk+"-01",-1).slice(0,7),lsp=spentIn(lm),up=upcomingBills(mk),upv=up.reduce((a,b)=>a+(+b.amt||0),0);
     const upC=id=>up.filter(b=>b.cat===id).reduce((a,b)=>a+(+b.amt||0),0),used=sp+upv;
-    const leftv=lim-used,paidB=spendIn(mk).filter(x=>x.bill).reduce((a,x)=>a+(+x.amt||0),0),billsM=paidB+upv,other=sp-paidB;
+    const INC=incomeTotal(),planV=INC||lim;lim=planV;const leftv=lim-used,paidB=spendIn(mk).filter(x=>x.bill).reduce((a,x)=>a+(+x.amt||0),0),billsM=paidB+upv,other=sp-paidB;
     const BL=bills(),today=usDay();
     const due=moneySummaryDue();
     pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
@@ -3588,9 +3601,15 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
           leftv>0?h("small",{class:"mh2day"},"That's about "+(show?money2(Math.floor(leftv/dl)):"••")+" a day"):h("small",{class:"mh2day"},"Bills and spending are more than the plan"),
           h("div",{class:"mh2bar"},h("i",{class:"b",style:"width:"+pc(billsM)+"%"}),h("i",{class:"s",style:"width:"+pc(other)+"%"}),h("i",{class:"l",style:"width:"+pc(leftv)+"%"})),
           h("div",{class:"mh2leg"},[["b","🔁 Bills",billsM],["s","🛒 Spent",other],["l",leftv>=0?"✅ Left":"⚠️ Over",Math.abs(leftv)]].map(([c,l,v])=>h("div",{class:c},h("small",null,l),h("b",null,M(v))))),
-          h("div",{class:"mh2foot"},h("span",null,"Monthly plan "+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
-      :h("div",{class:"mh2 empty"},emo("💰",56,true),h("b",{class:"mh2t"},"Set your plan for "+monthName(mk).split(" ")[0]),h("small",{class:"mh2day"},"Give each category a monthly amount. Bills and spending come out of it."),
-          h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"primary",onclick:()=>{ui.monAll=true;render()}},"Set amounts"),h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log spending"))),
+          h("div",{class:"mh2foot"},h("span",null,(INC?"Money in ":"Monthly plan ")+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
+      :h("div",{class:"mh2 empty"},emo("💰",56,true),h("b",{class:"mh2t"},"Start with what comes in"),h("small",{class:"mh2day"},"Add your monthly income. Bills and spending come out of it, and you'll see what's left."),
+          h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"primary",onclick:()=>incomeSheet(null)},"💵 Add income"),h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log spending"))),
+      (()=>{const IL=incomes(),ub=bills().filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0);
+        return h("div",{class:"bills inc"},h("div",{class:"billh"},h("b",null,"💵 Money in",IL.length?h("small",{class:"billtot"}," "+M(INC)+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>incomeSheet(null)},"+ Add income")),
+          IL.length?h("div",{class:"billrow"},IL.map(x=>h("button",{type:"button",class:"billr tap",style:"--bc:#1a9e7a",onclick:()=>incomeSheet(x)},h("span",{class:"bci"},emo("💵",20,false)),
+            h("span",{class:"bcn"},h("b",null,x.name),h("small",null,x.by===ME?"Yours":plainNm(x.by)+"'s")),h("b",{class:"spa",style:"color:#1a9e7a"},"+ "+M(x.amt)))))
+          :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Stipend, pay, side gigs. Add each one once."),
+          IL.length?h("div",{class:"incflow"},h("span",null,"💵 "+M(INC)),h("i",null,"−"),h("span",null,"🔁 "+M(ub)+" bills"),h("i",null,"="),h("b",null,M(INC-ub)+" for everything else")):null)})(),
       h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills",BL.length?h("small",{class:"billtot"}," "+M(BL.filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0))+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
         BL.length?h("div",{class:"billrow"},BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
           const c=bcats().find(x=>x.id===b.cat)||{e:"✨",id:"other"};
@@ -3598,6 +3617,7 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
             h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd))),
             h("b",{class:"spa"},M(b.amt)))}))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
+      h("div",{class:"billh",style:"margin-top:14px"},h("b",null,"🛒 Spending by category"),h("small",{class:"billtot"},"optional limits")),
       h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;if(!(+c.limit)&&!s2&&!ui.monAll)return null;
         return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
           h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),ub?h("small",{class:"carry"},"incl. "+M(ub)+" in bills due later"):null,cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
@@ -4617,7 +4637,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-v";
+const APP_VERSION="2026-11-19-w";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
