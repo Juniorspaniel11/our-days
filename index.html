@@ -762,6 +762,32 @@ body.tab-us #subline{display:none}body.tab-us #title{display:block!important}bod
 .chapter>section>.sechd>h2,.chapter>section>h2.sh,.chapter>section>.sechd>.sh{display:none}
 .chapter{position:relative}.chapter>section>.sechd{position:absolute;top:6px;right:0;margin:0;background:var(--bg);padding-left:8px}
 .chapter>section{margin-top:0}
+body.tab-us .gut.top{display:none}
+.lvhero{position:relative;overflow:hidden;border-radius:30px;padding:18px 14px 16px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:radial-gradient(80% 60% at 50% 110%,rgba(255,170,140,.55),transparent 70%),radial-gradient(60% 50% at 0% 0%,rgba(95,208,196,.25),transparent 70%),radial-gradient(60% 50% at 100% 0%,rgba(255,143,171,.3),transparent 70%),linear-gradient(170deg,#1f1640,#4a1f55 55%,#8c3a5e);
+  box-shadow:0 22px 46px rgba(74,31,85,.4)}
+.lvhero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1.2px 1.2px at 12% 18%,#fff9,transparent),radial-gradient(1px 1px at 33% 8%,#fffa,transparent),radial-gradient(1.4px 1.4px at 58% 22%,#fff8,transparent),radial-gradient(1px 1px at 82% 12%,#fff9,transparent),radial-gradient(1.2px 1.2px at 92% 34%,#fff7,transparent),radial-gradient(1px 1px at 6% 40%,#fff8,transparent);pointer-events:none}
+.lvhearts{position:absolute;inset:0;pointer-events:none}.lvhearts i{position:absolute;bottom:-20px;color:rgba(255,160,190,.5);font-style:normal;animation:lvrise 9s linear infinite}
+@keyframes lvrise{0%{transform:translateY(0) scale(.8);opacity:0}15%{opacity:.8}100%{transform:translateY(-330px) scale(1.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.lvhearts{display:none}}
+.lvtop{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;width:100%;gap:4px}
+.lvheart{margin-top:22px}
+.lvside{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1px;min-width:0}
+.lvpic{position:relative;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 30%,#1f1640);box-shadow:0 0 0 3px var(--c),0 0 26px color-mix(in srgb,var(--c) 70%,transparent);font-family:var(--fun);font-size:32px;font-weight:700;overflow:visible}
+.lvpic img{width:100%;height:100%;border-radius:50%;object-fit:cover}.lvpic .pfile{position:absolute;inset:0;opacity:0;cursor:pointer}
+.lvpic .padd{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;background:#fff;color:#4a1f55;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:16px;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.lvon{position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#3fe08a;box-shadow:0 0 0 3px #2a1a44}
+.lvname{font-family:"Caveat",cursive;font-size:30px;line-height:1;margin-top:8px}
+.lvtime{font-family:var(--mono);font-size:15px;font-weight:600;opacity:.95}.lvcity{font-size:12.5px;opacity:.75;letter-spacing:.04em}
+.lvside .hwx{background:rgba(255,255,255,.14);color:#fff;margin-top:4px}
+.lvarc{position:relative;width:100%;height:60px;margin-top:-6px}.lvarc svg{width:100%;height:100%;display:block}
+.lvplane{position:absolute;font-size:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+.lvmid{background:none;border:0;color:#fff;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:-8px;cursor:pointer}
+.lvbig{font-family:var(--fun);font-size:64px;line-height:.95;font-weight:700;background:linear-gradient(180deg,#fff,#ffd0dc);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 6px 30px rgba(255,143,171,.35)}
+.lvlab{font-family:"Caveat",cursive;font-size:22px;opacity:.95}
+.lvtiles{display:flex;gap:6px;margin-top:4px}.lvt{display:flex;flex-direction:column;align-items:center;min-width:48px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:4px 6px;backdrop-filter:blur(6px)}
+.lvt b{font-family:var(--mono);font-size:20px}.lvt small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.lvmiles{position:relative;font-size:13px;opacity:.85;margin-top:6px;letter-spacing:.03em}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -4315,32 +4341,31 @@ function viewUs(){
   return out;
 }
 /* ---------- Us hero: you | countdown | partner ---------- */
+/* ---------- Us hero: two people, one path between them ---------- */
 function heroSide(u){
-  const x=P(u),me=u===ME,c=me?"#8b6ad1":"#e2557c",ph=x&&x.avatar,pr=presenceOf(u),st=statusOf(u),n=tzNow(x.tz);
-  const pic=h("div",{class:"hpic",style:"--c:"+c},ph?h("img",{src:ph,alt:""}):h("span",null,(nm(u)[0]||"?")),
-    pr.on?h("i",{class:"odot","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
+  const x=P(u),me=u===ME,c=PCOL(u)[0],ph=x&&x.avatar,pr=presenceOf(u),n=tzNow(x.tz);
+  const pic=h("div",{class:"lvpic",style:"--c:"+c},ph?h("img",{src:ph,alt:""}):h("span",null,(plainNm(u)[0]||"?")),pr.on?h("i",{class:"lvon","aria-label":"Online"}):null,me&&!ph?h("i",{class:"padd"},"+"):null);
   if(me){const f=h("input",{type:"file",accept:"image/*","aria-label":"Choose your picture",class:"pfile"});f.onchange=()=>{const fl=f.files&&f.files[0];if(fl)pickAvatar(fl)};pic.appendChild(f)}
-  const stEl=h(me?"button":"div",{type:me?"button":null,class:"hstatus"+(me?" tap":""),onclick:me?statusSheet:null,"aria-label":me?"Set your status":null},emo(st.e,18,false),h("span",null,st.t),me?h("span",{class:"hedit","aria-hidden":"true"},"✎"):null);
-  return h("div",{class:"hside"},pic,h("b",{class:"hname"},nm(u)),h("small",{class:"hloc"},x.city||""),h("small",{class:"htime"},fmt(n.min)),wxChip(u),
-    h("small",{class:"hpres"+(pr.on?" on":"")},pr.on?"● Online now":pr.text||"Offline"),stEl);
-}
+  return h("div",{class:"lvside"},pic,h("b",{class:"lvname"},plainNm(u)),h("span",{class:"lvtime"},fmt(n.min)),h("small",{class:"lvcity"},x.city||""),wxChip(u))}
 function coupleStrip(){
   const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
   if(v){const J=US.main.journey||{};let from=J[v.id];if(!from){from=today;if(DB)saveUs({journey:{[v.id]:today}})}
     const total=Math.max(1,daysBetween(from,v.date));left=Math.max(0,daysBetween(today,v.date));p=Math.min(1,Math.max(0,1-left/total))}
   const met=v&&left===0;
-  const mid=h("button",{type:"button",class:"hmid",onclick:datesSheet,"aria-label":"Your next visit"});
-  if(!v){mid.append(h("div",{class:"hheart"},"💞"),h("b",{class:"hbig",style:"font-size:22px"},"Add a visit"),h("small",{class:"huntil"},"Tap to set the date"))}
-  else if(met){mid.append(h("div",{class:"hheart beat"},"💞"),h("b",{class:"hbig",style:"font-size:26px"},"Today!"),h("small",{class:"huntil"},"Together at last"))}
-  else{const tile=(id,l)=>h("div",{class:"ht"},h("b",{id},"00"),h("small",null,l));
-    mid.append(h("div",{class:"hheart beat"},"💞"),h("b",{class:"hbig",id:"hdays"},String(left)),h("small",{class:"hdlabel"},left===1?"day to go":"days to go"),
-      h("div",{class:"htiles",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},tile("hh","hrs"),tile("hm","min"),tile("hs","sec")),
-      h("small",{class:"huntil"},"until "+shortDate(v.date)),h("div",{class:"hbar"},h("i",{style:"width:"+Math.round(p*100)+"%"})));
-  }
-  const mi=h("small",{class:"hmiles"},"");Promise.all([ME,PARTNER].map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b)mi.textContent=miles(a,b).toLocaleString()+" miles apart"});
-  mid.appendChild(mi);
-  return h("section",{class:"ju"},h("div",{class:"hero"},heroSide(ME),mid,heroSide(PARTNER)));
-}
+  /* the path: an arc from you to her, a plane that moves along it as the visit gets closer */
+  const W=320,H=74,x0=26,x1=W-26,y0=H-8,cx=W/2,cy=-30,t=met?1:p,bx=(1-t)*(1-t)*x0+2*(1-t)*t*cx+t*t*x1,by=(1-t)*(1-t)*y0+2*(1-t)*t*cy+t*t*y0;
+  const dx=2*(1-t)*(cx-x0)+2*t*(x1-cx),dy=2*(1-t)*(cy-y0)+2*t*(y0-cy),ang=Math.atan2(dy,dx)*180/Math.PI;
+  const arc=h("div",{class:"lvarc"});arc.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="M${x0},${y0} Q${cx},${cy} ${x1},${y0}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-dasharray="3 7" stroke-linecap="round"/><path d="M${x0},${y0} Q${cx},${cy} ${x1},${y0}" fill="none" stroke="url(#lvg)" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="${t} 1"/><defs><linearGradient id="lvg"><stop offset="0" stop-color="${PCOL(ME)[0]}"/><stop offset="1" stop-color="${PCOL(PARTNER)[0]}"/></linearGradient></defs></svg>`;
+  arc.appendChild(h("span",{class:"lvplane",style:`left:${bx/W*100}%;top:${by/H*100}%;transform:translate(-50%,-50%) rotate(${ang+45}deg)`},"✈️"));
+  const mid=h("button",{type:"button",class:"lvmid",onclick:datesSheet,"aria-label":"Your next visit"});
+  if(!v)mid.append(h("b",{class:"lvbig",style:"font-size:30px"},"Add a visit"),h("small",{class:"lvlab"},"Tap to set the date"));
+  else if(met)mid.append(h("div",{class:"hheart beat"},emo("💞",44,true)),h("b",{class:"lvbig",style:"font-size:44px"},"Today!"),h("small",{class:"lvlab"},"Together at last"));
+  else{const tile=(id,l)=>h("div",{class:"lvt"},h("b",{id},"00"),h("small",null,l));
+    mid.append(h("b",{class:"lvbig",id:"hdays"},String(left)),h("small",{class:"lvlab"},left===1?"day until we're together":"days until we're together"),
+      h("div",{class:"lvtiles",id:"vpill","data-date":v.date,"data-time":v.time||"00:00"},tile("hh","hrs"),tile("hm","min"),tile("hs","sec")))}
+  const mi=h("small",{class:"lvmiles"},v?"until "+shortDate(v.date):"");Promise.all([ME,PARTNER].map(x=>geo(P(x).city))).then(([a,b])=>{if(a&&b)mi.textContent=miles(a,b).toLocaleString()+" miles apart"+(v&&!met?" · until "+shortDate(v.date):"")});
+  const hearts=h("div",{class:"lvhearts","aria-hidden":"true"},Array.from({length:7},(_,i)=>h("i",{style:`left:${8+i*13}%;animation-delay:${i*1.3}s;font-size:${10+(i%3)*4}px`},"♥")));
+  return h("section",{class:"lvhero"},hearts,h("div",{class:"lvtop"},heroSide(ME),h("div",{class:"lvheart"},emo("💞",34,true)),heroSide(PARTNER)),arc,mid,mi)}
 function usTick(){const e=el("vpill");if(!e||!P(ME))return;let s=visitLeft({date:e.dataset.date,time:e.dataset.time});const d=Math.floor(s/86400);s-=d*86400;const hh=Math.floor(s/3600);s-=hh*3600;const mm=Math.floor(s/60),ss=s-mm*60;
   const set=(id,v)=>{const x=el(id);if(x&&x.textContent!==v){x.textContent=v;if(!RM){x.classList.remove("tick");void x.offsetWidth;x.classList.add("tick")}}};
   set("hh",pad(hh));set("hm",pad(mm));set("hs",pad(ss))}
@@ -4534,7 +4559,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-p";
+const APP_VERSION="2026-11-19-q";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
