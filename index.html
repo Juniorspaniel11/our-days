@@ -871,6 +871,29 @@ body.tab-us .gut.top{display:none}
 .lvsn{position:absolute;top:10px;right:12px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:12.5px;font-weight:800}
 .lvsend{display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:18px;padding:13px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:linear-gradient(135deg,#ff5f97,#c46bff);box-shadow:0 8px 18px rgba(196,107,255,.35);cursor:pointer}
 .bills>.billh .lnk{white-space:nowrap;padding:6px 12px!important;font-size:14px!important}.bills>.billh>b{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.billtot{white-space:nowrap}
+/* ---- cycle card, light and readable ---- */
+.cyc2{background:var(--card);border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);box-shadow:0 8px 22px rgba(60,30,80,.08);border-top:6px solid var(--pc,#ff5d8f)}
+.c2top{display:flex;align-items:center;gap:14px;border:0;background:none;padding:0;font:inherit;color:var(--ink);text-align:left;cursor:pointer;width:100%}
+.c2top .cring{flex:0 0 auto}.c2top .cring g>circle:first-child{stroke:#efe9f3}.c2top .crc{color:var(--ink)}
+.c2tx{display:flex;flex-direction:column;gap:4px;min-width:0}.c2tx>small{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.c2tx>b{font-size:21px;line-height:1.15;color:var(--ink)}.c2tx p{margin:0;font-size:14.5px;color:var(--muted);line-height:1.35}
+.c2chip{align-self:flex-start;font-size:14px;font-weight:800;padding:3px 11px;border-radius:99px;background:color-mix(in srgb,var(--pc) 16%,transparent);color:color-mix(in srgb,var(--pc) 60%,#222)}
+.cyc2.empty{border-top-color:#ff5d8f}.cyc2.empty .c2top b{font-size:18px;display:block}.cyc2.empty .c2top small{color:var(--muted);font-size:14px}
+.cyc2 .cwd{background:#f6f2f8;color:var(--ink)}.cyc2 .cwd small{color:var(--muted);opacity:1}.cyc2 .cwd.now{background:#fff;outline:2px solid var(--ink)}.cyc2 .cwd.arm{outline:2px dashed var(--ink);background:#fff}
+.c2row{display:flex;gap:8px}.c2btn{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:11px;font:inherit;font-weight:800;font-size:15px;background:var(--card);color:var(--ink);cursor:pointer}.c2btn.main{flex:1.5;border:0;color:#fff;background:linear-gradient(135deg,#ff5f97,#ff8a5b)}
+.cyc2 .cfq button{background:#fff0f5;color:#b8326a;box-shadow:none;border:1.5px solid #ffc9dc}
+/* ---- love her well ---- */
+.lv2{background:var(--card);border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);box-shadow:0 8px 22px rgba(60,30,80,.08)}
+.lv2h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.lv2h b{font-size:19px;display:block}.lv2h small{color:var(--muted);font-size:14px}
+.lv2c{font-weight:800;font-size:13px;padding:3px 10px;border-radius:99px;background:#f3eef7;color:var(--muted)}
+.lv2list{display:flex;flex-direction:column;gap:8px}
+.lv2i{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 8px;border-radius:18px;background:#faf8fc;border:1px solid #f0eaf4;transition:opacity .2s}
+.lv2e{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;flex:0 0 auto}
+.lv2t{flex:1;font-size:16px;font-weight:700;line-height:1.3;color:var(--ink)}
+.lv2k{width:34px;height:34px;border-radius:50%;flex:0 0 auto;border:2px solid #d9cfe3;background:#fff;color:#fff;font-weight:900;font-size:17px;cursor:pointer}
+.lv2i.ok{opacity:.6}.lv2i.ok .lv2t{text-decoration:line-through}.lv2i.ok .lv2k{background:#16a37f;border-color:#16a37f}
+.lv2easy{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:#fff4e6;color:#7a4a12;font-size:15px}.lv2easy b{color:#b5650d}.lv2easy>span:first-child{font-size:22px}
+.lv2next{font-size:14px;font-weight:700;color:var(--muted);padding:0 4px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2265,11 +2288,16 @@ function careNoteSheet(ph){const o=PARTNER,ti=h("textarea",{class:"inp",rows:"3"
 const STC=[["#ff5f97","#ff9a6b"],["#7b5cff","#c46bff"],["#15b79a","#3b8cff"]];
 function careGuide(C,nmO){const ph=C.ph||C.phase,G=CARE[ph];if(!G)return null;const R=C.R,today=tzNow(P(PARTNER).tz).key;
   let upNext=null;if(R&&!R.late){const ws=R.windows,cur=ws.findIndex(w=>today>=w[1]&&today<=w[2]),nx=cur>=0?ws[cur+1]:ws.find(w=>w[1]>today);if(nx){const d=daysBetween(today,nx[1]);upNext=[CPH[nx[0]][1],CPH[nx[0]][0],d<=1?"tomorrow":"in "+d+" days"]}}
-  return h("section",{class:"lvg"},h("div",{class:"lvgh"},h("b",null,"💗 Love her well today"),h("small",null,G.feel)),
-    h("div",{class:"lvstories"},G.do.map(([e,t],i)=>h("div",{class:"lvst",style:"--a:"+STC[i][0]+";--b:"+STC[i][1]},h("span",{class:"lvsn"},String(i+1)),emo(e,46,true),h("b",null,t))),
-      h("div",{class:"lvst easy"},h("span",{class:"lvsn"},"!"),emo("🙅",46,true),h("b",null,h("small",null,"Go easy on"),G.easy)),
-      upNext?h("div",{class:"lvst next",style:"--a:"+PHC[CPH[upNext[1]]?upNext[1]:"follicular"]},h("span",{class:"lvsn"},"→"),emo(upNext[0],46,true),h("b",null,h("small",null,"Up next, "+upNext[2]),upNext[1])):null),
-    h("button",{type:"button",class:"lvsend tap",onclick:()=>careNoteSheet(ph)},emo("💌",26,true),"Send "+nmO+" a sweet note"))}
+  const dk="lvdone:"+today,done=(()=>{try{return JSON.parse(localStorage.getItem(dk)||"[]")}catch(e){return []}})();
+  const tick=(n,el)=>{const on=!done.includes(n);const d=on?done.concat([n]):done.filter(x=>x!==n);try{localStorage.setItem(dk,JSON.stringify(d))}catch(e){}if(on)hearts(el,8);render()};
+  const TINT=["#ffe1ec","#ece5ff","#dcf6ef"];
+  return h("section",{class:"lv2",style:"--pc:"+PHC[ph]},
+    h("div",{class:"lv2h"},h("div",null,h("b",null,"Love her well today"),h("small",null,G.feel)),h("span",{class:"lv2c"},done.length+"/"+G.do.length)),
+    h("div",{class:"lv2list"},G.do.map(([e,t],n)=>{const ok=done.includes(n);return h("div",{class:"lv2i"+(ok?" ok":"")},h("span",{class:"lv2e",style:"background:"+TINT[n%3]},emo(e,30,!ok)),h("span",{class:"lv2t"},t),
+      h("button",{type:"button",class:"lv2k tap","aria-pressed":String(ok),"aria-label":ok?"Mark not done":"Mark done",onclick:ev=>tick(n,ev.currentTarget)},ok?"✓":""))})),
+    h("div",{class:"lv2easy"},h("span",null,"🙅"),h("span",null,h("b",null,"Go easy on "),G.easy)),
+    upNext?h("div",{class:"lv2next"},"Up next: "+upNext[0]+" "+upNext[1]+" "+upNext[2]):null,
+    h("button",{type:"button",class:"lvsend tap",onclick:()=>careNoteSheet(ph)},"💌 Send "+nmO+" a sweet note"))}
 /* ---------- the cycle right on Care: a big circle and the week, Flo style ---------- */
 function careCycle(){const o=PARTNER,nmO=plainNm(o);if(!o||!P(o)||P(o).placeholder)return null;
   const herLog=(P(o)||{}).pcLog,forMe=herLog&&herLog.on&&(herLog.starts||[]).length&&!CYC().on;
@@ -2282,7 +2310,7 @@ function careCycle(){const o=PARTNER,nmO=plainNm(o);if(!o||!P(o)||P(o).placehold
     h("button",{type:"button",class:"tap",onclick:()=>{pick.style.display="block";try{pick.showPicker()}catch(e){pick.focus()}}},"📅 Pick"),pick);
   const R=(L.starts||[]).length&&L.on!==false?cycCalc(L,today):null;
   if(!R){if(ro||herOwnShared(o)||US.main.cycleFor===ME)return null;if(!US.main.cycleFor&&!/^fiona/i.test(plainNm(o)))return null;
-    return h("section",{class:"cflo empty"},emo("🌸",58,true),h("b",null,"When did "+nmO+"'s last period start?"),h("small",null,"One tap. The app works out the rest."),quick())}
+    return h("section",{class:"cyc2 empty"},h("div",{class:"c2top"},emo("🌸",52,true),h("div",null,h("b",null,"When did "+nmO+"'s last period start?"),h("small",null,"One tap. The app works out the rest."))),quick())}
   const ph=R.late?"late":R.phase,cw=R.windows.find(w=>today>=w[1]&&today<=w[2]);
   const dIn=cw?daysBetween(cw[1],today)+1:0,tot=cw?daysBetween(cw[1],cw[2])+1:0,toNext=daysBetween(today,R.next);
   const sub=ph==="period"?"Day "+dIn+" of "+tot:R.late?R.late+(R.late===1?" day":" days")+" late":"Period in "+toNext+(toNext===1?" day":" days");
@@ -2291,11 +2319,13 @@ function careCycle(){const o=PARTNER,nmO=plainNm(o);if(!o||!P(o)||P(o).placehold
     return h(past?"button":"div",{type:past?"button":null,class:"cwd"+(k===today?" now":"")+(past?" tap":""),style:"--pc:"+PHC[p],
       onclick:past?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){wk.querySelectorAll(".arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap again","to log "+shortDate(k)+" as the first day");return}log(k)}:null},
       h("small",null,k===today?"Today":d.toLocaleDateString("en-US",{weekday:"narrow"})),h("b",null,String(d.getDate())),h("i",null,st?"🌸":""))}));
-  return h("section",{class:"cflo",style:"--pc:"+PHC[ph]},
-    h("button",{type:"button",class:"cfc tap","aria-label":"Open the full cycle",onclick:ro?takeOverSheet:logHerSheet},h("small",null,ro?"Your cycle":nmO+"'s cycle"),emo(CPH[ph][1],48,true),h("b",null,CPH[ph][0]),h("span",null,sub)),
-    h("p",{class:"cftip"},CPH[ph][3]),wk,
-    ro?h("button",{type:"button",class:"cfbtn tap",onclick:takeOverSheet},plainNm(o)+" logs this for you · take over"):
-    ui.cq?quick():h("div",{class:"cfrow"},h("button",{type:"button",class:"cfbtn main tap",onclick:()=>{ui.cq=true;render()}},"🌸 Period started"),h("button",{type:"button",class:"cfbtn tap",onclick:logHerSheet},"✏️ Edit")))}
+  const ring=cycleRing(R,112,today);
+  return h("section",{class:"cyc2",style:"--pc:"+PHC[ph]},
+    h("button",{type:"button",class:"c2top tap","aria-label":"Open the full cycle",onclick:ro?takeOverSheet:logHerSheet},ring,
+      h("div",{class:"c2tx"},h("small",null,ro?"Your cycle":nmO+"'s cycle"),h("b",null,CPH[ph][1]+" "+CPH[ph][2]),h("span",{class:"c2chip"},sub),h("p",null,CPH[ph][3]))),
+    wk,
+    ro?h("button",{type:"button",class:"c2btn tap",onclick:takeOverSheet},plainNm(o)+" logs this for you · take over"):
+    ui.cq?quick():h("div",{class:"c2row"},h("button",{type:"button",class:"c2btn main tap",onclick:()=>{ui.cq=true;render()}},"🌸 Period started"),h("button",{type:"button",class:"c2btn tap",onclick:logHerSheet},"✏️ Edit")))}
 const PHC={period:"#ff5d8f",follicular:"#3fd0a6",ovulation:"#ffc94d",luteal:"#d4a35f",pre:"#9b7bff",late:"#ff8a5b"};
 /* the cycle as a ring: colored phases, a dot for today */
 function cycleRing(R,size,today){const len=Math.max(R.len,R.day),r=size/2-9,c=size/2,C=2*Math.PI*r;
@@ -4745,7 +4775,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-e";
+const APP_VERSION="2026-11-20-f";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
