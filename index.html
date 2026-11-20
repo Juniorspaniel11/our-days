@@ -4644,9 +4644,9 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-y";
+const APP_VERSION="2026-11-20-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
-  if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
+  if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
 setTimeout(checkUpdate,3000);setInterval(checkUpdate,15*60000);
 /* ---------- boot ---------- */
