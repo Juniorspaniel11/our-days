@@ -654,10 +654,10 @@ html,body{margin:0}
 .uspb{position:absolute;top:4px;right:10px;min-width:9px;height:9px;padding:0 4px;border-radius:999px;background:#e2557c;color:#fff;font-size:10.5px;font-style:normal;line-height:9px;font-weight:800}
 .uspb:not(:empty){height:16px;line-height:16px;min-width:16px;top:-4px;right:-2px}
 .uspb:empty{top:6px;right:8px}
-.chero{border-radius:28px;padding:18px 16px;color:#fff;display:flex;flex-direction:column;gap:10px;background:radial-gradient(120% 70% at 100% 0%,rgba(255,143,171,.35),transparent 60%),linear-gradient(155deg,#2a1640,#4a1f55 55%,#7a2f5a);box-shadow:0 18px 40px rgba(60,20,70,.35);border:0;text-align:left;font:inherit;width:100%}
+.chero{border-radius:28px;padding:18px 16px;color:#fff;display:flex;flex-direction:column;gap:10px;background:radial-gradient(120% 70% at 100% 0%,rgba(140,120,255,.35),transparent 60%),linear-gradient(155deg,#1e1838,#33296a 55%,#4d3c94);box-shadow:0 18px 40px rgba(60,20,70,.35);border:0;text-align:left;font:inherit;width:100%}
 .chero.mini{padding:14px 14px;border-radius:22px;gap:8px}
 .chtop{display:flex;align-items:center;gap:12px}.chtx{flex:1;min-width:0;display:flex;flex-direction:column}
-.chtx small{font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#ffb3c8}.chtx b{font-family:var(--fun);font-size:30px;line-height:1.1;margin:2px 0}.chero.mini .chtx b{font-size:23px}
+.chtx small{font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#c9bcff}.chtx b{font-family:var(--fun);font-size:30px;line-height:1.1;margin:2px 0}.chero.mini .chtx b{font-size:23px}
 .chtx span{font-size:15px;opacity:.9;line-height:1.35}.chemo{font-size:52px;line-height:1;flex:0 0 auto}.chero.mini .chemo{font-size:40px}
 .chring{background:none;border:0;padding:0;flex:0 0 auto;color:#fff}
 .chtile{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:16px;padding:12px 14px;background:var(--tc);color:#fff;font:inherit;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
@@ -735,11 +735,11 @@ html,body{margin:0}
 body{--hdr:linear-gradient(135deg,#1d2b64,#3a5bd9 55%,#2aa59a);--acc:#2aa59a}
 body.tab-today{--bg:#eef1fb;--hdr:linear-gradient(135deg,#141b3d,#1d3557 50%,#1f8a8a);--acc:#2aa59a}
 body.tab-projects{--bg:#f6f0e4;--hdr:linear-gradient(135deg,#2b2118,#5a3b22 55%,#b9661c);--acc:#b9661c;background-image:linear-gradient(rgba(120,90,50,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(120,90,50,.06) 1px,transparent 1px);background-size:22px 22px}
-body.tab-us{--bg:#fbeef3;--hdr:linear-gradient(135deg,#4a1942,#8c2f6b 50%,#e2557c);--acc:#e2557c}
+body.tab-us{--bg:#f3f1f7;--hdr:linear-gradient(135deg,#231a3d,#4b3b86 55%,#7a62c9);--acc:#6f58d6}
 body.tab-home{--bg:#eef4ef;--hdr:linear-gradient(135deg,#102a24,#1f5a48 55%,#c9a24a);--acc:#2f8a68}
 body.tab-future{--bg:#15102b;--hdr:linear-gradient(135deg,#1c1238,#2e1f55 55%,#6b4a2c);--acc:#f6d38a}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tab-today{--bg:#0f1426}:root:not([data-theme="light"]) body.tab-projects{--bg:#1a150f}:root:not([data-theme="light"]) body.tab-us{--bg:#1d0f19}:root:not([data-theme="light"]) body.tab-home{--bg:#0d1a16}}
-:root[data-theme="dark"] body.tab-today{--bg:#0f1426}:root[data-theme="dark"] body.tab-projects{--bg:#1a150f}:root[data-theme="dark"] body.tab-us{--bg:#1d0f19}:root[data-theme="dark"] body.tab-home{--bg:#0d1a16}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.tab-today{--bg:#0f1426}:root:not([data-theme="light"]) body.tab-projects{--bg:#1a150f}:root:not([data-theme="light"]) body.tab-us{--bg:#121019}:root:not([data-theme="light"]) body.tab-home{--bg:#0d1a16}}
+:root[data-theme="dark"] body.tab-today{--bg:#0f1426}:root[data-theme="dark"] body.tab-projects{--bg:#1a150f}:root[data-theme="dark"] body.tab-us{--bg:#121019}:root[data-theme="dark"] body.tab-home{--bg:#0d1a16}
 /* header band */
 .gut.top header{background:var(--hdr);color:#fff;border-radius:26px;padding:14px 14px 12px;margin-top:6px;box-shadow:0 14px 30px rgba(20,20,50,.22);align-items:flex-start}
 .gut.top header .eyebrow{color:rgba(255,255,255,.82);display:flex;align-items:center;gap:8px}
@@ -913,6 +913,11 @@ body.tab-us .gut.top{display:none}
 :root[data-theme="dark"] .lv2k{background:#1b1625;border-color:#5a4d6b}
 :root[data-theme="dark"] .lv2easy{background:#3a2a17;color:#f5d9b4}.lv2easy b{color:#ffb35c}
 :root[data-theme="dark"] .bills>.billh>b{color:color-mix(in srgb,var(--mc) 55%,#fff)}
+/* less pink: neutral buttons, violet accents */
+.c2btn.main{background:var(--ink)!important;color:var(--bg)!important;box-shadow:none}
+.cyc2 .cfq button{background:var(--card)!important;color:var(--ink)!important;border:1.5px solid var(--line)!important}
+.lvsend{background:linear-gradient(135deg,#5b6cff,#8a5cf6)!important;box-shadow:0 8px 18px rgba(91,108,255,.3)!important}
+.cyc2{border-top-width:4px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -4794,7 +4799,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-g";
+const APP_VERSION="2026-11-20-h";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
