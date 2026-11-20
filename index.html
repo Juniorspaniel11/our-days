@@ -941,13 +941,19 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mtl{font-size:13px;color:var(--muted)}.mtl b{color:var(--ink);font-size:14.5px}.mt.add .mtl{color:var(--mc);font-weight:700}
 .mh2key{display:flex;gap:14px;font-size:13px;font-weight:700;opacity:.95}.mh2key span{display:flex;align-items:center;gap:5px}.mh2key span::before{content:"";width:9px;height:9px;border-radius:3px}.mh2key .b::before{background:#b9a6ff}.mh2key .s::before{background:#ffcf5c}.mh2key .l::before{background:#7dffcf}
 .mh2foot{justify-content:flex-end!important}.mh2foot>span:empty{display:none}
+.libx{position:relative;border-radius:28px;padding:18px 14px 14px;color:#fff;overflow:hidden;
+  background:radial-gradient(120% 80% at 100% 0%,rgba(246,211,138,.28),transparent 55%),radial-gradient(90% 70% at 0% 100%,rgba(124,92,255,.35),transparent 60%),linear-gradient(150deg,#1b1436,#2c2160 55%,#3d2a7a);
+  border:1.5px solid rgba(246,211,138,.45);box-shadow:0 14px 34px rgba(44,33,96,.35),inset 0 1px 0 rgba(255,255,255,.12)}
+.libxh{display:flex;flex-direction:column;gap:2px;margin:0 4px 14px}
+.libxk{align-self:flex-start;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1b1436;background:#f6d38a;border-radius:99px;padding:3px 10px;margin-bottom:6px}
+.libxh b{font-family:"Crimson Pro",Georgia,serif;font-size:30px;line-height:1.05;color:#fbe7b5;letter-spacing:-.01em}.libxh small{font-size:14.5px;color:rgba(255,255,255,.8)}
 .libg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.libt{position:relative;border-radius:20px;background:var(--card);border:1px solid var(--line);box-shadow:0 6px 16px rgba(20,10,40,.06);overflow:hidden}
-.libt::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--lc)}
-.libmain{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 12px 12px;width:100%;border:0;background:none;font:inherit;color:var(--ink);text-align:left;text-decoration:none;cursor:pointer}
-.libmain b{font-size:16px;letter-spacing:-.01em}.libmain small{font-size:13px;color:var(--muted)}.libt.add .libmain small{color:var(--lc);font-weight:700}
-.libi{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--lc) 16%,transparent);margin-bottom:4px}
-.libed{position:absolute;top:10px;right:8px;width:32px;height:32px;border-radius:50%;border:0;background:color-mix(in srgb,var(--ink) 8%,transparent);font-size:14px;cursor:pointer}
+.libt{position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--lc) 55%,#1b1436),color-mix(in srgb,var(--lc) 25%,#1b1436));border:1px solid rgba(255,255,255,.14);box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.libmain{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px 14px 14px;width:100%;min-height:150px;border:0;background:none;font:inherit;color:#fff;text-align:left;text-decoration:none;cursor:pointer}
+.libmain b{font-size:18px;letter-spacing:-.01em;margin-top:auto}
+.libi{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.libgo{font-size:14px;font-weight:800;color:#fff;background:rgba(255,255,255,.18);border-radius:99px;padding:5px 12px}.libt.add .libgo{background:#f6d38a;color:#1b1436}
+.libed{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.16);font-size:14px;cursor:pointer}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -4637,8 +4643,8 @@ function viewUs(){
     out.push(coupleStrip());
     {const bb=bigBanner();if(bb)out.push(bb)}
     if(gotEl)out.push(h("div",{class:"ju"},gotEl));
+    out.push(librarySection());
     out.push(chapter("🙏","Pray and read",faithSection()));
-    out.push(chapter("📚","Our library",librarySection()));
   }
   setTimeout(usTick,0);
   return out;
@@ -4661,11 +4667,13 @@ function libSheet(it){const L=libLinks(),cur=L[it.id]||{},inp=h("input",{type:"u
     h("p",{class:"hint",style:"margin:0"},"Saved privately. Only you and "+plainNm(PARTNER)+" can see it."),inp,nm,h("button",{type:"submit",class:"primary"},"Save"),
     cur.url?confirmBtn("Remove link",()=>{const n=Object.assign({},L);delete n[it.id];saveUs({library:n});closeSheet()}):null))}
 function librarySection(){const L=libLinks();
-  return h("section",{class:"ju"},h("div",{class:"libg"},LIB0.map(it=>{const cur=L[it.id],has=cur&&libOk(cur.url);
-    return h("div",{class:"libt"+(has?"":" add"),style:"--lc:"+it.c},
-      h(has?"a":"button",has?{class:"libmain tap",href:cur.url,target:"_blank",rel:"noopener noreferrer"}:{type:"button",class:"libmain tap",onclick:()=>libSheet(it)},
-        h("span",{class:"libi"},emo(it.e,30,false)),h("b",null,(cur&&cur.t)||it.t),h("small",null,has?it.d+" ↗":"Tap to add the link")),
-      has?h("button",{type:"button",class:"libed tap","aria-label":"Edit "+it.t,onclick:()=>libSheet(it)},"✏️"):null)})))}
+  return h("section",{class:"libx"},
+    h("div",{class:"libxh"},h("span",{class:"libxk"},"✨ Most important"),h("b",null,"Our library"),h("small",null,"Watch, read and grow together")),
+    h("div",{class:"libg"},LIB0.map(it=>{const cur=L[it.id],has=cur&&libOk(cur.url);
+      return h("div",{class:"libt"+(has?"":" add"),style:"--lc:"+it.c},
+        h(has?"a":"button",has?{class:"libmain tap",href:cur.url,target:"_blank",rel:"noopener noreferrer"}:{type:"button",class:"libmain tap",onclick:()=>libSheet(it)},
+          h("span",{class:"libi"},emo(it.e,40,has)),h("b",null,(cur&&cur.t)||it.t),h("span",{class:"libgo"},has?(it.id==="videos"?"Watch ↗":"Open ↗"):"Tap to add the link")),
+        has?h("button",{type:"button",class:"libed tap","aria-label":"Edit "+it.t,onclick:()=>libSheet(it)},"✏️"):null)})))}
 function coupleStrip(){
   const v=nextVisit(),today=tzNow(P(ME).tz).key;let p=0,left=null;
   if(v){const J=US.main.journey||{};let from=J[v.id];if(!from){from=today;if(DB)saveUs({journey:{[v.id]:today}})}
@@ -4879,7 +4887,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-l";
+const APP_VERSION="2026-11-20-m";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
