@@ -840,6 +840,11 @@ body.tab-us .gut.top{display:none}
 .cyd.now{outline:2px solid #fff;background:rgba(255,255,255,.16)}.cyd.now small{opacity:1;font-weight:800}
 .cyleg{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left}.cyleg span{display:flex;align-items:center;gap:7px;font-size:13.5px;color:#fff;opacity:.9}.cyleg i{width:10px;height:10px;border-radius:3px;background:var(--pc);flex:0 0 auto}
 .cylog{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:6px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15);width:100%}.cylog>small{color:#fff;opacity:.75}
+.cyd.tap{cursor:pointer;border:0;font:inherit}.cyd.was{opacity:.72}.cyd.arm{outline:2px dashed #fff;opacity:1}
+.cyadj{width:100%;display:flex;flex-direction:column;gap:6px;text-align:left;background:rgba(255,255,255,.08);border-radius:16px;padding:12px;color:#fff}.cyadj>b{font-size:16px}.cyadj small{opacity:.75;font-size:12.5px}
+.cyst{display:flex;align-items:center;gap:8px}.cyst span{flex:1;font-weight:700;font-size:14.5px}.cyst button{width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;font-weight:800;cursor:pointer}.cyst b{min-width:62px;text-align:center;font-size:15px}
+.cyadj .lnk{align-self:flex-start;background:rgba(255,255,255,.16)!important;color:#fff!important}
+.cychips{display:flex;flex-wrap:wrap;gap:6px}.cychips button{border:0;border-radius:999px;padding:5px 11px;background:rgba(255,93,143,.25);color:#fff;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2208,11 +2213,11 @@ const CYC=()=>(P(ME)||{}).cycle||{};
 const saveCycle=o=>{if(!DB||!CID)return;DB.doc("couples/"+CID+"/people/"+ME+"/extra/cycle").set(o,{merge:true}).then(()=>setTimeout(()=>cyclePublish(true),300)).catch(syncErr)};
 function cycCalc(c,today){const st=(c.starts||[]).slice().sort();if(!st.length)return null;
   const gaps=[];for(let i=1;i<st.length;i++){const g=daysBetween(st[i-1],st[i]);if(g>=20&&g<=45)gaps.push(g)}const g6=gaps.slice(-6);
-  const len=g6.length?Math.round(g6.reduce((a,b)=>a+b,0)/g6.length):28,plen=Math.min(10,Math.max(2,+c.plen||5)),last=st[st.length-1];
+  const auto=g6.length?Math.round(g6.reduce((a,b)=>a+b,0)/g6.length):28,len=+c.clen?Math.min(45,Math.max(20,+c.clen)):auto,plen=Math.min(10,Math.max(2,+c.plen||5)),last=st[st.length-1];
   const day=daysBetween(last,today)+1,next=addDays(last,len),late=today>=next?daysBetween(next,today):0;
   const win=S0=>{const O=addDays(S0,len-14);return [["period",S0,addDays(S0,plen-1)],["follicular",addDays(S0,plen),addDays(O,-2)],["ovulation",addDays(O,-1),addDays(O,1)],["luteal",addDays(O,2),addDays(S0,len-8)],["pre",addDays(S0,len-7),addDays(S0,len-1)]].filter(w=>w[1]<=w[2])};
   const windows=[...win(last),...win(next)];let phase=(windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0];if(late>0)phase="late";
-  return {len,plen,last,day,next,late,phase,windows,n:st.length,guess:!g6.length}}
+  return {len,plen,last,day,next,late,phase,windows,n:st.length,guess:!g6.length&&!+c.clen,auto,fixed:!!+c.clen}}
 const CPH={period:["Period","🩸","On her period","Warmth, rest, easy plans."],
   follicular:["Rising energy","🌱","Energy rising","Great week for dates and plans."],
   ovulation:["Peak days","☀️","Bright, social days","Plan something fun."],
@@ -2276,23 +2281,31 @@ function cycleOwnCard(){const p=P(ME),c=CYC();if(!c.on)return null;const t=tzNow
 function cycleDueCard(){const c=CYC();if(!c.on)return null;const R=cycCalc(c,tzNow(P(ME).tz).key);if(!R)return null;const dl=daysBetween(tzNow(P(ME).tz).key,R.next);return dl<=2||R.late?cycleOwnCard():null}
 function logPeriod(k){const c=CYC(),st=(c.starts||[]).filter(x=>Math.abs(daysBetween(x,k))>10);st.push(k);saveCycle({on:true,starts:st.sort().slice(-24)});toast("Logged 🌸","Period started "+shortDate(k))}
 /* ---------- cycle sheets: a ring, one big button, details tucked away ---------- */
-function cycVisual(R,today,logFn,who){const out=[];
+function cycVisual(R,today,logFn,who,ed){const out=[];
   const other=h("input",{type:"date",class:"inp cydate",max:today,"aria-label":"Pick the start date"});other.onchange=()=>{if(other.value)logFn(other.value)};
   const otherBtn=h("button",{type:"button",class:"cyother tap",onclick:()=>{other.style.display="block";try{other.showPicker()}catch(e){other.focus()}}},"📅 Another day");
   if(!R){out.push(h("div",{class:"cyhero"},h("span",{class:"cyhe",style:"font-size:64px;line-height:1"},"🌸"),h("b",null,"When did "+who+" last period start?")),
       h("button",{type:"button",class:"cystart big tap",onclick:()=>logFn(today)},"🩸 Today"),otherBtn,other);return out}
   const ph=R.late?"late":(R.windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0],cw=R.windows.find(w=>today>=w[1]&&today<=w[2]);
-  const left=cw?daysBetween(today,cw[2]):0,phOf=k=>{const w=R.windows.find(w=>k>=w[1]&&k<=w[2]);return w?w[0]:"late"};
+  const left=cw?daysBetween(today,cw[2]):0,phOf=k=>{const w=R.windows.find(w=>k>=w[1]&&k<=w[2]);return w?w[0]:k<R.last?"pre":"late"};
   const plain=R.late?"Her period may be "+R.late+(R.late===1?" day":" days")+" late":ph==="period"?"Day "+R.day+" of her period"+(left?" · ends in about "+left+(left===1?" day":" days"):" · last day"):CPH[ph][2]+(left?" · "+(left+1)+" more days":" · last day");
-  const days=Array.from({length:14},(_,n)=>addDays(today,n));
-  const strip=h("div",{class:"cystrip"},days.map((k,n)=>{const p=phOf(k),d=parseKey(k),first=n===0||phOf(addDays(k,-1))!==p;
-    return h("div",{class:"cyd"+(n===0?" now":""),style:"--pc:"+PHC[p]},h("small",null,n===0?"Today":d.toLocaleDateString("en-US",{weekday:"short"})),h("b",null,String(d.getDate())),h("i"),h("span",{class:"cyde"},first?CPH[p][1]:""))}));
+  const days=Array.from({length:14},(_,n)=>addDays(today,n-4));
+  const strip=h("div",{class:"cystrip"},days.map((k,n)=>{const p=phOf(k),d=parseKey(k),first=n===0||phOf(addDays(k,-1))!==p,past=k<=today,isNow=k===today;
+    const el=h(past?"button":"div",{type:past?"button":null,class:"cyd"+(isNow?" now":"")+(past?" tap":"")+(k<today?" was":""),style:"--pc:"+PHC[p],"aria-label":past?"Period started "+shortDate(k):null,
+      onclick:past?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){strip.querySelectorAll(".cyd.arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap "+shortDate(k)+" again","to mark it as the day her period started");return}logFn(k)}:null},
+      h("small",null,isNow?"Today":d.toLocaleDateString("en-US",{weekday:"short"})),h("b",null,String(d.getDate())),h("i"),h("span",{class:"cyde"},first?CPH[p][1]:""));return el}));
   const used=[...new Set(days.map(phOf))];
   const logBtn=h("button",{type:"button",class:"cyother tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to confirm";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🩸 New period started today"}},4000);return}logFn(today)}},"🩸 New period started today");
   out.push(h("div",{class:"cyhero"},cycleRing(R,170,today),h("b",{style:"color:"+PHC[ph]},CPH[ph][1]+" "+CPH[ph][0]),h("span",null,plain),
       h("span",{style:"opacity:.75;font-size:13.5px"},"Next period around "+parseKey(R.next).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+(R.guess?" (a guess until you log a second month)":""))),
-    h("small",{class:"cyh",style:"color:#fff;opacity:.8"},"Next 2 weeks"),strip,
+    h("small",{class:"cyh",style:"color:#fff;opacity:.8"},"Next 2 weeks · tap a past day to mark a period start"),strip,
     h("div",{class:"cyleg"},used.map(p=>h("span",{style:"--pc:"+PHC[p]},h("i"),CPH[p][1]+" "+CPH[p][0]+" · "+CPH[p][3]))),
+    ed?h("div",{class:"cyadj"},h("b",null,"✏️ Adjust"),
+      h("div",{class:"cyst"},h("span",null,"🩸 Period lasts"),h("button",{type:"button",class:"tap","aria-label":"Shorter period",onclick:()=>{ed.save({plen:Math.max(2,R.plen-1)});ed.re()}},"−"),h("b",null,R.plen+" days"),h("button",{type:"button",class:"tap","aria-label":"Longer period",onclick:()=>{ed.save({plen:Math.min(10,R.plen+1)});ed.re()}},"+")),
+      h("div",{class:"cyst"},h("span",null,"🔁 Cycle is"),h("button",{type:"button",class:"tap","aria-label":"Shorter cycle",onclick:()=>{ed.save({clen:Math.max(20,R.len-1)});ed.re()}},"−"),h("b",null,R.len+" days"),h("button",{type:"button",class:"tap","aria-label":"Longer cycle",onclick:()=>{ed.save({clen:Math.min(45,R.len+1)});ed.re()}},"+")),
+      R.fixed?h("button",{type:"button",class:"lnk",onclick:()=>{ed.save({clen:0});ed.re()}},R.n>1?"Use her real average ("+R.auto+" days)":"Back to the usual 28"):h("small",null,R.n>1?"Worked out from the dates you logged":"Usual 28 until you log a second month"),
+      h("small",{style:"margin-top:4px"},"Period starts you logged (tap × to remove):"),
+      h("div",{class:"cychips"},(ed.L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button",class:"tap","aria-label":"Remove "+shortDate(k),onclick:()=>{ed.save({starts:(ed.L.starts||[]).filter(x=>x!==k)});ed.re()}},"🩸 "+shortDate(k)+"  ×")))):null,
     h("div",{class:"cylog"},h("small",null,"When a new period starts, log it here:"),h("div",{class:"row",style:"justify-content:center;gap:8px"},logBtn,otherBtn),other));
   return out}
 const cycKnobs=(L,save,re)=>[(L.starts||[]).length?h("div",{class:"chips"},(L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button","aria-label":"Remove "+shortDate(k),onclick:()=>{save({starts:(L.starts||[]).filter(x=>x!==k)});re()}},shortDate(k)+" ×"))):null,
@@ -2301,13 +2314,13 @@ function logHerSheet(){const o=PARTNER,nmO=plainNm(o);openSheet(nmO+"'s cycle",(
   const save=x=>{if(!DB||!CID)return;DB.doc("couples/"+CID+"/people/"+ME+"/extra/partnerCycle").set(Object.assign({on:true,for:o},x),{merge:true}).catch(syncErr)};
   const re=()=>{closeSheet();setTimeout(logHerSheet,350)};
   const log=k=>{const st=(L.starts||[]).filter(x=>Math.abs(daysBetween(x,k))>10);st.push(k);save({starts:st.sort().slice(-24)});toast("Logged 🌸",shortDate(k));re()};
-  return h("div",{class:"body cysheet"},herOwnShared(o)?h("p",{class:"pzmsg"},nmO+" is sharing her own now. Yours is a backup."):null,...cycVisual(R,today,log,nmO+"'s"),
-    (L.starts||[]).length?h("details",{class:"cydet"},h("summary",null,"⚙️ Dates and settings"),...cycKnobs(L,save,re),confirmBtn("Delete this log",()=>{DB.doc("couples/"+CID+"/people/"+ME+"/extra/partnerCycle").delete().catch(syncErr);closeSheet()})):null)})())}
+  return h("div",{class:"body cysheet"},herOwnShared(o)?h("p",{class:"pzmsg"},nmO+" is sharing her own now. Yours is a backup."):null,...cycVisual(R,today,log,nmO+"'s",{L,save,re}),
+    (L.starts||[]).length?h("details",{class:"cydet"},h("summary",null,"🗑️ Delete"),confirmBtn("Delete this whole log",()=>{DB.doc("couples/"+CID+"/people/"+ME+"/extra/partnerCycle").delete().catch(syncErr);closeSheet()})):null)})())}
 function cycleSheet(){openSheet("My cycle",(()=>{const c=CYC(),p=P(ME),today=tzNow(p.tz).key,R=c.on?cycCalc(c,today):null,re=()=>{closeSheet();setTimeout(cycleSheet,350)};
   const tog=(on,lab,fn)=>h("button",{type:"button",class:"rolltg"+(on?" on":""),"aria-pressed":String(!!on),onclick:fn},h("span",null,h("b",null,lab)),h("i",{class:"sw"}));
   if(!c.on)return h("div",{class:"body cysheet"},h("div",{class:"cyhero"},h("span",{class:"cyhe",style:"font-size:64px;line-height:1"},"🌸"),h("b",null,"Track my cycle"),h("span",null,"Private to you. "+plainNm(PARTNER)+" only gets gentle tips.")),
     h("button",{type:"button",class:"cystart big tap",onclick:()=>{saveCycle({on:true,share:c.share||"phase"});re()}},"Turn it on"));
-  return h("div",{class:"body cysheet"},...cycVisual(R,today,k=>{logPeriod(k);re()},"your"),
+  return h("div",{class:"body cysheet"},...cycVisual(R,today,k=>{logPeriod(k);re()},"your",{L:c,save:saveCycle,re}),
     h("details",{class:"cydet"},h("summary",null,"⚙️ Settings"),
       tog((c.share||"phase")!=="off","Gentle heads ups for "+plainNm(PARTNER),()=>{saveCycle({share:(c.share||"phase")==="off"?"phase":"off",notifyPartner:true});re()}),
       tog(c.notifyMe!==false,"Remind me 2 days before",()=>{saveCycle({notifyMe:c.notifyMe===false});re()}),
@@ -4679,7 +4692,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-c";
+const APP_VERSION="2026-11-20-d";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
