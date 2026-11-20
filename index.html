@@ -811,6 +811,8 @@ body.tab-us .gut.top{display:none}
 .mhero.dark{flex-wrap:wrap}.mstat{flex:1 1 100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}.mstat>div{background:rgba(255,255,255,.1);border-radius:12px;padding:7px 8px;display:flex;flex-direction:column;align-items:center}.mstat small{color:rgba(255,255,255,.8)!important;font-size:12.5px}.mstat b{color:#fff!important;font-size:17px}
 .billrow{flex-direction:column;overflow:visible;gap:6px;scroll-snap-type:none}.billrow .billr{flex:none!important;width:100%;flex-direction:row!important;align-items:center!important;gap:10px!important;border-top:0!important;border-left:4px solid var(--bc)}.billrow .billr .bcn{flex:1;min-width:0}.billtot{font-weight:600;color:var(--muted);font-size:13px}
 .tgrid.one{grid-template-columns:1fr!important}
+.ovbar{display:flex;align-items:center;gap:10px;width:100%;margin-top:18px;padding:10px 14px;border:0;border-radius:16px;text-align:left;cursor:pointer;color:#fff;background:linear-gradient(120deg,#2b1d4a,#4a2a5e 60%,#6b4a2a);box-shadow:0 6px 16px rgba(43,29,74,.25)}
+.ovbe{font-size:20px}.ovbt{flex:1;min-width:0;display:flex;flex-direction:column}.ovbt b{font-family:"Crimson Pro",Georgia,serif;font-size:17px;color:#f6d38a}.ovbt small{font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ovbgo{font-size:26px;color:#f6d38a;line-height:1}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3657,7 +3659,7 @@ function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url"
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});closeSheet();toast(l?"Saved":"Removed","")}},h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"ghost"},"Save"))))}
 /* a clear chapter header, so moving from one part of a tab to the next is obvious */
 function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},e),h("b",null,title),h("i")),node)}
-function viewHome(){return [visionPoster(),chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection())]}
+function viewHome(){return [chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection()),visionPoster()]}
 /* The Aboagye home: one vision statement and the pillars you live by */
 const HOME0={stmt:"A home that belongs to God, where love is spoken every day, and where our science, music and faith lift the poor, the disabled, and the brilliant but needy.",
   pillars:[{id:"p1",e:"🙏",t:"God first",d:"We pray together every night. Big decisions start on our knees."},
@@ -3680,9 +3682,8 @@ function visionPoster(){const V=homeV(),open=!!ui.ovOpen,o=PARTNER;
   const who=u=>h("button",{type:"button",class:"ovwho tap",onclick:ev=>{ev.stopPropagation();openFuture(u)}},initialEl(u),u===ME?"My vision":plainNm(u)+"'s");
   const head=h("div",{class:"ovhead"},h("div",null,h("small",{class:"ovk"},"✨ Our vision"),h("b",{class:"ovname"},"The Aboagye Home")),h("span",{class:"ovtog"},open?"Close ▴":"Open ▾"));
   const stmt=h(open?"button":"p",{type:open?"button":null,class:"ovstmt"+(open?" tap":""),onclick:open?homeStmtSheet:null},"“",vHi(V.stmt),"”");
-  if(!open)return h("section",{class:"ovcard tap",role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=true;render()}},head,stmt,
-    h("div",{class:"ovpills"},(V.pillars||[]).map(p=>h("span",{class:"ovpill"},emo(p.e,20,false),p.t))),
-    h("div",{class:"ovwhos"},who(ME),o&&P(o)&&!P(o).placeholder?who(o):null));
+  if(!open)return h("button",{type:"button",class:"ovbar tap",onclick:()=>{ui.ovOpen=true;render()}},h("span",{class:"ovbe"},"✨"),
+    h("span",{class:"ovbt"},h("b",null,"The Aboagye Home"),h("small",null,(V.pillars||[]).map(p=>p.t).join(" · "))),h("span",{class:"ovbgo"},"›"));
   return h("section",{class:"ovcard open"},h("div",{role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=false;render()}},head),stmt,
     h("div",{class:"ovlist"},(V.pillars||[]).map((p,i)=>h("button",{type:"button",class:"ovitem tap",onclick:()=>pillarSheet(p)},h("span",{class:"ovnum"},emo(p.e,30,false)),h("span",{class:"ovpt"},h("b",null,p.t),h("small",null,p.d))))),
     h("div",{class:"ovwhos"},h("button",{type:"button",class:"ovadd tap",onclick:()=>pillarSheet(null)},"＋ Pillar"),who(ME),o&&P(o)&&!P(o).placeholder?who(o):null))}
@@ -4600,7 +4601,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-t";
+const APP_VERSION="2026-11-19-u";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
