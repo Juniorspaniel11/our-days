@@ -1,0 +1,2 @@
+Fluent Emoji 3D images: Copyright (c) Microsoft Corporation, MIT License.
+Source: https://github.com/microsoft/fluentui-emoji (packaged as @lobehub/fluent-emoji-3d@1.1.0, MIT).
