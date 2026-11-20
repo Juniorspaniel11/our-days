@@ -918,6 +918,27 @@ body.tab-us .gut.top{display:none}
 .cyc2 .cfq button{background:var(--card)!important;color:var(--ink)!important;border:1.5px solid var(--line)!important}
 .lvsend{background:linear-gradient(135deg,#5b6cff,#8a5cf6)!important;box-shadow:0 8px 18px rgba(91,108,255,.3)!important}
 .cyc2{border-top-width:4px}
+/* ---- Apple design pass: instant press feedback, sheet material, reduced motion and transparency ---- */
+html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.sheet.closing{pointer-events:none}
+.sheet .grab{position:absolute;top:0;left:0;right:0;height:22px;cursor:grab;touch-action:none;z-index:2}
+.sheet .grab::after{content:"";position:absolute;top:7px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:9px;background:color-mix(in srgb,var(--ink) 25%,transparent)}
+.sheet .pn{padding-top:24px!important;box-shadow:0 -10px 40px rgba(10,6,20,.25)}.sheet .sh{touch-action:none;cursor:grab}
+.sheet .bd{background:rgba(10,6,20,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+@media (prefers-reduced-motion:no-preference){
+  button,.tap,[role=button]{transition:transform .1s ease-out}
+  button:active,.tap:active,[role=button]:active{transform:scale(.97)}
+  .ju .tap:active,.ju .btn:active{transform:scale(.97)!important}
+}
+.tabbar{backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%)}
+@media (prefers-reduced-transparency:reduce){.tabbar,.sheet .bd,.ovbar.hdr{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.tabbar{background:var(--card)!important}}
+@media (prefers-contrast:more){.tabbar,.cyc2,.lv2,.bills{border:1.5px solid var(--ink)!important}}
+.c2tx>b,.mh2big b,.lvgh b,.lv2h b,.chtx b,.sheet h3{letter-spacing:-.02em}
+.mt2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.mt{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;border:1px solid var(--line);border-radius:20px;padding:12px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer;box-shadow:0 6px 16px rgba(20,10,40,.06)}
+.mt>b{font-size:16px;letter-spacing:-.01em}.mti{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--mc) 16%,transparent)}
+.mtbar{width:100%;height:8px;border-radius:9px;background:color-mix(in srgb,var(--mc) 14%,transparent);overflow:hidden;margin:3px 0}.mtbar i{display:block;height:100%;border-radius:9px;background:var(--mc)}
+.mtl{font-size:13px;color:var(--muted)}.mtl b{color:var(--ink);font-size:14.5px}.mt.add .mtl{color:var(--mc);font-weight:700}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1460,6 +1481,7 @@ button.hsp{cursor:pointer}.hsp.mine{border-color:color-mix(in srgb,#8b6ad1 45%,t
 <div class="sheet" id="sheet" hidden>
   <div class="bd" id="sheetBd"></div>
   <div class="pn" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grab" id="sheetGrab" aria-hidden="true"></div>
     <div class="sh"><h3 id="sheetTitle"></h3><button type="button" class="ghost" id="sheetClose">Close</button></div>
     <div class="body" id="sheetBody"></div>
   </div>
@@ -1792,9 +1814,33 @@ function skyFor(m){
 }
 /* ---------- sheet & toast ---------- */
 let sheetFn=null;
-function openSheet(title,body){sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);el("sheet").hidden=false;
+function openSheet(title,body){sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);sheetShow();
   setTimeout(()=>{const f=b.querySelector("input[type=text],textarea");if(f&&!f.value&&!b.querySelector("[data-nofocus]"))f.focus()},50)}
-function closeSheet(){el("sheet").hidden=true;sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}render()}
+/* sheets: slide up, slide back down the same way, drag the top to dismiss (Apple fluid interface rules) */
+const SHEET_EASE="cubic-bezier(.32,.72,0,1)";let sheetTok=0;
+const sheetRM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+function sheetY(pn){const m=getComputedStyle(pn).transform;if(!m||m==="none")return 0;const a=m.match(/matrix.*\((.+)\)/);if(!a)return 0;const v=a[1].split(",").map(Number);return v.length===6?v[5]:v[13]||0}
+function sheetShow(){const sh=el("sheet"),pn=sh.querySelector(".pn"),bd=el("sheetBd");sheetTok++;const closing=sh.classList.contains("closing"),was=!sh.hidden&&!closing,cy=closing?sheetY(pn):0;sh.classList.remove("closing");sh.hidden=false;
+  if(was||sheetRM()){pn.getAnimations().forEach(a=>a.cancel());bd.getAnimations().forEach(a=>a.cancel());pn.style.transform="";return}
+  const from=closing?cy:pn.offsetHeight;pn.getAnimations().forEach(a=>a.cancel());bd.getAnimations().forEach(a=>a.cancel());
+  pn.animate([{transform:"translateY("+from+"px)"},{transform:"translateY(0)"}],{duration:440,easing:SHEET_EASE});bd.animate([{opacity:0},{opacity:1}],{duration:260,easing:"ease-out"})}
+function sheetHide(){const sh=el("sheet"),pn=sh.querySelector(".pn"),bd=el("sheetBd"),tok=++sheetTok;if(sh.hidden)return;
+  if(sheetRM()){sh.hidden=true;return}
+  const y=sheetY(pn);pn.getAnimations().forEach(a=>a.cancel());sh.classList.add("closing");
+  const a=pn.animate([{transform:"translateY("+y+"px)"},{transform:"translateY("+(pn.offsetHeight+24)+"px)"}],{duration:300,easing:SHEET_EASE,fill:"forwards"});
+  bd.animate([{opacity:1},{opacity:0}],{duration:240,easing:"ease-out",fill:"forwards"});
+  a.onfinish=()=>{if(tok!==sheetTok)return;sh.hidden=true;sh.classList.remove("closing");pn.getAnimations().forEach(x=>x.cancel());bd.getAnimations().forEach(x=>x.cancel());pn.style.transform=""}}
+(function sheetDrag(){const sh=el("sheet"),pn=sh.querySelector(".pn"),zones=[el("sheetGrab"),sh.querySelector(".sh")];let st=null;
+  const rubber=(o,d,c=.55)=>o*d*c/(d+c*Math.abs(o));
+  zones.forEach(z=>{z.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,a"))return;pn.getAnimations().forEach(a=>a.cancel());st={y0:e.clientY,base:sheetY(pn),hist:[[e.clientY,e.timeStamp]],moved:false,id:e.pointerId};try{z.setPointerCapture(e.pointerId)}catch(_){}});
+    z.addEventListener("pointermove",e=>{if(!st||e.pointerId!==st.id)return;let dy=e.clientY-st.y0+st.base;if(!st.moved&&Math.abs(dy)<6)return;st.moved=true;if(dy<0)dy=rubber(dy,pn.offsetHeight);pn.style.transform="translateY("+dy+"px)";st.hist.push([e.clientY,e.timeStamp]);if(st.hist.length>6)st.hist.shift()});
+    const end=e=>{if(!st||e.pointerId!==st.id)return;const s0=st;st=null;if(!s0.moved){pn.style.transform="";return}
+      const y=sheetY(pn),h0=s0.hist[0],h1=s0.hist[s0.hist.length-1],dt=Math.max(40,h1[1]-h0[1]),v=Math.max(-2500,Math.min(2500,(h1[0]-h0[0])/dt*1000));
+      const proj=y+(v/1000)*.998/(1-.998)*.12;
+      if(proj>pn.offsetHeight*.38&&y>0){closeSheet();return}
+      pn.style.transform="";if(!sheetRM())pn.animate([{transform:"translateY("+y+"px)"},{transform:"translateY(0)"}],{duration:380,easing:SHEET_EASE})};
+    z.addEventListener("pointerup",end);z.addEventListener("pointercancel",end)})})();
+function closeSheet(){sheetHide();sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}render()}
 el("sheetClose").onclick=closeSheet;el("sheetBd").onclick=closeSheet;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!el("sheet").hidden)closeSheet()});
 let toastT=null;
@@ -2107,7 +2153,7 @@ function itemSheet(pid,k,x){
     h("label",{class:"check"},ag,"Keep a meeting agenda for this"),
     h("label",{class:"check"},big,"⭐ Big day, like an exam, presentation or deadline. "+nm(PARTNER)+" gets a heads up that morning"),
     h("div",{class:"row"},h("button",{type:"submit",class:"primary"},isNew?"Add":"Save"),
-      !isNew&&x.kind==="rep"?h("button",{type:"button",class:"ghost",onclick:()=>{el("sheet").hidden=true;toggleIn(pid,k,"skip",x.id)}},"Cancel just this "+DAYS[parseKey(k).getDay()]):null),
+      !isNew&&x.kind==="rep"?h("button",{type:"button",class:"ghost",onclick:()=>{sheetHide();toggleIn(pid,k,"skip",x.id)}},"Cancel just this "+DAYS[parseKey(k).getDay()]):null),
     isNew?null:confirmBtn(x.kind==="rep"?"Delete from every week":"Delete",()=>{p.routine=p.routine.filter(r=>r.id!==x.id);p.events=p.events.filter(r=>r.id!==x.id);if(p.bigdays)delete p.bigdays[x.id];persist();closeSheet()}));
   openSheet(isNew?"Add to "+(k===tzNow(p.tz).key?"today":longDate(k)):"Edit",form);
 }
@@ -3762,6 +3808,13 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
           h("div",{class:"mh2foot"},h("span",null,(INC?"Money in ":"Monthly plan ")+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
       :h("div",{class:"mh2 empty"},emo("💰",56,true),h("b",{class:"mh2t"},"Start with what comes in"),h("small",{class:"mh2day"},"Add your monthly income. Bills and spending come out of it, and you'll see what's left."),
           h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"primary",onclick:()=>incomeSheet(null)},"💵 Add income"),h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log spending"))),
+      (()=>{const pct=(a,b)=>b>0?Math.min(100,Math.round(a/b*100)):0,go=sel=>{const t=document.querySelector(sel);if(t)t.scrollIntoView({behavior:sheetRM()?"auto":"smooth",block:"start"})};
+        return h("div",{class:"mt2"},
+          h("button",{type:"button",class:"mt tap",style:"--mc:#7b6cf6",onclick:()=>go(".bills:not(.inc):not(.cats)")},h("span",{class:"mti"},emo("🔁",22,false)),h("b",null,"Bills"),
+            h("div",{class:"mtbar"},h("i",{style:"width:"+pct(paidB,billsM)+"%"})),h("span",{class:"mtl"},h("b",null,M(paidB))," paid"),h("span",{class:"mtl"},h("b",null,M(upv))," to go")),
+          INC?h("button",{type:"button",class:"mt tap",style:"--mc:#16a37f",onclick:()=>go(".bills.inc")},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),
+            h("div",{class:"mtbar"},h("i",{style:"width:"+pct(used,INC)+"%"})),h("span",{class:"mtl"},h("b",null,M(INC))," a month"),h("span",{class:"mtl"},h("b",null,M(Math.max(0,leftv)))," still free"))
+          :h("button",{type:"button",class:"mt tap add",style:"--mc:#16a37f",onclick:()=>incomeSheet(null)},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),h("span",{class:"mtl"},"Add your income to see what's free")))})(),
       (()=>{const IL=incomes(),ub=bills().filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0);
         return h("div",{class:"bills inc"},h("div",{class:"billh"},h("b",null,"💵 Money in",IL.length?h("small",{class:"billtot"}," "+M(INC)+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>incomeSheet(null)},"+ Add income")),
           IL.length?h("div",{class:"billrow"},IL.map(x=>h("button",{type:"button",class:"billr tap",style:"--bc:#1a9e7a",onclick:()=>incomeSheet(x)},h("span",{class:"bci"},emo("💵",20,false)),
@@ -4800,7 +4853,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-i";
+const APP_VERSION="2026-11-20-j";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
