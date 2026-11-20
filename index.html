@@ -813,6 +813,19 @@ body.tab-us .gut.top{display:none}
 .tgrid.one{grid-template-columns:1fr!important}
 .ovbar{display:flex;align-items:center;gap:10px;width:100%;margin-top:18px;padding:10px 14px;border:0;border-radius:16px;text-align:left;cursor:pointer;color:#fff;background:linear-gradient(120deg,#2b1d4a,#4a2a5e 60%,#6b4a2a);box-shadow:0 6px 16px rgba(43,29,74,.25)}
 .ovbe{font-size:20px}.ovbt{flex:1;min-width:0;display:flex;flex-direction:column}.ovbt b{font-family:"Crimson Pro",Georgia,serif;font-size:17px;color:#f6d38a}.ovbt small{font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ovbgo{font-size:26px;color:#f6d38a;line-height:1}
+.mh2{border-radius:22px;padding:16px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,#3ad1a5 0%,transparent 55%),linear-gradient(140deg,#11806f,#1d5f8a);box-shadow:0 10px 26px rgba(17,128,111,.3);display:flex;flex-direction:column;gap:4px}
+.mh2.over{background:radial-gradient(120% 90% at 100% 0%,#ffb35c 0%,transparent 55%),linear-gradient(140deg,#c2562d,#8a2d4a)}
+.mh2top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;opacity:.95}
+.mh2big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:-8px}.mh2big b{font-family:var(--fun);font-size:46px;line-height:1}.mh2big span{font-size:17px;font-weight:700}
+.mh2day{font-size:14px;opacity:.92}
+.mh2bar{display:flex;height:16px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.22);margin:10px 0 6px}.mh2bar i{display:block;height:100%}
+.mh2bar .b,.mh2leg .b small::before{background:#b9a6ff}.mh2bar .s,.mh2leg .s small::before{background:#ffcf5c}.mh2bar .l,.mh2leg .l small::before{background:#7dffcf}
+.mh2leg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.mh2leg>div{background:rgba(255,255,255,.13);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column}
+.mh2leg small{font-size:12.5px;opacity:.9;display:flex;align-items:center;gap:5px}.mh2leg small::before{content:"";width:9px;height:9px;border-radius:3px;flex:0 0 auto}.mh2leg b{font-size:17px}
+.mh2foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13.5px;opacity:.95;gap:8px}.mh2foot .mlog{margin:0}
+.mh2.empty{align-items:center;text-align:center;gap:6px}.mh2t{font-size:20px}
+.ovbar.hdr{margin-top:6px;background:rgba(0,0,0,.22);box-shadow:none;backdrop-filter:blur(4px)}
+.bca.ok>b{color:#1a9e7a}.bca.ov>b{color:#d9622b}.bca>b{font-size:16px;white-space:nowrap}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3564,18 +3577,20 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
   if(tab==="budget"){setTimeout(autoBills,0);const mk=mKey(),cs=bcats(),lim=cs.reduce((a,c)=>a+Math.max(0,availIn(c,mk)),0),sp=spentIn(mk);
     const lm=addDays(mk+"-01",-1).slice(0,7),lsp=spentIn(lm),up=upcomingBills(mk),upv=up.reduce((a,b)=>a+(+b.amt||0),0);
     const upC=id=>up.filter(b=>b.cat===id).reduce((a,b)=>a+(+b.amt||0),0),used=sp+upv;
-    const ring=h("div",{class:"mring"}),segs=cs.map(c=>({v:spentIn(mk,c.id)+upC(c.id),col:bcol(c)})),base=Math.max(lim,used)||1;ring.innerHTML=budgetRing(segs,base,132);
-    ring.append(h("div",{class:"mrc"},h("b",null,show?money(used):"••••"),h("small",null,lim?(show?"of "+money(lim):"of ••••"):"used")));
     const leftv=lim-used,paidB=spendIn(mk).filter(x=>x.bill).reduce((a,x)=>a+(+x.amt||0),0),billsM=paidB+upv,other=sp-paidB;
     const BL=bills(),today=usDay();
     const due=moneySummaryDue();
     pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
-      h("div",{class:"mhero dark"},ring,h("div",{class:"mhx"},h("span",{class:"k"},monthName(mk).split(" ")[0]),
-        h("b",{class:leftv<0?"over":""},lim?(leftv>=0?M(leftv)+" left":M(-leftv)+" over"):"No plan yet"),
-        lim?null:h("small",null,"Tap a category below to set a monthly amount"),
-        lim&&leftv>0?h("small",null,(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1;return "About "+(show?money2(Math.floor(leftv/dl)):"••")+" a day for "+dl+(dl===1?" day":" days")})()):null,
-        h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")),
-        lim?h("div",{class:"mstat"},[["💵","Plan",lim],["🔁","Bills",billsM],["🛒","Spending",other]].map(([e,l,v])=>h("div",null,h("small",null,e+" "+l),h("b",null,M(v))))):null),
+      lim?(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1,base=Math.max(lim,used)||1,pc=v=>Math.max(0,v)/base*100;
+        return h("div",{class:"mh2"+(leftv<0?" over":"")},
+          h("div",{class:"mh2top"},h("span",null,monthName(mk).split(" ")[0]+" · "+dl+(dl===1?" day":" days")+" left"),emo(leftv<0?"😬":leftv<lim*0.15?"🫣":"🤑",40,true)),
+          h("div",{class:"mh2big"},h("b",null,leftv>=0?M(leftv):M(-leftv)),h("span",null,leftv>=0?"left to spend":"over the plan")),
+          leftv>0?h("small",{class:"mh2day"},"That's about "+(show?money2(Math.floor(leftv/dl)):"••")+" a day"):h("small",{class:"mh2day"},"Bills and spending are more than the plan"),
+          h("div",{class:"mh2bar"},h("i",{class:"b",style:"width:"+pc(billsM)+"%"}),h("i",{class:"s",style:"width:"+pc(other)+"%"}),h("i",{class:"l",style:"width:"+pc(leftv)+"%"})),
+          h("div",{class:"mh2leg"},[["b","🔁 Bills",billsM],["s","🛒 Spent",other],["l",leftv>=0?"✅ Left":"⚠️ Over",Math.abs(leftv)]].map(([c,l,v])=>h("div",{class:c},h("small",null,l),h("b",null,M(v))))),
+          h("div",{class:"mh2foot"},h("span",null,"Monthly plan "+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
+      :h("div",{class:"mh2 empty"},emo("💰",56,true),h("b",{class:"mh2t"},"Set your plan for "+monthName(mk).split(" ")[0]),h("small",{class:"mh2day"},"Give each category a monthly amount. Bills and spending come out of it."),
+          h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"primary",onclick:()=>{ui.monAll=true;render()}},"Set amounts"),h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log spending"))),
       h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills",BL.length?h("small",{class:"billtot"}," "+M(BL.filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0))+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
         BL.length?h("div",{class:"billrow"},BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
           const c=bcats().find(x=>x.id===b.cat)||{e:"✨",id:"other"};
@@ -3586,7 +3601,7 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
       h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;if(!(+c.limit)&&!s2&&!ui.monAll)return null;
         return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
           h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),ub?h("small",{class:"carry"},"incl. "+M(ub)+" in bills due later"):null,cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
-          h("span",{class:"bca"},M(s2),l||+c.limit?h("small",null,"of "+M(l)):null))})),
+          l||+c.limit?h("span",{class:"bca"+(s2>l?" ov":" ok")},h("b",null,s2>l?M(s2-l)+" over":M(l-s2)+" left"),h("small",null,M(s2)+" of "+M(l))):h("span",{class:"bca"},M(s2),h("small",null,"no amount set")))})),
       h("button",{type:"button",class:"link",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show only categories in use":"Show all categories · set amounts"),
       h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" so far"),lsp?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]+" summary"):null)]}
   else if(tab==="split"){const bal=splitBalance(),it=splitItems(),open=it.filter(x=>!x.settled);
@@ -3659,7 +3674,7 @@ function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url"
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});closeSheet();toast(l?"Saved":"Removed","")}},h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"ghost"},"Save"))))}
 /* a clear chapter header, so moving from one part of a tab to the next is obvious */
 function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},e),h("b",null,title),h("i")),node)}
-function viewHome(){return [chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection()),visionPoster()]}
+function viewHome(){return [ui.ovOpen?visionPoster():null,chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection())]}
 /* The Aboagye home: one vision statement and the pillars you live by */
 const HOME0={stmt:"A home that belongs to God, where love is spoken every day, and where our science, music and faith lift the poor, the disabled, and the brilliant but needy.",
   pillars:[{id:"p1",e:"🙏",t:"God first",d:"We pray together every night. Big decisions start on our knees."},
@@ -3678,11 +3693,11 @@ function pillarSheet(p){const V=homeV(),cur=p?V.pillars.find(x=>x.id===p.id):nul
       saveHomeV({pillars:cur?P0.map(x=>x.id===cur.id?{...x,t,d:dd.value.trim(),e:em}:x):P0.concat([{id:uid(),t,d:dd.value.trim(),e:em}])});closeSheet()}},
     ems,tt,dd,h("button",{type:"submit",class:"primary"},cur?"Save":"Add"),cur?confirmBtn("Remove",()=>{saveHomeV({pillars:(V.pillars||[]).filter(x=>x.id!==cur.id)});closeSheet()}):null))}
 const openFuture=pid=>{S.viewAs=pid||ME;go("future")};
-function visionPoster(){const V=homeV(),open=!!ui.ovOpen,o=PARTNER;
+function visionPoster(inHdr){const V=homeV(),open=!!ui.ovOpen&&!inHdr,o=PARTNER;
   const who=u=>h("button",{type:"button",class:"ovwho tap",onclick:ev=>{ev.stopPropagation();openFuture(u)}},initialEl(u),u===ME?"My vision":plainNm(u)+"'s");
   const head=h("div",{class:"ovhead"},h("div",null,h("small",{class:"ovk"},"✨ Our vision"),h("b",{class:"ovname"},"The Aboagye Home")),h("span",{class:"ovtog"},open?"Close ▴":"Open ▾"));
   const stmt=h(open?"button":"p",{type:open?"button":null,class:"ovstmt"+(open?" tap":""),onclick:open?homeStmtSheet:null},"“",vHi(V.stmt),"”");
-  if(!open)return h("button",{type:"button",class:"ovbar tap",onclick:()=>{ui.ovOpen=true;render()}},h("span",{class:"ovbe"},"✨"),
+  if(!open)return h("button",{type:"button",class:"ovbar tap"+(inHdr?" hdr":""),onclick:()=>{ui.ovOpen=true;render();window.scrollTo({top:0})}},h("span",{class:"ovbe"},"✨"),
     h("span",{class:"ovbt"},h("b",null,"The Aboagye Home"),h("small",null,(V.pillars||[]).map(p=>p.t).join(" · "))),h("span",{class:"ovbgo"},"›"));
   return h("section",{class:"ovcard open"},h("div",{role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=false;render()}},head),stmt,
     h("div",{class:"ovlist"},(V.pillars||[]).map((p,i)=>h("button",{type:"button",class:"ovitem tap",onclick:()=>pillarSheet(p)},h("span",{class:"ovnum"},emo(p.e,30,false)),h("span",{class:"ovpt"},h("b",null,p.t),h("small",null,p.d))))),
@@ -4575,6 +4590,7 @@ function render(){
     :{today:greet+", "+p.name,projects:"Your projects",us:p.name+" & "+o.name,home:"Our home",future:"Future me"}[S.tab];
   const sl=el("subline");sl.innerHTML="";
   const pidP=partnerOf(ME);
+  if(S.tab==="home"){if(!ui.ovOpen)sl.appendChild(visionPoster(true))}else
   [ME,pidP].forEach(id=>{const x=P(id);if(!x)return;const ph=!!x.placeholder;
     const chip=(h("button",{type:"button",class:"tz"+(id!==ME?" them":"")+(id===pid&&!ph&&P(pidP)&&!P(pidP).placeholder?" on":""),disabled:ph,
       "aria-pressed":String(id===pid),"aria-label":ph?"Partner not joined yet":(id===ME?"Show my plan":"Show "+x.name+"'s plan"),
@@ -4601,7 +4617,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-u";
+const APP_VERSION="2026-11-19-v";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
