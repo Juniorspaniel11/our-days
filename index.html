@@ -3657,7 +3657,14 @@ function catSheet(c0){juSheet(c0.name,()=>{const c=bcats().find(x=>x.id===c0.id)
   return [h("div",{class:"bigemo"},emo(c.e,56,true)),
     h("p",{class:"q",style:"text-align:center"},(show?money2(spentIn(mk,c.id)):"••••")+" spent in "+monthName(mk).split(" ")[0]+(availIn(c,mk)||c.limit?" of "+(show?money2(availIn(c,mk)):"••••"):"")),
     carryIn(c,mk)?h("p",{class:"hint",style:"text-align:center;margin-top:-6px"},(carryIn(c,mk)>0?"Includes "+(show?money2(carryIn(c,mk)):"••••")+" rolled over from earlier months":"Reduced by "+(show?money2(-carryIn(c,mk)):"••••")+" overspent in earlier months")):null,
-    h("button",{type:"button",class:"btn",onclick:()=>spendSheet(c)},"+ Log spending"),
+    h("p",{class:"hint",style:"margin:4px 0 0"},"Add spending in "+c.name),
+    h("form",{class:"row",onsubmit:e=>{e.preventDefault();const f=e.target,v=amtIn(f.amt.value);if(!v){toast("Amount needed","Type how much you spent");return}const note=f.note.value.trim();if(!noSensitive(note))return;
+      ui.lastCat=c.id;const o={spend:{[uid()]:{cat:c.id,amt:v,note,by:ME,at:Date.now(),mk:mKey()}}};const k=ruleKey(note);if(k)o.rules={[k]:c.id};
+      saveMoney(o);f.reset();if(document.activeElement)document.activeElement.blur();toast("Logged",money2(v)+" · "+c.name)}},
+      h("input",{type:"text",name:"amt",inputmode:"decimal",class:"inp",style:"flex:1 1 110px",placeholder:"Amount, e.g. 24.50","aria-label":"Amount spent"}),
+      h("input",{type:"text",name:"note",class:"inp",style:"flex:2 1 150px",placeholder:"What for, e.g. Walmart","aria-label":"What for"}),
+      h("button",{type:"submit",class:"primary"},"Log")),
+    h("p",{class:"hint",style:"margin:10px 0 0"},"Monthly amount for "+c.name),
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();const v=lim.value.trim()===""?0:amtIn(lim.value);saveMoney({budget:{cats:{[c.id]:{name:c.name,e:c.e,order:c.order,limit:v}}}});toast("Saved",v?c.name+": "+money2(v)+" a month":"No set amount")}},
       h("div",{style:"flex:1 1 160px"},lim),h("button",{type:"submit",class:"ghost"},"Set monthly amount")),
     h("button",{type:"button",class:"rolltg"+(c.roll?" on":""),"aria-pressed":String(!!c.roll),onclick:()=>{const on=!c.roll;saveMoney({budget:{cats:{[c.id]:{name:c.name,e:c.e,order:c.order,limit:c.limit||0,roll:on,rollFrom:on?(c.rollFrom&&c.roll?c.rollFrom:mk):null}}}});toast(on?"Rollover on 🔁":"Rollover off",on?"What's left of "+c.name+" this month carries into next month":"Each month starts fresh")}},
