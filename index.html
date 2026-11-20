@@ -788,6 +788,26 @@ body.tab-us .gut.top{display:none}
 .lvtiles{display:flex;gap:6px;margin-top:4px}.lvt{display:flex;flex-direction:column;align-items:center;min-width:48px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:4px 6px;backdrop-filter:blur(6px)}
 .lvt b{font-family:var(--mono);font-size:20px}.lvt small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
 .lvmiles{position:relative;font-size:13px;opacity:.85;margin-top:6px;letter-spacing:.03em}
+/* ---- sub tabs that look like tabs, actions that look like buttons ---- */
+.seg{display:inline-flex;gap:6px;background:none!important;border:0!important;border-radius:0;overflow:visible;flex-wrap:wrap}
+.seg button{border:2px solid color-mix(in srgb,var(--acc,#7b5fcf) 40%,transparent)!important;background:color-mix(in srgb,var(--acc,#7b5fcf) 9%,var(--card))!important;color:var(--acc,#7b5fcf)!important;border-radius:14px!important;padding:8px 14px!important;font:inherit;font-size:15px!important;font-weight:800!important;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.seg button[aria-pressed="true"]{background:var(--acc,#7b5fcf)!important;border-color:var(--acc,#7b5fcf)!important;color:#fff!important;box-shadow:0 6px 16px color-mix(in srgb,var(--acc,#7b5fcf) 40%,transparent)}
+.mseg{display:grid!important;grid-template-columns:repeat(3,1fr);width:100%}.mseg button{padding:11px 4px!important;font-size:15.5px!important}
+.cysheet .seg button,.chero .seg button{color:#fff!important}
+.link:not(.papers.ms .link),.lnk{display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--acc,#e2557c) 12%,transparent)!important;color:var(--acc,#e2557c)!important;text-decoration:none!important;border-radius:999px!important;padding:6px 14px!important;font-weight:800!important;font-size:14.5px!important;border:0}
+.papers.ms .link{background:none!important;padding:2px 0!important;text-decoration:underline!important;color:#a3302a!important}
+/* ---- family vision ---- */
+.ovstmt{margin:0;font-family:"Crimson Pro",Georgia,serif;font-size:21px;line-height:1.35;font-weight:600;font-style:italic;color:#fff;background:none;border:0;text-align:left;padding:0}.ovstmt .vk{color:#f6d38a;font-style:normal}
+.ovpills{display:flex;flex-wrap:wrap;gap:6px}.ovpill{display:inline-flex;align-items:center;gap:5px;background:rgba(246,211,138,.14);border:1px solid rgba(246,211,138,.35);color:#fbe7b5;border-radius:999px;padding:3px 10px 3px 4px;font-size:13px;font-weight:700}
+.ovitem{align-items:center!important}.ovnum{flex:0 0 auto}.ovpt{display:flex;flex-direction:column;gap:2px}.ovpt b{font-family:var(--fun);font-size:18px;color:#fbe7b5;font-style:normal}.ovpt small{font-family:var(--body);font-size:14.5px;opacity:.9;font-weight:500;line-height:1.4}
+/* ---- compact Together hero ---- */
+.lvhero{padding:12px 12px 12px;gap:2px}
+.lvpic{width:56px;height:56px;font-size:24px}.lvname{font-size:24px;margin-top:4px}.lvtime{font-size:13.5px}.lvcity{font-size:11.5px}
+.lvside .hwx{padding:1px 8px;font-size:12px;margin-top:2px}.lvheart{margin-top:12px}
+.lvarc{height:38px;margin-top:-10px}.lvplane{font-size:18px}
+.lvmid{margin-top:-14px;flex-direction:column}.lvbig{font-size:46px}.lvlab{font-size:18px}
+.lvtiles{gap:4px;margin-top:2px}.lvt{min-width:40px;padding:2px 4px;border-radius:10px}.lvt b{font-size:16px}.lvt small{font-size:9px}
+.lvmiles{margin-top:2px;font-size:12px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3576,7 +3596,7 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
     pane=[h("div",{class:"savetot"},emo("🫙",44,true),h("div",null,h("span",{class:"k"},"Saved together"),h("b",null,show?money(tot):"••••"))),
       h("div",{class:"goals"},gs.map(goalCard)),h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(null)},"+ New goal")]}
   return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our money"),lockLink),
-    h("div",{class:"seg mseg"},segb("budget","Budget"),segb("save","Savings"),segb("split","Split")),
+    h("div",{class:"seg mseg"},segb("budget","📊 Budget"),segb("save","🫙 Savings"),segb("split","🤝 Split")),
     ...pane)}
 function spendSheet(cat){let c=cat?cat.id:(ui.lastCat||"food"),manual=!!cat;juSheet("Log spending",()=>{
   const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount, e.g. 24.50","aria-label":"Amount"}),n=h("input",{type:"text",class:"inp",placeholder:"What for, e.g. Walmart","aria-label":"What for"});
@@ -3633,33 +3653,34 @@ function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url"
 /* a clear chapter header, so moving from one part of a tab to the next is obvious */
 function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},e),h("b",null,title),h("i")),node)}
 function viewHome(){return [visionPoster(),chapter("💰","Our money",moneySection()),chapter("🎁","Wish lists",wishSection()),chapter("🏡","Dream home",homeDesignSection())]}
-/* Our vision: the two of you as one household. Small when closed, a gold list when opened */
-const OURV0=[["family","💍","We are married in a church wedding in Ghana with both our families, and every night we pray together before we sleep."],
-  ["career","🎓","By 2030 we are Dr. and Dr. Aboagye: Joel leads a funded cardiovascular research lab, and Fiona's hospitality work is known in Ghana and the United States."],
-  ["family","🏡","We own a 4 bedroom home in Texas with a piano in the living room and a guest room always ready for family from Ghana."],
-  ["family","🏠","Joel's parents live in the comfortable house we built for them in Ghana, and our own family house stands beside it."],
-  ["wealth","💰","We give 10% to God first, save 20% of every paycheck together, and we are debt free."],
-  ["impact","🌍","The Joel & Fiona Aboagye Foundation pays full school fees for 100 brilliant but needy students in Ghana every year."],
-  ["family","👨‍👩‍👧","Our children speak Twi and English, know God, and see us serve and give."],
-  ["life","✈️","Every year we take one trip just for the two of us, and we spend Christmas with family in Ghana."]];
-const ourVis=()=>(US.main.ourVision||OURV0.map(([c,e,t],i)=>({id:"d"+i,c,e,t,at:i}))).filter(x=>x&&x.t);
-const saveOurVis=L=>saveUs({ourVision:L.map(x=>({id:x.id,c:x.c||"life",e:x.e||"✨",t:x.t,at:x.at||Date.now()}))});
-function ourVisSheet(x){const L=ourVis(),cur=x?L.find(y=>y.id===x.id):null,ti=h("textarea",{class:"inp",rows:"3",placeholder:"We... (say it as if it's already true)","aria-label":"Our vision"});ti.value=cur?cur.t:"";let em=cur?cur.e:"✨";
-  const ems=h("div",{class:"chips"},["💍","🏡","🎓","🌍","👨‍👩‍👧","⛪","💰","✈️","🙏","❤️","✨"].map(e=>h("button",{type:"button","aria-pressed":String(e===em),onclick:ev=>{em=e;ems.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},e)));
-  openSheet(cur?"Edit our vision":"Add to our vision",h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t){ti.focus();return}
-      const N=cur?L.map(y=>y.id===cur.id?{...y,t,e:em}:y):L.concat([{id:uid(),t,e:em,c:"life",at:Date.now()}]);saveOurVis(N);closeSheet();toast(cur?"Updated ✨":"Added ✨","")}},
-    ems,ti,h("button",{type:"submit",class:"primary"},cur?"Save":"Add"),cur?confirmBtn("Remove",()=>{saveOurVis(L.filter(y=>y.id!==cur.id));closeSheet()}):null));setTimeout(()=>ti.focus(),80)}
+/* The Aboagye home: one vision statement and the pillars you live by */
+const HOME0={stmt:"A home that belongs to God, where love is spoken every day, and where our science, music and faith lift the poor, the disabled, and the brilliant but needy.",
+  pillars:[{id:"p1",e:"🙏",t:"God first",d:"We pray together every night. Big decisions start on our knees."},
+    {id:"p2",e:"💞",t:"Love out loud",d:"We say it, show it, and fight fair: no silent treatment, never going to bed angry."},
+    {id:"p3",e:"🎓",t:"Two doctors, one team",d:"We push each other to the top of our fields and celebrate every win together."},
+    {id:"p4",e:"🌍",t:"Open hands",d:"Our home, our table and our foundation stay open to family and to those in need."},
+    {id:"p5",e:"🇬🇭",t:"Rooted in two lands",d:"Ghana and America are both home. We build, give and raise our children in both."}]};
+const homeV=()=>{const x=US.main.ourHome;return x&&x.stmt?x:HOME0};
+const saveHomeV=o=>saveUs({ourHome:Object.assign({},homeV(),o)});
+function homeStmtSheet(){const ti=h("textarea",{class:"inp",rows:"4","aria-label":"Our vision statement"});ti.value=homeV().stmt;
+  openSheet("Our vision",h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;saveHomeV({stmt:t});closeSheet();toast("Saved ✨","")}},ti,h("button",{type:"submit",class:"primary"},"Save")))}
+function pillarSheet(p){const V=homeV(),cur=p?V.pillars.find(x=>x.id===p.id):null,tt=h("input",{type:"text",class:"inp",placeholder:"Pillar, e.g. God first","aria-label":"Pillar"}),dd=h("textarea",{class:"inp",rows:"2",placeholder:"What it looks like in our home","aria-label":"What it means"});
+  tt.value=cur?cur.t:"";dd.value=cur?cur.d:"";let em=cur?cur.e:"✨";
+  const ems=h("div",{class:"chips"},["🙏","💞","🎓","🌍","🇬🇭","🏡","💰","🎹","👨‍👩‍👧","🤝","✨"].map(e=>h("button",{type:"button","aria-pressed":String(e===em),onclick:ev=>{em=e;ems.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===ev.currentTarget)))}},e)));
+  openSheet(cur?"Edit pillar":"New pillar",h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=tt.value.trim();if(!t){tt.focus();return}const P0=V.pillars||[];
+      saveHomeV({pillars:cur?P0.map(x=>x.id===cur.id?{...x,t,d:dd.value.trim(),e:em}:x):P0.concat([{id:uid(),t,d:dd.value.trim(),e:em}])});closeSheet()}},
+    ems,tt,dd,h("button",{type:"submit",class:"primary"},cur?"Save":"Add"),cur?confirmBtn("Remove",()=>{saveHomeV({pillars:(V.pillars||[]).filter(x=>x.id!==cur.id)});closeSheet()}):null))}
 const openFuture=pid=>{S.viewAs=pid||ME;go("future")};
-function visionPoster(){const L=ourVis(),open=!!ui.ovOpen,o=PARTNER,today=usDay();
-  const line=L.length?L[hashN(today+"ov",L.length)]:null;
+function visionPoster(){const V=homeV(),open=!!ui.ovOpen,o=PARTNER;
   const who=u=>h("button",{type:"button",class:"ovwho tap",onclick:ev=>{ev.stopPropagation();openFuture(u)}},initialEl(u),u===ME?"My vision":plainNm(u)+"'s");
-  const head=h("div",{class:"ovhead"},h("div",null,h("small",{class:"ovk"},"✨ Our vision"),h("b",{class:"ovname"},"The Aboagyes")),h("span",{class:"ovtog"},open?"Close":"Open"));
-  if(!open)return h("section",{class:"ovcard tap",role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=true;render()}},head,
-    line?h("p",{class:"ovline"},h("span",{class:"ove"},line.e)," ",vHi(line.t)):null,
+  const head=h("div",{class:"ovhead"},h("div",null,h("small",{class:"ovk"},"✨ Our vision"),h("b",{class:"ovname"},"The Aboagye Home")),h("span",{class:"ovtog"},open?"Close ▴":"Open ▾"));
+  const stmt=h(open?"button":"p",{type:open?"button":null,class:"ovstmt"+(open?" tap":""),onclick:open?homeStmtSheet:null},"“",vHi(V.stmt),"”");
+  if(!open)return h("section",{class:"ovcard tap",role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=true;render()}},head,stmt,
+    h("div",{class:"ovpills"},(V.pillars||[]).map(p=>h("span",{class:"ovpill"},emo(p.e,20,false),p.t))),
     h("div",{class:"ovwhos"},who(ME),o&&P(o)&&!P(o).placeholder?who(o):null));
-  return h("section",{class:"ovcard open"},h("div",{role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=false;render()}},head),
-    h("div",{class:"ovlist"},L.map(x=>h("button",{type:"button",class:"ovitem tap",onclick:()=>ourVisSheet(x)},h("span",{class:"ove"},x.e),h("span",null,vHi(x.t))))),
-    h("div",{class:"ovwhos"},h("button",{type:"button",class:"ovadd tap",onclick:()=>ourVisSheet(null)},"＋ Add"),who(ME),o&&P(o)&&!P(o).placeholder?who(o):null))}
+  return h("section",{class:"ovcard open"},h("div",{role:"button",tabindex:"0",onclick:()=>{ui.ovOpen=false;render()}},head),stmt,
+    h("div",{class:"ovlist"},(V.pillars||[]).map((p,i)=>h("button",{type:"button",class:"ovitem tap",onclick:()=>pillarSheet(p)},h("span",{class:"ovnum"},emo(p.e,30,false)),h("span",{class:"ovpt"},h("b",null,p.t),h("small",null,p.d))))),
+    h("div",{class:"ovwhos"},h("button",{type:"button",class:"ovadd tap",onclick:()=>pillarSheet(null)},"＋ Pillar"),who(ME),o&&P(o)&&!P(o).placeholder?who(o):null))}
 function viewFuture(){return [h("button",{type:"button",class:"backbtn tap",onclick:()=>{S.viewAs=ME;go("home")}},"‹ Home"),visionSection(me())]}
 
 /* ---------- Future me: vision board ---------- */
@@ -3703,7 +3724,7 @@ function visionTidy(p){let ch=false;const norm=t=>(t||"").trim().toLowerCase();
   const before=p.vision.length;p.vision=p.vision.filter(x=>!/^I am Dr\b/i.test((x.t||"").trim()));if(p.vision.length!==before)ch=true;
   if(ch)persist()}
 /* key words in gold */
-const VKEYS=["4 bedroom home","piano","10% to God","20% of every paycheck","debt free","church wedding","By 2030","Twi and English","Christmas","science, music and faith","heal hearts","lift spirits","open doors","the poor, the disabled, and the brilliant but needy","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
+const VKEYS=["belongs to God","love is spoken every day","4 bedroom home","piano","10% to God","20% of every paycheck","debt free","church wedding","By 2030","Twi and English","Christmas","science, music and faith","heal hearts","lift spirits","open doors","the poor, the disabled, and the brilliant but needy","The Joel & Fiona Aboagye Foundation","Joel & Fiona Aboagye Foundation","our foundation","100 brilliant but needy students","full school fees","genuinely needy people","disabled people","steady monthly income","dignity","Ghana","the United States","God","integrity, humility and generosity","faithful, patient and present husband","present and joyful father","our home","family house","comfortable home I built for them","healthy, strong and full of energy","strong first author papers","my own funded cardiovascular research lab","reach patients","mentor","earn for my family every month","the circle keeps growing"];
 function vHi(t){const ks=VKEYS.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   const re=new RegExp("(?<![A-Za-z])("+ks.join("|")+"|\\b\\d[\\d,]*\\b)(?![A-Za-z])","gi"),out=[];let last=0,m;
   while((m=re.exec(t))){if(m.index>last)out.push(t.slice(last,m.index));const w=m[0];out.push(h("span",{class:"vk"+(/foundation/i.test(w)&&/aboagye/i.test(w)?" fn":"")},w));last=m.index+w.length}
@@ -4574,7 +4595,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-r";
+const APP_VERSION="2026-11-19-s";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
