@@ -808,6 +808,9 @@ body.tab-us .gut.top{display:none}
 .lvmid{margin-top:-14px;flex-direction:column}.lvbig{font-size:46px}.lvlab{font-size:18px}
 .lvtiles{gap:4px;margin-top:2px}.lvt{min-width:40px;padding:2px 4px;border-radius:10px}.lvt b{font-size:16px}.lvt small{font-size:9px}
 .lvmiles{margin-top:2px;font-size:12px}
+.mhero.dark{flex-wrap:wrap}.mstat{flex:1 1 100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}.mstat>div{background:rgba(255,255,255,.1);border-radius:12px;padding:7px 8px;display:flex;flex-direction:column;align-items:center}.mstat small{color:rgba(255,255,255,.8)!important;font-size:12.5px}.mstat b{color:#fff!important;font-size:17px}
+.billrow{flex-direction:column;overflow:visible;gap:6px;scroll-snap-type:none}.billrow .billr{flex:none!important;width:100%;flex-direction:row!important;align-items:center!important;gap:10px!important;border-top:0!important;border-left:4px solid var(--bc)}.billrow .billr .bcn{flex:1;min-width:0}.billtot{font-weight:600;color:var(--muted);font-size:13px}
+.tgrid.one{grid-template-columns:1fr!important}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3558,26 +3561,29 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
   let pane;
   if(tab==="budget"){setTimeout(autoBills,0);const mk=mKey(),cs=bcats(),lim=cs.reduce((a,c)=>a+Math.max(0,availIn(c,mk)),0),sp=spentIn(mk);
     const lm=addDays(mk+"-01",-1).slice(0,7),lsp=spentIn(lm),up=upcomingBills(mk),upv=up.reduce((a,b)=>a+(+b.amt||0),0);
-    const ring=h("div",{class:"mring"}),segs=cs.map(c=>({v:spentIn(mk,c.id),col:bcol(c)})),base=Math.max(lim,sp)||1;ring.innerHTML=budgetRing(segs,base,132);
-    ring.append(h("div",{class:"mrc"},h("b",null,show?money(sp):"••••"),h("small",null,lim?(show?Math.round(sp/lim*100)+"% of "+money(lim):"of ••••"):"spent")));
-    const leftv=lim-sp-upv;
+    const upC=id=>up.filter(b=>b.cat===id).reduce((a,b)=>a+(+b.amt||0),0),used=sp+upv;
+    const ring=h("div",{class:"mring"}),segs=cs.map(c=>({v:spentIn(mk,c.id)+upC(c.id),col:bcol(c)})),base=Math.max(lim,used)||1;ring.innerHTML=budgetRing(segs,base,132);
+    ring.append(h("div",{class:"mrc"},h("b",null,show?money(used):"••••"),h("small",null,lim?(show?"of "+money(lim):"of ••••"):"used")));
+    const leftv=lim-used,paidB=spendIn(mk).filter(x=>x.bill).reduce((a,x)=>a+(+x.amt||0),0),billsM=paidB+upv,other=sp-paidB;
     const BL=bills(),today=usDay();
     const due=moneySummaryDue();
     pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
       h("div",{class:"mhero dark"},ring,h("div",{class:"mhx"},h("span",{class:"k"},monthName(mk).split(" ")[0]),
         h("b",{class:leftv<0?"over":""},lim?(leftv>=0?M(leftv)+" left":M(-leftv)+" over"):"No plan yet"),
-        h("small",null,lim?(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1;return (upv?"after "+M(upv)+" in bills still to come · ":"")+dl+(dl===1?" day":" days")+" to go"+(leftv>0&&show?" · about "+money2(Math.floor(leftv/dl))+" a day":"")})():"Tap a category to set a monthly amount"),
-        h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending"))),
-      h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills"),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
+        lim?null:h("small",null,"Tap a category below to set a monthly amount"),
+        lim&&leftv>0?h("small",null,(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1;return "About "+(show?money2(Math.floor(leftv/dl)):"••")+" a day for "+dl+(dl===1?" day":" days")})()):null,
+        h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")),
+        lim?h("div",{class:"mstat"},[["💵","Plan",lim],["🔁","Bills",billsM],["🛒","Spending",other]].map(([e,l,v])=>h("div",null,h("small",null,e+" "+l),h("b",null,M(v))))):null),
+      h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills",BL.length?h("small",{class:"billtot"}," "+M(BL.filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0))+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
         BL.length?h("div",{class:"billrow"},BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
           const c=bcats().find(x=>x.id===b.cat)||{e:"✨",id:"other"};
           return h("button",{type:"button",class:"billr tap"+(paid?" paid":"")+(!paid&&!skip&&!notyet&&dleft<=3?" soon":""),style:"--bc:"+bcol(c),onclick:()=>billSheet(b)},h("span",{class:"bci"},emo(c.e,20,false)),
-            h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd)+" · in "+dleft+" days")),
+            h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd))),
             h("b",{class:"spa"},M(b.amt)))}))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
-      h("div",{class:"bcl"},cs.map(c=>{const s2=spentIn(mk,c.id),cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;if(!(+c.limit)&&!s2&&!ui.monAll)return null;
+      h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;if(!(+c.limit)&&!s2&&!ui.monAll)return null;
         return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
-          h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
+          h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),ub?h("small",{class:"carry"},"incl. "+M(ub)+" in bills due later"):null,cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
           h("span",{class:"bca"},M(s2),l||+c.limit?h("small",null,"of "+M(l)):null))})),
       h("button",{type:"button",class:"link",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show only categories in use":"Show all categories · set amounts"),
       h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" so far"),lsp?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]+" summary"):null)]}
@@ -3644,8 +3650,7 @@ function wishAddSheet(){openSheet("Add a wish",(()=>{const ti=h("input",{type:"t
     saveWish({items:{[uid()]:{owner:ME,title:ti.value.trim(),link:l,at:Date.now(),got:null}}});closeSheet();toast("Added 🎁","")}},ti,ln,h("button",{type:"submit",class:"primary"},"Add"))})())}
 function homeDesignSection(){const link=US.main.homeLink||"",H=US.home||{},hm=SHOPITEM[H.home||"apt"],bits=[...(H.pets||[]).map(x=>SHOPITEM[x.k].e),...(H.kids||[]).map(x=>x.e)].slice(0,4).join("");
   const T=(c,e,name,sub,fn)=>h("button",{type:"button",class:"tile tap",style:"--c:"+c,onclick:fn},emo(e,36,false),h("b",null,name),h("small",{class:"sub"},sub));
-  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🏡",28,false),"Our dream home"),h("div",{class:"tgrid two"},
-    T("#c0398a",hm.e,H.name||"Build it",bits||"House, pets, kids",homeSheet),
+  return h("section",{class:"ju"},h("h2",{class:"sh"},emo("🏡",28,false),"Our dream home"),h("div",{class:"tgrid one"},
     T("#1f7f78","🧊","3D home",link?"Open it":"Design it",()=>link?window.open(link,"_blank","noopener"):home3dSheet())))}
 function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url",class:"inp",value:link,placeholder:"Paste your shared 3D home link"});
   openSheet("3D home",h("div",{class:"body"},h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler")),
@@ -4595,7 +4600,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-19-s";
+const APP_VERSION="2026-11-19-t";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
