@@ -845,6 +845,32 @@ body.tab-us .gut.top{display:none}
 .cyst{display:flex;align-items:center;gap:8px}.cyst span{flex:1;font-weight:700;font-size:14.5px}.cyst button{width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;font-weight:800;cursor:pointer}.cyst b{min-width:62px;text-align:center;font-size:15px}
 .cyadj .lnk{align-self:flex-start;background:rgba(255,255,255,.16)!important;color:#fff!important}
 .cychips{display:flex;flex-wrap:wrap;gap:6px}.cychips button{border:0;border-radius:999px;padding:5px 11px;background:rgba(255,93,143,.25);color:#fff;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}
+/* ---- money: each sub section its own card ---- */
+.bills{--mc:#6c5ce7;margin-top:16px;border:2px solid color-mix(in srgb,var(--mc) 30%,transparent)!important;background:color-mix(in srgb,var(--mc) 6%,var(--card))!important;border-radius:20px!important;padding:0 12px 12px!important;overflow:hidden}
+.bills.inc{--mc:#16a37f}.bills.cats{--mc:#e0841e}
+.bills>.billh{margin:0 -12px 6px;padding:11px 14px;background:color-mix(in srgb,var(--mc) 16%,var(--card));border-bottom:1px solid color-mix(in srgb,var(--mc) 25%,transparent)}
+.bills>.billh>b{font-size:18px;color:color-mix(in srgb,var(--mc) 75%,#111)}.bills>.billh .lnk{background:var(--mc)!important;color:#fff!important}
+.bills.cats .bcl{display:flex;flex-direction:column;gap:6px}
+/* ---- cycle on Care ---- */
+.cflo{border-radius:26px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:#fff;background:radial-gradient(90% 70% at 50% 0%,color-mix(in srgb,var(--pc,#ff5d8f) 55%,#2b1740),#24133a 75%);box-shadow:0 12px 28px rgba(43,23,64,.3)}
+.cflo.empty{--pc:#ff5d8f}.cflo.empty b{font-family:var(--fun);font-size:20px}.cflo.empty>small{opacity:.8}
+.cfc{width:196px;height:196px;border-radius:50%;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--pc) 70%,#fff),var(--pc) 60%,color-mix(in srgb,var(--pc) 70%,#000));box-shadow:0 0 0 8px color-mix(in srgb,var(--pc) 25%,transparent),0 0 0 16px color-mix(in srgb,var(--pc) 12%,transparent),0 14px 30px color-mix(in srgb,var(--pc) 45%,transparent);margin:12px 0 6px;animation:cfpulse 4s ease-in-out infinite}
+@keyframes cfpulse{50%{transform:scale(1.03)}}
+.cfc small{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.9}.cfc b{font-family:var(--fun);font-size:25px;line-height:1.05;padding:0 14px}.cfc span{font-size:14.5px;font-weight:700;background:rgba(0,0,0,.2);border-radius:99px;padding:3px 12px;margin-top:4px}
+.cftip{margin:0;font-size:15px;font-weight:600;opacity:.95}
+.cwk{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%}.cwd{display:flex;flex-direction:column;align-items:center;gap:1px;border:0;font:inherit;color:#fff;background:rgba(255,255,255,.07);border-radius:14px;padding:6px 0;border-bottom:4px solid var(--pc)}
+.cwd small{font-size:10.5px;opacity:.75}.cwd b{font-size:16px}.cwd i{font-style:normal;font-size:12px;min-height:15px}.cwd.tap{cursor:pointer}.cwd.now{background:rgba(255,255,255,.2);outline:2px solid #fff}.cwd.arm{outline:2px dashed #fff;background:rgba(255,255,255,.25)}
+.cfrow{display:flex;gap:8px;width:100%}.cfbtn{flex:1;border:0;border-radius:16px;padding:12px;font:inherit;font-weight:800;font-size:15px;color:#fff;background:rgba(255,255,255,.14);cursor:pointer}.cfbtn.main{flex:1.5;background:linear-gradient(135deg,#ff5f97,#ff8a5b);box-shadow:0 6px 16px rgba(255,95,151,.4)}
+.cfq{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;width:100%}.cfq button{border:0;border-radius:99px;padding:10px 15px;font:inherit;font-weight:800;font-size:15px;background:#fff;color:#b8326a;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.15)}.cfq .cydate{display:none;width:100%}
+/* ---- love her well: story cards ---- */
+.lvg{display:flex;flex-direction:column;gap:8px}.lvgh{display:flex;flex-direction:column;padding:0 2px}.lvgh b{font-family:var(--fun);font-size:21px}.lvgh small{color:var(--muted);font-size:14px}
+.lvstories{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 10px;margin:0 -2px;scrollbar-width:none}.lvstories::-webkit-scrollbar{display:none}
+.lvst{position:relative;flex:0 0 138px;min-height:172px;border-radius:24px;padding:14px 12px 12px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;color:#fff;scroll-snap-align:start;background:linear-gradient(160deg,var(--a),var(--b,color-mix(in srgb,var(--a) 60%,#2b1740)));box-shadow:0 10px 20px color-mix(in srgb,var(--a) 35%,transparent)}
+.lvst b{font-size:16px;line-height:1.25;display:flex;flex-direction:column;gap:2px}.lvst b small{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.lvst.easy{--a:#ffb347;--b:#ff6a5f}.lvst.next{--b:#2b1740}
+.lvsn{position:absolute;top:10px;right:12px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:12.5px;font-weight:800}
+.lvsend{display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:18px;padding:13px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:linear-gradient(135deg,#ff5f97,#c46bff);box-shadow:0 8px 18px rgba(196,107,255,.35);cursor:pointer}
+.bills>.billh .lnk{white-space:nowrap;padding:6px 12px!important;font-size:14px!important}.bills>.billh>b{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.billtot{white-space:nowrap}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2147,6 +2173,7 @@ const NEEDS=[["normal","Just a normal day","🙂","","Normal"],["space","Some sp
   ["comfort","Comfort","🤗","Be soft. Listen more than you fix.","Comfort"],["talk","To talk","💬","Make time for a real call.","Talk"],
   ["encourage","Encouragement","💪","Tell them you believe in them.","Cheer me"],["fun","Some fun","🎉","Keep it light and silly.","Fun"],["prayer","Prayer","🙏","Pray together today.","Prayer"]];
 const needOf=u=>{const p=P(u),n=p&&p.need;if(!n||!n.k)return null;return n.date===tzNow(p.tz).key?NEEDS.find(x=>x[0]===n.k)||null:null};
+function clearNeed(){if(!DB||!CID)return;const p=P(ME);DB.doc("couples/"+CID+"/people/"+ME+"/extra/need").set({k:null,date:tzNow(p.tz).key,at:Date.now()}).catch(syncErr);P(ME).need=null;render();toast("Cleared","")}
 function setNeed(k){if(!DB||!CID)return;const p=P(ME),nd=NEEDS.find(x=>x[0]===k);DB.doc("couples/"+CID+"/people/"+ME+"/extra/need").set({k,date:tzNow(p.tz).key,at:Date.now()}).catch(syncErr);
   if(k!=="normal")addTo("nudges",{from:ME,at:Date.now(),kind:"need",title:plainNm(ME)+" needs "+nd[1].toLowerCase()+" today "+nd[2],body:nd[3]});
   P(ME).need={k,date:tzNow(p.tz).key,at:Date.now()};render();toast(k==="normal"?"Got it":"Sent to "+plainNm(PARTNER),k==="normal"?"":plainNm(PARTNER)+" will know what helps today")}
@@ -2162,23 +2189,24 @@ function headsUp(u){const p=P(u);if(!p||p.placeholder)return [];const t=tzNow(p.
   return out}
 function careSection(){const o=PARTNER,nmO=plainNm(o),on=needOf(o),mine=needOf(ME),C=partnerCycle(o),hu=headsUp(o).filter(x=>x.k!=="cyc"),myhu=headsUp(ME),tdy=tzNow(P(o).tz).key;
   const needOn=!!(on&&on[0]!=="normal");
-  const head=needOn?"Needs "+on[4].toLowerCase():C?CPH[C.ph][2]:hu.length?hu[0].t:"All good today";
-  const sub=needOn?on[3]:C?CPH[C.ph][3]:hu.length?hu[0].tip:"Ask how "+nmO+"'s day is going.";
-  const tiles=[];if(needOn&&C)tiles.push({e:CPH[C.ph][1],t:CPH[C.ph][2],tip:CPH[C.ph][3],open:C.mine?logHerSheet:cyclePartnerSheet});(needOn||C?hu:hu.slice(1)).forEach(x=>tiles.push(x));
-  const R=C&&C.R?C.R:null,right=R?(()=>{const b=h("button",{type:"button",class:"chring tap","aria-label":"Open "+nmO+"'s cycle",onclick:logHerSheet});b.append(cycleRing(R,92,tdy));return b})():h("span",{class:"chemo"},emo(needOn?on[2]:C?CPH[C.ph][1]:"💛",56,true));
+  const head=needOn?"Needs "+on[4].toLowerCase():hu.length?hu[0].t:"All good today";
+  const sub=needOn?on[3]:hu.length?hu[0].tip:"Ask how "+nmO+"'s day is going.";
+  const tiles=[];(needOn?hu:hu.slice(1)).forEach(x=>tiles.push(x));
+  const right=h("span",{class:"chemo"},emo(needOn?on[2]:hu.length?hu[0].e:"💛",56,true));
   const hero=h("section",{class:"chero"},h("div",{class:"chtop"},h("div",{class:"chtx"},h("small",null,nmO+" today"),h("b",null,head),h("span",null,sub)),right),
     tiles.map((x,i)=>h(x.open?"button":"div",{type:x.open?"button":null,class:"chtile"+(x.open?" tap":""),style:"--tc:"+DPAL[(i*3+1)%DPAL.length],onclick:x.open||null},h("span",{class:"chte"},emo(x.e,28,false)),h("span",{class:"chtt"},h("b",null,x.t),x.tip?h("small",null,x.tip):null))));
   const myCyc=CYC().on?(()=>{const Rm=cycCalc(CYC(),tzNow(P(ME).tz).key);return Rm?h("button",{type:"button",class:"cymini tap",onclick:cycleSheet},cycleRing(Rm,56,tzNow(P(ME).tz).key),h("span",null,h("b",null,CPH[Rm.phase][0]),h("small",null,Rm.late?"Period due":"Period in "+daysBetween(tzNow(P(ME).tz).key,Rm.next)+" days"))):null})():null;
   const you=h("section",{class:"cyou"},h("small",{class:"cyh"},"You today"),
-    h("div",{class:"ngrid"},NEEDS.map(([k,l,e,t,sh])=>h("button",{type:"button",class:"nbtn"+(mine&&mine[0]===k?" on":""),"aria-pressed":String(!!mine&&mine[0]===k),"aria-label":l,onclick:()=>setNeed(k)},h("span",{class:"nbe"},emo(e,34,false)),h("small",null,sh)))),
+    h("div",{class:"ngrid"},NEEDS.map(([k,l,e,t,sh])=>h("button",{type:"button",class:"nbtn"+(mine&&mine[0]===k?" on":""),"aria-pressed":String(!!mine&&mine[0]===k),"aria-label":l,onclick:()=>mine&&mine[0]===k?clearNeed():setNeed(k)},h("span",{class:"nbe"},emo(e,34,false)),h("small",null,sh)))),
     myCyc,
     myhu.length?h("div",{class:"seesme"},h("small",null,nmO+" sees"),myhu.map(x=>h("span",{class:"seechip"},x.e+" "+x.t))):null);
   const herLog=(P(o)||{}).pcLog,loggedForMe=herLog&&herLog.on&&(herLog.starts||[]).length&&!CYC().on;
   const cb=(lab,fn)=>h("button",{type:"button",class:"bigbtn cycbtn tap",onclick:fn},h("span",{style:"font-size:20px"},"🌸"),lab);
   const cycBtns=loggedForMe?[cb("My cycle",takeOverSheet)]:[cb(nmO+"'s cycle",logHerSheet),CYC().on?cb("My cycle",cycleSheet):null];
-  return h("div",{class:"ju care",id:"care"},hero,C?careGuide(C,nmO):null,you,
+  const cyc=careCycle(),forMe=herLog&&herLog.on&&(herLog.starts||[]).length&&!CYC().on;
+  return h("div",{class:"ju care",id:"care"},cyc,C&&!forMe?careGuide(C,nmO):null,hero,you,
     h("div",{class:"careact"},h("button",{type:"button",class:"bigbtn pzbtn tap",onclick:pauseSheet},h("span",{style:"font-size:20px"},"⏸"),"Pause"),
-      ...cycBtns))}
+      CYC().on?cb("My cycle",cycleSheet):null))}
 /* one card on Today: what the partner needs and their heads ups */
 function careToday(){const o=PARTNER;if(!o||!P(o)||P(o).placeholder)return null;const on=needOf(o),hu=headsUp(o).filter(x=>x.k!=="cyc"),needOn=!!(on&&on[0]!=="normal");if(!needOn&&!hu.length)return null;
   const head=needOn?"Needs "+on[4].toLowerCase():hu[0].t,sub=needOn?on[3]:hu[0].tip,chips=(needOn?hu:hu.slice(1)).map(x=>x.e+" "+x.t);
@@ -2218,12 +2246,12 @@ function cycCalc(c,today){const st=(c.starts||[]).slice().sort();if(!st.length)r
   const win=S0=>{const O=addDays(S0,len-14);return [["period",S0,addDays(S0,plen-1)],["follicular",addDays(S0,plen),addDays(O,-2)],["ovulation",addDays(O,-1),addDays(O,1)],["luteal",addDays(O,2),addDays(S0,len-8)],["pre",addDays(S0,len-7),addDays(S0,len-1)]].filter(w=>w[1]<=w[2])};
   const windows=[...win(last),...win(next)];let phase=(windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0];if(late>0)phase="late";
   return {len,plen,last,day,next,late,phase,windows,n:st.length,guess:!g6.length&&!+c.clen,auto,fixed:!!+c.clen}}
-const CPH={period:["Period","🩸","On her period","Warmth, rest, easy plans."],
-  follicular:["Rising energy","🌱","Energy rising","Great week for dates and plans."],
-  ovulation:["Peak days","☀️","Bright, social days","Plan something fun."],
-  luteal:["Slowing down","🍂","Energy slowing","Steady reassurance, fewer surprises."],
-  pre:["Pre period week","🌙","Extra gentle week","Patience, snacks, lighter plans."],
-  late:["Period due","🗓️","Period due any day","Be gentle and flexible."]};
+const CPH={period:["Cozy days","🌸","Cozy days","Soft, slow and pampered."],
+  follicular:["Glow up","✨","Glow up week","Energy's back. Plan something fun."],
+  ovulation:["Main character","☀️","Main character days","Bright and social. Go out."],
+  luteal:["Slow and steady","🍂","Slow and steady","Calm plans, lots of reassurance."],
+  pre:["Handle with love","🌙","Handle with love","Patience, snacks, cozy calls."],
+  late:["Any day now","⏳","Any day now","Flexible plans, comfort ready."]};
 const CARE={
   period:{feel:"Low energy, maybe cramps",do:[["🍫","Send a treat or warm food"],["📞","Call and mostly listen"],["🫖","Ask: what would help right now?"]],easy:"Heavy talks, teasing, big plans",note:"Thinking of you today. Can I order you something warm? ❤️"},
   follicular:{feel:"Energy coming back",do:[["🎬","Plan a fun date or call"],["🗓️","Good time to plan together"],["💬","Bring up things you've been holding"]],easy:"Nothing special, enjoy it",note:"I miss you. Let's plan something fun this week 😊"},
@@ -2234,13 +2262,40 @@ const CARE={
 function careNoteSheet(ph){const o=PARTNER,ti=h("textarea",{class:"inp",rows:"3","aria-label":"Note"});ti.value=(CARE[ph]||CARE.period).note;
   openSheet("Note to "+plainNm(o),h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;addTo("nudges",{from:ME,at:Date.now(),kind:"note",title:plainNm(ME)+" 💌",body:t});closeSheet();hearts(null,14);toast("Sent 💌",plainNm(o)+" gets it as a notification")}},
     h("p",{class:"hint",style:"margin:0"},"Change it however you like."),ti,h("button",{type:"submit",class:"primary"},"💌 Send")))}
+const STC=[["#ff5f97","#ff9a6b"],["#7b5cff","#c46bff"],["#15b79a","#3b8cff"]];
 function careGuide(C,nmO){const ph=C.ph||C.phase,G=CARE[ph];if(!G)return null;const R=C.R,today=tzNow(P(PARTNER).tz).key;
-  let upNext=null;if(R&&!R.late){const ws=R.windows,cur=ws.findIndex(w=>today>=w[1]&&today<=w[2]),nx=cur>=0?ws[cur+1]:ws.find(w=>w[1]>today);if(nx){const d=daysBetween(today,nx[1]);upNext=CPH[nx[0]][1]+" "+CPH[nx[0]][0]+(d<=1?" tomorrow":" in "+d+" days")}}
-  return h("section",{class:"cguide",style:"--pc:"+PHC[ph]},h("div",{class:"cgh"},h("b",null,"How to love her today"),h("small",null,G.feel)),
-    h("div",{class:"cgdo"},G.do.map(([e,t])=>h("div",{class:"cgi"},emo(e,26,false),h("span",null,t)))),
-    h("p",{class:"cgeasy"},h("b",null,"Go easy on: "),G.easy),
-    upNext?h("p",{class:"cgnext"},"Up next: "+upNext):null,
-    h("button",{type:"button",class:"primary cgsend tap",onclick:()=>careNoteSheet(ph)},"💌 Send "+nmO+" a sweet note"))}
+  let upNext=null;if(R&&!R.late){const ws=R.windows,cur=ws.findIndex(w=>today>=w[1]&&today<=w[2]),nx=cur>=0?ws[cur+1]:ws.find(w=>w[1]>today);if(nx){const d=daysBetween(today,nx[1]);upNext=[CPH[nx[0]][1],CPH[nx[0]][0],d<=1?"tomorrow":"in "+d+" days"]}}
+  return h("section",{class:"lvg"},h("div",{class:"lvgh"},h("b",null,"💗 Love her well today"),h("small",null,G.feel)),
+    h("div",{class:"lvstories"},G.do.map(([e,t],i)=>h("div",{class:"lvst",style:"--a:"+STC[i][0]+";--b:"+STC[i][1]},h("span",{class:"lvsn"},String(i+1)),emo(e,46,true),h("b",null,t))),
+      h("div",{class:"lvst easy"},h("span",{class:"lvsn"},"!"),emo("🙅",46,true),h("b",null,h("small",null,"Go easy on"),G.easy)),
+      upNext?h("div",{class:"lvst next",style:"--a:"+PHC[CPH[upNext[1]]?upNext[1]:"follicular"]},h("span",{class:"lvsn"},"→"),emo(upNext[0],46,true),h("b",null,h("small",null,"Up next, "+upNext[2]),upNext[1])):null),
+    h("button",{type:"button",class:"lvsend tap",onclick:()=>careNoteSheet(ph)},emo("💌",26,true),"Send "+nmO+" a sweet note"))}
+/* ---------- the cycle right on Care: a big circle and the week, Flo style ---------- */
+function careCycle(){const o=PARTNER,nmO=plainNm(o);if(!o||!P(o)||P(o).placeholder)return null;
+  const herLog=(P(o)||{}).pcLog,forMe=herLog&&herLog.on&&(herLog.starts||[]).length&&!CYC().on;
+  const L=forMe?herLog:((P(ME)||{}).pcLog||{}),ro=!!forMe,today=tzNow(P(forMe?ME:o).tz).key;
+  if(!forMe&&CYC().on)return null;
+  const save=x=>{if(!DB||!CID)return;DB.doc("couples/"+CID+"/people/"+ME+"/extra/partnerCycle").set(Object.assign({on:true,for:o},x),{merge:true}).catch(syncErr)};
+  const log=k=>{const st=(L.starts||[]).filter(x=>Math.abs(daysBetween(x,k))>10);st.push(k);const nx=st.sort().slice(-24);save({starts:nx});if(US.main.cycleFor!==o)saveUs({cycleFor:o});P(ME).pcLog=Object.assign({},L,{on:true,for:o,starts:nx});ui.cq=false;hearts(null,10);toast("Logged 🌸",shortDate(k));render()};
+  const pick=h("input",{type:"date",class:"inp cydate",max:today,"aria-label":"Pick the day"});pick.onchange=()=>{if(pick.value)log(pick.value)};
+  const quick=()=>h("div",{class:"cfq"},[[0,"Today"],[1,"Yesterday"],[2,"2 days ago"]].map(([n,l])=>h("button",{type:"button",class:"tap",onclick:()=>log(addDays(today,-n))},l)),
+    h("button",{type:"button",class:"tap",onclick:()=>{pick.style.display="block";try{pick.showPicker()}catch(e){pick.focus()}}},"📅 Pick"),pick);
+  const R=(L.starts||[]).length&&L.on!==false?cycCalc(L,today):null;
+  if(!R){if(ro||herOwnShared(o)||US.main.cycleFor===ME)return null;if(!US.main.cycleFor&&!/^fiona/i.test(plainNm(o)))return null;
+    return h("section",{class:"cflo empty"},emo("🌸",58,true),h("b",null,"When did "+nmO+"'s last period start?"),h("small",null,"One tap. The app works out the rest."),quick())}
+  const ph=R.late?"late":R.phase,cw=R.windows.find(w=>today>=w[1]&&today<=w[2]);
+  const dIn=cw?daysBetween(cw[1],today)+1:0,tot=cw?daysBetween(cw[1],cw[2])+1:0,toNext=daysBetween(today,R.next);
+  const sub=ph==="period"?"Day "+dIn+" of "+tot:R.late?R.late+(R.late===1?" day":" days")+" late":"Period in "+toNext+(toNext===1?" day":" days");
+  const phOf=k=>{const w=R.windows.find(w=>k>=w[1]&&k<=w[2]);return w?w[0]:k<R.last?"pre":"late"};
+  const wk=h("div",{class:"cwk"},Array.from({length:7},(_,n)=>addDays(today,n-3)).map(k=>{const p=phOf(k),d=parseKey(k),past=k<=today&&!ro,st=(L.starts||[]).includes(k);
+    return h(past?"button":"div",{type:past?"button":null,class:"cwd"+(k===today?" now":"")+(past?" tap":""),style:"--pc:"+PHC[p],
+      onclick:past?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){wk.querySelectorAll(".arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap again","to log "+shortDate(k)+" as the first day");return}log(k)}:null},
+      h("small",null,k===today?"Today":d.toLocaleDateString("en-US",{weekday:"narrow"})),h("b",null,String(d.getDate())),h("i",null,st?"🌸":""))}));
+  return h("section",{class:"cflo",style:"--pc:"+PHC[ph]},
+    h("button",{type:"button",class:"cfc tap","aria-label":"Open the full cycle",onclick:ro?takeOverSheet:logHerSheet},h("small",null,ro?"Your cycle":nmO+"'s cycle"),emo(CPH[ph][1],48,true),h("b",null,CPH[ph][0]),h("span",null,sub)),
+    h("p",{class:"cftip"},CPH[ph][3]),wk,
+    ro?h("button",{type:"button",class:"cfbtn tap",onclick:takeOverSheet},plainNm(o)+" logs this for you · take over"):
+    ui.cq?quick():h("div",{class:"cfrow"},h("button",{type:"button",class:"cfbtn main tap",onclick:()=>{ui.cq=true;render()}},"🌸 Period started"),h("button",{type:"button",class:"cfbtn tap",onclick:logHerSheet},"✏️ Edit")))}
 const PHC={period:"#ff5d8f",follicular:"#3fd0a6",ovulation:"#ffc94d",luteal:"#d4a35f",pre:"#9b7bff",late:"#ff8a5b"};
 /* the cycle as a ring: colored phases, a dot for today */
 function cycleRing(R,size,today){const len=Math.max(R.len,R.day),r=size/2-9,c=size/2,C=2*Math.PI*r;
@@ -2362,11 +2417,9 @@ function viewProjects(){
     h("div",{class:"pjttop"},emo(e,26,false),h("span",{class:"pjtic"},"＋")),h("b",null,t),h("span",{class:"pjdue"},pid!==ME?"Example "+nm(pid)+" sees":"Example · tap to make it yours"))));
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
-    sharedProjectsSection(),
     papersSection(pid),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
-      list),
-    sharedInvite()
+      list)
   ];
 }
 
@@ -3667,11 +3720,11 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
             h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd))),
             h("b",{class:"spa"},M(b.amt)))}))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
-      h("div",{class:"billh",style:"margin-top:14px"},h("b",null,"🗂️ Categories"),h("small",{class:"billtot"},"tap one to set its amount")),
+      h("div",{class:"bills cats"},h("div",{class:"billh"},h("b",null,"🗂️ Categories"),h("small",{class:"billtot"},"tap one to log or set an amount")),
       h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;
         return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
           h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),ub?h("small",{class:"carry"},"incl. "+M(ub)+" in bills due later"):null,cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
-          l||+c.limit?h("span",{class:"bca"+(s2>l?" ov":" ok")},h("b",null,s2>l?M(s2-l)+" over":M(l-s2)+" left"),h("small",null,M(s2)+" of "+M(l))):h("span",{class:"bca"},M(s2),h("small",null,"tap to set amount")))})),
+          l||+c.limit?h("span",{class:"bca"+(s2>l?" ov":" ok")},h("b",null,s2>l?M(s2-l)+" over":M(l-s2)+" left"),h("small",null,M(s2)+" of "+M(l))):h("span",{class:"bca"},M(s2),h("small",null,"tap to set amount")))}))),
       h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" so far"),lsp?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]+" summary"):null)]}
   else if(tab==="split"){const bal=splitBalance(),it=splitItems(),open=it.filter(x=>!x.settled);
     const line=Math.abs(bal)<0.005?"You're all square 🤝":bal>0?nm(PARTNER)+" owes you "+M(bal):"You owe "+nm(PARTNER)+" "+M(-bal);
@@ -4692,7 +4745,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-d";
+const APP_VERSION="2026-11-20-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
