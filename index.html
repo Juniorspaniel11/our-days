@@ -831,6 +831,15 @@ body.tab-us .gut.top{display:none}
 .mh2 .ghost{background:rgba(255,255,255,.18)!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.6)!important}
 .lvpic img{position:absolute;inset:0}.lvpic .padd{width:18px;height:18px;font-size:13px;right:-3px;bottom:-3px}.lvon{width:11px!important;height:11px!important;right:0!important;top:0!important;box-shadow:0 0 0 2px #2a1a44!important}
 .careact{display:flex;flex-wrap:wrap;gap:8px}.careact>.bigbtn{flex:1 1 30%}
+.cguide{border-radius:20px;padding:14px;background:linear-gradient(160deg,color-mix(in srgb,var(--pc) 22%,var(--card)),var(--card));border:2px solid color-mix(in srgb,var(--pc) 45%,transparent);display:flex;flex-direction:column;gap:8px}
+.cgh{display:flex;flex-direction:column}.cgh b{font-family:var(--fun);font-size:19px}.cgh small{color:var(--muted);font-size:13.5px}
+.cgdo{display:flex;flex-direction:column;gap:6px}.cgi{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:8px 10px;font-weight:700;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.cgeasy{margin:0;font-size:14px}.cgeasy b{color:color-mix(in srgb,var(--pc) 70%,#000)}.cgnext{margin:0;font-size:14px;font-weight:700;color:var(--muted)}.cgsend{margin-top:2px}
+.cystrip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%}.cyd{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:12px;background:rgba(255,255,255,.06)}
+.cyd small{font-size:10.5px;opacity:.75;color:#fff}.cyd b{font-size:15px;color:#fff}.cyd i{display:block;width:70%;height:7px;border-radius:9px;background:var(--pc)}.cyd .cyde{font-size:13px;min-height:16px;line-height:16px}
+.cyd.now{outline:2px solid #fff;background:rgba(255,255,255,.16)}.cyd.now small{opacity:1;font-weight:800}
+.cyleg{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left}.cyleg span{display:flex;align-items:center;gap:7px;font-size:13.5px;color:#fff;opacity:.9}.cyleg i{width:10px;height:10px;border-radius:3px;background:var(--pc);flex:0 0 auto}
+.cylog{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:6px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15);width:100%}.cylog>small{color:#fff;opacity:.75}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2162,7 +2171,7 @@ function careSection(){const o=PARTNER,nmO=plainNm(o),on=needOf(o),mine=needOf(M
   const herLog=(P(o)||{}).pcLog,loggedForMe=herLog&&herLog.on&&(herLog.starts||[]).length&&!CYC().on;
   const cb=(lab,fn)=>h("button",{type:"button",class:"bigbtn cycbtn tap",onclick:fn},h("span",{style:"font-size:20px"},"🌸"),lab);
   const cycBtns=loggedForMe?[cb("My cycle",takeOverSheet)]:[cb(nmO+"'s cycle",logHerSheet),CYC().on?cb("My cycle",cycleSheet):null];
-  return h("div",{class:"ju care",id:"care"},hero,you,
+  return h("div",{class:"ju care",id:"care"},hero,C?careGuide(C,nmO):null,you,
     h("div",{class:"careact"},h("button",{type:"button",class:"bigbtn pzbtn tap",onclick:pauseSheet},h("span",{style:"font-size:20px"},"⏸"),"Pause"),
       ...cycBtns))}
 /* one card on Today: what the partner needs and their heads ups */
@@ -2210,6 +2219,23 @@ const CPH={period:["Period","🩸","On her period","Warmth, rest, easy plans."],
   luteal:["Slowing down","🍂","Energy slowing","Steady reassurance, fewer surprises."],
   pre:["Pre period week","🌙","Extra gentle week","Patience, snacks, lighter plans."],
   late:["Period due","🗓️","Period due any day","Be gentle and flexible."]};
+const CARE={
+  period:{feel:"Low energy, maybe cramps",do:[["🍫","Send a treat or warm food"],["📞","Call and mostly listen"],["🫖","Ask: what would help right now?"]],easy:"Heavy talks, teasing, big plans",note:"Thinking of you today. Can I order you something warm? ❤️"},
+  follicular:{feel:"Energy coming back",do:[["🎬","Plan a fun date or call"],["🗓️","Good time to plan together"],["💬","Bring up things you've been holding"]],easy:"Nothing special, enjoy it",note:"I miss you. Let's plan something fun this week 😊"},
+  ovulation:{feel:"Bright and social",do:[["🎉","Do something fun together"],["📸","Video call, dress up, go out"],["💌","Compliment her"]],easy:"Cancelling plans last minute",note:"You've been on my mind all day. You're beautiful 💕"},
+  luteal:{feel:"Energy slowing down",do:[["🤝","Steady reassurance"],["🧘","Keep plans simple"],["✅","Follow through on what you said"]],easy:"Surprises and loose ends",note:"Just a reminder: I'm proud of you and I'm here ❤️"},
+  pre:{feel:"May feel tired or sensitive",do:[["🍿","Snacks, comfort, a cozy call"],["👂","Listen before fixing"],["🙏","Pray for her by name"]],easy:"Criticism, heavy topics, being late to call",note:"Whatever kind of day it is, I'm on your side. Love you ❤️"},
+  late:{feel:"Period due any day",do:[["🫶","Be flexible with plans"],["📞","Check in a little more"],["🍫","Have comfort ready"]],easy:"Pressure and big plans",note:"Thinking of you. Anything I can do today? ❤️"}};
+function careNoteSheet(ph){const o=PARTNER,ti=h("textarea",{class:"inp",rows:"3","aria-label":"Note"});ti.value=(CARE[ph]||CARE.period).note;
+  openSheet("Note to "+plainNm(o),h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=ti.value.trim();if(!t)return;addTo("nudges",{from:ME,at:Date.now(),kind:"note",title:plainNm(ME)+" 💌",body:t});closeSheet();hearts(null,14);toast("Sent 💌",plainNm(o)+" gets it as a notification")}},
+    h("p",{class:"hint",style:"margin:0"},"Change it however you like."),ti,h("button",{type:"submit",class:"primary"},"💌 Send")))}
+function careGuide(C,nmO){const ph=C.ph||C.phase,G=CARE[ph];if(!G)return null;const R=C.R,today=tzNow(P(PARTNER).tz).key;
+  let upNext=null;if(R&&!R.late){const ws=R.windows,cur=ws.findIndex(w=>today>=w[1]&&today<=w[2]),nx=cur>=0?ws[cur+1]:ws.find(w=>w[1]>today);if(nx){const d=daysBetween(today,nx[1]);upNext=CPH[nx[0]][1]+" "+CPH[nx[0]][0]+(d<=1?" tomorrow":" in "+d+" days")}}
+  return h("section",{class:"cguide",style:"--pc:"+PHC[ph]},h("div",{class:"cgh"},h("b",null,"How to love her today"),h("small",null,G.feel)),
+    h("div",{class:"cgdo"},G.do.map(([e,t])=>h("div",{class:"cgi"},emo(e,26,false),h("span",null,t)))),
+    h("p",{class:"cgeasy"},h("b",null,"Go easy on: "),G.easy),
+    upNext?h("p",{class:"cgnext"},"Up next: "+upNext):null,
+    h("button",{type:"button",class:"primary cgsend tap",onclick:()=>careNoteSheet(ph)},"💌 Send "+nmO+" a sweet note"))}
 const PHC={period:"#ff5d8f",follicular:"#3fd0a6",ovulation:"#ffc94d",luteal:"#d4a35f",pre:"#9b7bff",late:"#ff8a5b"};
 /* the cycle as a ring: colored phases, a dot for today */
 function cycleRing(R,size,today){const len=Math.max(R.len,R.day),r=size/2-9,c=size/2,C=2*Math.PI*r;
@@ -2255,12 +2281,19 @@ function cycVisual(R,today,logFn,who){const out=[];
   const otherBtn=h("button",{type:"button",class:"cyother tap",onclick:()=>{other.style.display="block";try{other.showPicker()}catch(e){other.focus()}}},"📅 Another day");
   if(!R){out.push(h("div",{class:"cyhero"},h("span",{class:"cyhe",style:"font-size:64px;line-height:1"},"🌸"),h("b",null,"When did "+who+" last period start?")),
       h("button",{type:"button",class:"cystart big tap",onclick:()=>logFn(today)},"🩸 Today"),otherBtn,other);return out}
-  const ph=R.late?"late":(R.windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0];
-  out.push(h("div",{class:"cyhero"},cycleRing(R,190,today),h("b",{style:"color:"+PHC[ph]},CPH[ph][1]+" "+CPH[ph][0]),
-      h("span",null,R.late?"Period may be "+R.late+(R.late===1?" day":" days")+" late":"Next period · "+parseKey(R.next).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}))),
-    h("button",{type:"button",class:"cystart big tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to log";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🩸 Period started today"}},4000);return}logFn(today)}},"🩸 Period started today"),
-    h("div",{class:"row",style:"justify-content:center"},otherBtn),other,
-    h("div",{class:"cytl"},R.windows.filter(w=>w[2]>=today).slice(0,5).map(w=>h("div",{class:"cytr",style:"--pc:"+PHC[w[0]]},h("span",null,CPH[w[0]][1]),h("b",null,CPH[w[0]][0]),h("small",null,shortDate(w[1])+(w[1]!==w[2]?" – "+shortDate(w[2]):""))))));
+  const ph=R.late?"late":(R.windows.find(w=>today>=w[1]&&today<=w[2])||["late"])[0],cw=R.windows.find(w=>today>=w[1]&&today<=w[2]);
+  const left=cw?daysBetween(today,cw[2]):0,phOf=k=>{const w=R.windows.find(w=>k>=w[1]&&k<=w[2]);return w?w[0]:"late"};
+  const plain=R.late?"Her period may be "+R.late+(R.late===1?" day":" days")+" late":ph==="period"?"Day "+R.day+" of her period"+(left?" · ends in about "+left+(left===1?" day":" days"):" · last day"):CPH[ph][2]+(left?" · "+(left+1)+" more days":" · last day");
+  const days=Array.from({length:14},(_,n)=>addDays(today,n));
+  const strip=h("div",{class:"cystrip"},days.map((k,n)=>{const p=phOf(k),d=parseKey(k),first=n===0||phOf(addDays(k,-1))!==p;
+    return h("div",{class:"cyd"+(n===0?" now":""),style:"--pc:"+PHC[p]},h("small",null,n===0?"Today":d.toLocaleDateString("en-US",{weekday:"short"})),h("b",null,String(d.getDate())),h("i"),h("span",{class:"cyde"},first?CPH[p][1]:""))}));
+  const used=[...new Set(days.map(phOf))];
+  const logBtn=h("button",{type:"button",class:"cyother tap",onclick:ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to confirm";setTimeout(()=>{if(b.isConnected){b.dataset.arm="";b.textContent="🩸 New period started today"}},4000);return}logFn(today)}},"🩸 New period started today");
+  out.push(h("div",{class:"cyhero"},cycleRing(R,170,today),h("b",{style:"color:"+PHC[ph]},CPH[ph][1]+" "+CPH[ph][0]),h("span",null,plain),
+      h("span",{style:"opacity:.75;font-size:13.5px"},"Next period around "+parseKey(R.next).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+(R.guess?" (a guess until you log a second month)":""))),
+    h("small",{class:"cyh",style:"color:#fff;opacity:.8"},"Next 2 weeks"),strip,
+    h("div",{class:"cyleg"},used.map(p=>h("span",{style:"--pc:"+PHC[p]},h("i"),CPH[p][1]+" "+CPH[p][0]+" · "+CPH[p][3]))),
+    h("div",{class:"cylog"},h("small",null,"When a new period starts, log it here:"),h("div",{class:"row",style:"justify-content:center;gap:8px"},logBtn,otherBtn),other));
   return out}
 const cycKnobs=(L,save,re)=>[(L.starts||[]).length?h("div",{class:"chips"},(L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button","aria-label":"Remove "+shortDate(k),onclick:()=>{save({starts:(L.starts||[]).filter(x=>x!==k)});re()}},shortDate(k)+" ×"))):null,
   h("div",{class:"row",style:"align-items:center;gap:8px"},h("span",{class:"hint"},"Period length"),h("button",{type:"button",class:"ghost",onclick:()=>{save({plen:Math.max(2,(+L.plen||5)-1)});re()}},"−"),h("b",null,(+L.plen||5)+" days"),h("button",{type:"button",class:"ghost",onclick:()=>{save({plen:Math.min(10,(+L.plen||5)+1)});re()}},"+"))];
@@ -4646,7 +4679,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-b";
+const APP_VERSION="2026-11-20-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
