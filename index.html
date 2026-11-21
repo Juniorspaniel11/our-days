@@ -954,6 +954,13 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .libi{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 .libgo{font-size:14px;font-weight:800;color:#fff;background:rgba(255,255,255,.18);border-radius:99px;padding:5px 12px}.libt.add .libgo{background:#f6d38a;color:#1b1436}
 .libed{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.16);font-size:14px;cursor:pointer}
+.bills.subs{--mc:#d9468f}.subsum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.subsum>div{border-radius:14px;padding:8px;text-align:center;background:color-mix(in srgb,#d9468f 12%,transparent)}.subsum b{display:block;font-size:17px}.subsum small{color:var(--muted);font-size:12px}
+.nbbook{align-items:center!important;padding-top:6px!important;padding-bottom:6px!important}.nbbook .nbtext{display:flex;flex-direction:column;line-height:1.15}.nbsubt{font-size:12px;color:#7a6f86;font-family:system-ui,-apple-system,sans-serif;font-weight:600;margin-top:3px;letter-spacing:0}.nbbook .nbbox{font-size:15px}.nbch{font-weight:800!important;opacity:1!important}
+.bk{display:flex;flex-direction:column;gap:12px}.bkh{display:flex;align-items:center;gap:12px}.bkc{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:color-mix(in srgb,#2a6f97 18%,transparent)}
+.bkh b{font-size:19px;display:block;letter-spacing:-.01em}.bkh small{color:var(--muted)}.bknow{text-align:center}.bknow b{display:block;font-size:24px;letter-spacing:-.02em}.bknow small{color:var(--muted)}
+.bkbar{height:10px;border-radius:9px;background:color-mix(in srgb,#2a6f97 15%,transparent);overflow:hidden}.bkbar i{display:block;height:100%;background:linear-gradient(90deg,#2a6f97,#16a37f);border-radius:9px}
+.bkdots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}.bkdots span{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:12px;font-weight:700;background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--muted)}
+.bkdots span.on{background:#16a37f;color:#fff}.bkdots span.nx{outline:2px solid #16a37f;color:var(--ink)}.bkgo{font-size:17px!important;padding:14px!important}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2054,12 +2061,40 @@ function todayHero(pid){
       h("div",{class:"daddrow"},ai,h("label",{class:"dtime"},h("span",null,"⏰"),at),h("button",{type:"submit"},"+ Add")),
       h("button",{type:"button",class:"dlink",onclick:()=>itemSheet(pid,k,null)},"More options: repeat, end time, another day")));
 }
+const isBookH=x=>x.kind==="book"||/\b(read|reading|book)\b/i.test(x.title||"");
+function bookSheet(pid,hid){const p=P(pid),x=(p.habits||[]).find(y=>y.id===hid);if(!x)return;const k=tzNow(p.tz).key,d=day(pid,k);
+  const save=o=>{Object.assign(x,o);persist();render()};
+  const setup=!x.book||ui.bookEdit;
+  if(setup){const bt=h("input",{type:"text",class:"inp",placeholder:"Book title, e.g. Create Your Own Future","aria-label":"Book title"});bt.value=x.book||"";
+    const au=h("input",{type:"text",class:"inp",placeholder:"Author (optional)","aria-label":"Author"});au.value=x.author||"";
+    const ch=h("input",{type:"number",min:"0",max:"200",class:"inp",placeholder:"Chapters finished so far","aria-label":"Chapters finished"});ch.value=x.book?String(x.ch||0):"";
+    const tt=h("input",{type:"number",min:"0",max:"200",class:"inp",placeholder:"Total chapters (optional)","aria-label":"Total chapters"});tt.value=x.total||"";
+    openSheet("📖 "+(x.book?"Edit book":"What are you reading?"),h("form",{class:"body",onsubmit:e=>{e.preventDefault();const t=bt.value.trim();if(!t){bt.focus();return}ui.bookEdit=false;
+        save({kind:"book",book:t,author:au.value.trim(),ch:Math.max(0,parseInt(ch.value)||0),total:Math.max(0,parseInt(tt.value)||0)});bookSheet(pid,hid)}},
+      bt,au,h("p",{class:"hint",style:"margin:0"},"Chapters you've finished"),ch,tt,h("button",{type:"submit",class:"primary"},"Save")));return}
+  const c=x.ch||0,T=x.total||0,done=T&&c>=T,pc=T?Math.round(c/T*100):0;
+  const fin=ev=>{const n=c+1;const o={ch:n,log:(x.log||[]).concat([{ch:n,d:k}]).slice(-200)};save(o);if(!d.habits.includes(hid))toggleIn(pid,k,"habits",hid);hearts(ev.currentTarget,10);
+    toast("Chapter "+n+" done 📖",x.book+(T&&n>=T?" · finished the book! 🎉":""));if(T&&n>=T)confetti(80);bookSheet(pid,hid)};
+  const last=(x.log||[]).slice().reverse().find(l=>l.ch===c);
+  openSheet("📖 Reading",h("div",{class:"body bk"},
+    h("div",{class:"bkh"},h("span",{class:"bkc"},emo("📖",46,true)),h("div",null,h("b",null,x.book),x.author?h("small",null,"by "+x.author):null)),
+    h("div",{class:"bknow"},h("b",null,done?"Finished 🎉":c?"Chapter "+c+" done":"Not started"),h("small",null,T?c+" of "+T+" chapters · "+pc+"%":last?"Last one on "+shortDate(last.d):"Tap below when you finish a chapter")),
+    T?h("div",{class:"bkbar"},h("i",{style:"width:"+pc+"%"})):null,
+    T?h("div",{class:"bkdots"},Array.from({length:Math.min(T,40)},(_,i)=>h("span",{class:i<c?"on":i===c?"nx":""},String(i+1)))):null,
+    done?h("button",{type:"button",class:"primary",onclick:()=>{save({book:"",author:"",ch:0,total:0,log:[],past:(x.past||[]).concat([{book:x.book,author:x.author,at:k}])});ui.bookEdit=false;bookSheet(pid,hid)}},"📚 Start a new book")
+      :h("button",{type:"button",class:"primary bkgo",onclick:fin},"✓ Finished chapter "+(c+1)),
+    h("div",{class:"row",style:"gap:8px;justify-content:center"},c?h("button",{type:"button",class:"ghost",onclick:()=>{save({ch:c-1,log:(x.log||[]).filter(l=>l.ch!==c)});bookSheet(pid,hid)}},"↩︎ Undo chapter "+c):null,
+      h("button",{type:"button",class:"ghost",onclick:()=>{ui.bookEdit=true;bookSheet(pid,hid)}},"✏️ Edit book")),
+    (x.past||[]).length?h("small",{class:"hint",style:"text-align:center"},"Finished before: "+x.past.map(b=>b.book).join(", ")):null))}
 function growWeek(pid,hid){const p=P(pid),k=tzNow(p.tz).key;let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c}
 function growMe(pid){
   const ro=pid!==ME,p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];
   return h("section",{class:"notebook"},
     h("div",{class:"nbhead"},h("span",{class:"nbtitle"},ro?nm(pid)+" is growing 🌱":"Growing me 🌱"),hb.length?h("span",{class:"nbsub"},"this week"):null,ro?null:h("button",{type:"button",class:"nbedit",onclick:()=>growSheet(pid)},hb.length?"edit":"add")),
     hb.map(x=>{const on=d.habits.includes(x.id),w=growWeek(pid,x.id);
+      if(isBookH(x)){const c=x.ch||0,T=x.total||0;return h("button",{type:"button",class:"nbrow nbbook"+(on?" on":""),disabled:ro,"aria-label":(x.book||x.title)+(x.book?", chapter "+c+" done":", set up the book"),onclick:()=>{if(!ro)bookSheet(pid,x.id)}},
+        h("span",{class:"nbbox"},on?"✓":"📖"),h("span",{class:"nbtext"},x.book||x.title,x.book?h("small",{class:"nbsubt"},T?c+" of "+T+" chapters":c?"Chapter "+c+" done":"Not started"):null),
+        h("span",{class:"nbcount nbch"},x.book?(T&&c>=T?"🎉":"Ch "+c):"Set up"))}
       return h("button",{type:"button",class:"nbrow"+(on?" on":""),disabled:ro,"aria-pressed":String(on),"aria-label":x.title+(on?", done today. Tap to undo":", tap when you did it today"),
         onclick:ev=>{if(ro)return;if(!on){hearts(ev.currentTarget,6);toast("Nice 🌱",x.title+" · "+(w+1)+"× this week")}toggleIn(pid,k,"habits",x.id)}},
         h("span",{class:"nbbox"},on?"✓":""),h("span",{class:"nbtext"},x.title),h("span",{class:"nbcount",title:"Times in the last 7 days"},w?w+"×":""))}),
@@ -3760,10 +3795,32 @@ const billSid=(b,mk)=>"bill_"+b.id+"_"+mk;
 const billDayIn=(b,mk)=>{const last=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate();return mk+"-"+String(Math.min(+b.day||1,last)).padStart(2,"0")};
 const billEntry=(b,mk)=>(MONEY().spend||{})[billSid(b,mk)];
 function billLog(b,mk){return {cat:b.cat,amt:+b.amt,note:b.name,by:b.by||ME,at:Date.now(),mk,bill:b.id}}
+const billDue=(b,mk)=>!(b.yearly&&+mk.slice(5)!==+b.mon);
+const subMonthly=b=>b.yearly?(+b.amt||0)/12:(+b.amt||0);
 function autoBills(){if(PREVIEW||!DB||!CID)return;const mk=mKey(),today=usDay(),o={};
-  bills().forEach(b=>{if(b.from&&b.from>mk)return;if(billEntry(b,mk))return;if(billDayIn(b,mk)<=today)o[billSid(b,mk)]=billLog(b,mk)});
+  bills().forEach(b=>{if(b.from&&b.from>mk)return;if(!billDue(b,mk))return;if(billEntry(b,mk))return;if(billDayIn(b,mk)<=today)o[billSid(b,mk)]=billLog(b,mk)});
   if(Object.keys(o).length)saveMoney({spend:o})}
-function upcomingBills(mk){const today=usDay();return bills().filter(b=>!(b.from&&b.from>mk)&&!billEntry(b,mk)&&billDayIn(b,mk)>today)}
+function upcomingBills(mk){const today=usDay();return bills().filter(b=>!(b.from&&b.from>mk)&&billDue(b,mk)&&!billEntry(b,mk)&&billDayIn(b,mk)>today)}
+const SUBE=[[/netflix|hulu|disney|hbo|max\b|peacock|paramount|prime video/i,"🎬"],[/spotify|apple music|music|audible/i,"🎵"],[/youtube/i,"▶️"],[/icloud|google one|dropbox|onedrive|storage/i,"☁️"],[/amazon|prime/i,"📦"],[/gym|fitness|planet/i,"💪"],[/chatgpt|claude|openai|gemini|copilot|\bai\b/i,"🤖"],[/phone|mobile|t-mobile|verizon|at&t|mint/i,"📱"],[/internet|wifi|xfinity|spectrum/i,"🌐"],[/adobe|canva|microsoft|office|notion|zotero|grammarly/i,"🧰"],[/news|times|journal|medium|substack/i,"📰"],[/game|xbox|playstation|nintendo/i,"🎮"],[/bible|church|tithe/i,"🙏"]];
+const subEmo=n=>{for(const[r,e]of SUBE)if(r.test(n))return e;return "🔄"};
+function subNext(b){const t=usDay(),mk=t.slice(0,7);if(!b.yearly){const d=billDayIn(b,mk);return d>=t?d:billDayIn(b,nextMk(mk))}
+  const y=+t.slice(0,4),mm=String(b.mon).padStart(2,"0");let d=billDayIn(b,y+"-"+mm);if(d<t)d=billDayIn(b,(y+1)+"-"+mm);return d}
+function subSheet(b0){const b=b0?Object.assign({},b0):{cat:"fun",day:+usDay().slice(8),yearly:false,mon:+usDay().slice(5,7)};juSheet(b0?"Edit subscription":"New subscription",()=>{
+  const n=h("input",{type:"text",class:"inp",placeholder:"Name, e.g. Netflix, Spotify, iCloud, gym","aria-label":"Subscription name"});n.value=b.name||"";
+  const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Price","aria-label":"Price"});a.value=b.amt||"";
+  const d=h("input",{type:"number",min:"1",max:"31",class:"inp",placeholder:"Day it renews","aria-label":"Day it renews"});d.value=b.day||"";
+  const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const ms=h("select",{class:"inp","aria-label":"Month it renews"},MON.map((m,i)=>h("option",{value:String(i+1)},m)));ms.value=String(b.mon||1);
+  const mrow=h("div",{style:"display:"+(b.yearly?"block":"none")},h("p",{class:"hint",style:"margin:0 0 4px"},"Month it renews"),ms);
+  const cyc=h("div",{class:"seg",style:"width:100%"},[[false,"Monthly"],[true,"Yearly"]].map(([v,l])=>h("button",{type:"button","aria-pressed":String(!!b.yearly===v),onclick:ev=>{b.yearly=v;mrow.style.display=v?"block":"none";a.placeholder=v?"Price per year":"Price per month";cyc.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},l)));
+  a.placeholder=b.yearly?"Price per year":"Price per month";
+  const chips=h("div",{class:"chips"},bcats().map(x=>h("button",{type:"button","aria-pressed":String(x.id===b.cat),onclick:ev=>{b.cat=x.id;chips.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},x.e+" "+x.name)));
+  return [h("form",{class:"body",onsubmit:e=>{e.preventDefault();const nm0=n.value.trim(),v=amtIn(a.value),dd=Math.min(31,Math.max(1,parseInt(d.value)||0));
+      if(!nm0){n.focus();return}if(!v){toast("Price needed","");return}if(!parseInt(d.value)){toast("Which day?","The day of the month it renews, 1 to 31");return}if(!noSensitive(nm0))return;
+      const mk=mKey(),id=b0?b0.id:uid(),rec={name:nm0,amt:v,cat:b.cat,day:dd,sub:true,yearly:!!b.yearly,mon:+ms.value,by:b0?b0.by||ME:ME,at:b0?b0.at||Date.now():Date.now()};if(!b0)rec.from=mk;
+      saveMoney({bills:{[id]:rec}});closeSheet();toast(b0?"Updated":"Added 🔄",nm0+" · "+money2(v)+(b.yearly?" a year":" a month"));setTimeout(autoBills,600)}},
+    n,cyc,a,d,mrow,h("p",{class:"hint"},"Category"),chips,h("button",{type:"submit",class:"primary"},b0?"Save":"Add subscription")),
+    b0?confirmBtn("Cancelled it · remove",()=>{saveMoney({bills:{[b0.id]:{removed:true}}});closeSheet();toast("Removed",b0.name+" no longer counts")}):null]})}
 function billSheet(b0){const b=b0?Object.assign({},b0):{cat:"home",day:1};juSheet(b0?"Edit bill":"New bill",()=>{
   const n=h("input",{type:"text",class:"inp",placeholder:"Name, e.g. Rent, Phone, Netflix, Tithe","aria-label":"Bill name"});n.value=b.name||"";
   const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount each month","aria-label":"Amount"});a.value=b.amt||"";
@@ -3810,7 +3867,7 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
     const lm=addDays(mk+"-01",-1).slice(0,7),lsp=spentIn(lm),up=upcomingBills(mk),upv=up.reduce((a,b)=>a+(+b.amt||0),0);
     const upC=id=>up.filter(b=>b.cat===id).reduce((a,b)=>a+(+b.amt||0),0),used=sp+upv;
     const INC=incomeTotal(),planV=INC||lim;lim=planV;const leftv=lim-used,paidB=spendIn(mk).filter(x=>x.bill).reduce((a,x)=>a+(+x.amt||0),0),billsM=paidB+upv,other=sp-paidB;
-    const BL=bills(),today=usDay();
+    const BL=bills().filter(b=>!b.sub),SL=bills().filter(b=>b.sub),today=usDay();
     const due=moneySummaryDue();
     pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
       lim?(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1,base=Math.max(lim,used)||1,pc=v=>Math.max(0,v)/base*100;
@@ -3843,6 +3900,14 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
             h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd))),
             h("b",{class:"spa"},M(b.amt)))}))
           :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
+      (()=>{const tot=SL.reduce((a,b)=>a+subMonthly(b),0),srt=SL.slice().sort((x,y)=>subNext(x)<subNext(y)?-1:1);
+        return h("div",{class:"bills subs"},h("div",{class:"billh"},h("b",null,"🔄 Subscriptions"),h("button",{type:"button",class:"lnk",onclick:()=>subSheet(null)},"+ Add")),
+          SL.length?h("div",{class:"subsum"},h("div",null,h("b",null,M(tot)),h("small",null,"a month")),h("div",null,h("b",null,M(tot*12)),h("small",null,"a year")),h("div",null,h("b",null,String(SL.length)),h("small",null,SL.length===1?"subscription":"subscriptions"))):null,
+          SL.length?h("div",{class:"billrow"},srt.map(b=>{const nx=subNext(b),dl=daysBetween(today,nx);
+            return h("button",{type:"button",class:"billr tap"+(dl<=3?" soon":""),style:"--bc:#d9468f",onclick:()=>subSheet(b)},h("span",{class:"bci"},emo(subEmo(b.name),20,false)),
+              h("span",{class:"bcn"},h("b",null,b.name),h("small",null,(dl===0?"Renews today":dl===1?"Renews tomorrow":"Renews "+shortDate(nx))+(b.yearly?" · yearly":""))),
+              h("span",{class:"spa"},h("b",null,M(b.amt)),h("small",{style:"display:block;font-size:11.5px;color:var(--muted);text-align:right"},b.yearly?"/yr ≈ "+M(subMonthly(b))+"/mo":"/mo")))}))
+          :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Netflix, Spotify, iCloud, gym… Add each once to see what they cost you every month."))})(),
       h("div",{class:"bills cats"},h("div",{class:"billh"},h("b",null,"🗂️ Categories"),h("small",{class:"billtot"},"tap one to log or set an amount")),
       h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;
         return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
@@ -4887,7 +4952,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-n";
+const APP_VERSION="2026-11-20-o";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
