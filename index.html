@@ -2678,14 +2678,13 @@ function viewToday(){
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
   return [
     isT&&pid===ME?pauseBanner():null,
-    isT&&pid===ME?careToday():null,
     isT?todayHero(pid):null,
-    isT?pulse(pid):null,
     isT?growMe(pid):null,
     pid===ME?bigBanner():null,
     countdownStrip(pid),
     weekStrip(pid),
-    isT?null:dayCard(pid,sel,isT?"Today":sel===addDays(n.key,1)?"Tomorrow":longDate(sel))
+    isT?null:dayCard(pid,sel,isT?"Today":sel===addDays(n.key,1)?"Tomorrow":longDate(sel)),
+    isT?pulse(pid):null
   ].filter(Boolean);
 }
 
@@ -5169,7 +5168,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-21-e";
+const APP_VERSION="2026-11-21-f";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
