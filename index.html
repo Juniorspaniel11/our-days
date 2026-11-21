@@ -975,6 +975,21 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mitrackc{fill:none;stroke:color-mix(in srgb,var(--ink) 7%,transparent);stroke-width:14}.miseg{fill:none;stroke-width:14;stroke-linecap:round}
 .midonc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.midonc b{font-size:16px;letter-spacing:-.02em}.midonc small{font-size:11.5px;color:var(--muted)}
 .mileg{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}.mileg>div{display:flex;align-items:center;gap:7px;font-size:13.5px}.mileg i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}.mileg span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mileg b{font-size:13.5px}
+/* ---- week and projects at a glance ---- */
+.wg{border-radius:24px;padding:16px 14px;background:linear-gradient(160deg,color-mix(in srgb,#7b6cf6 9%,var(--card)),var(--card) 60%);border:1px solid var(--line);box-shadow:0 10px 26px rgba(40,20,90,.08)}
+.wgh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.wgh b{font-size:20px;letter-spacing:-.02em}.wgh em{font-family:"Crimson Pro",Georgia,serif;font-style:italic;font-weight:600;color:#7b6cf6;font-size:22px}.wgh small{color:var(--muted);font-size:12.5px}
+.wgg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.wgc{border-radius:18px;padding:11px 11px 9px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.wgt{display:flex;align-items:center;gap:6px}.wgt small{font-size:12.5px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wgi{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--wc) 16%,transparent);flex:0 0 auto}
+.wgv{font-size:26px;letter-spacing:-.03em;line-height:1.1;margin-top:4px}.wgs{font-size:12px;color:var(--muted)}
+.wgspk{height:30px;margin:2px 0}.wgspk .spk{width:100%;height:30px;display:block}
+.wgdots{display:flex;gap:5px;height:30px;align-items:center;margin:2px 0}.wgdots i{flex:1;height:10px;border-radius:9px;background:color-mix(in srgb,var(--ink) 9%,transparent)}.wgdots i.on{background:#e0a21e}.wgdots i.now:not(.on){background:transparent;box-shadow:inset 0 0 0 2px color-mix(in srgb,#e0a21e 60%,transparent)}
+.pg .wgh em{color:#2a6f97}.pg{background:linear-gradient(160deg,color-mix(in srgb,#2a6f97 10%,var(--card)),var(--card) 60%)}
+.pgg{display:grid;grid-template-columns:1fr 1fr;gap:9px}.pgt{border-radius:18px;padding:11px;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--wc);display:flex;flex-direction:column;min-width:0}
+.pgt small{font-size:12.5px;color:var(--muted);font-weight:700}.pgt b{font-size:28px;letter-spacing:-.03em;line-height:1.15}.pgt span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pjst{display:flex;align-items:center;gap:12px;margin-top:8px}.pjring{position:relative;width:46px;height:46px;color:#fff;flex:0 0 auto}.pjring svg{display:block}.pjring small{position:absolute;inset:0;display:grid;place-items:center;font-size:11.5px;font-weight:800}
+.pjsn{display:flex;flex-direction:column;line-height:1.1}.pjsn b{font-size:15.5px;white-space:nowrap}.pjsn small{font-size:11.5px;opacity:.85}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2561,6 +2576,7 @@ function viewToday(){
     isT&&pid===ME?pauseBanner():null,
     isT&&pid===ME?careToday():null,
     isT?todayHero(pid):null,
+    isT?weekGlance(pid):null,
     isT?growMe(pid):null,
     pid===ME?bigBanner():null,
     countdownStrip(pid),
@@ -2569,6 +2585,39 @@ function viewToday(){
   ].filter(Boolean);
 }
 
+/* ---------- at a glance helpers: sparklines and rings ---------- */
+function sparkSvg(vals,col){const W=100,H=30,mx=Math.max(1,...vals),st=W/(vals.length-1||1);const pts=vals.map((v,i)=>[i*st,H-3-(v/mx)*(H-8)]);
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");const last=pts[pts.length-1];
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" class="spk" aria-hidden="true"><path d="'+d+' L'+W+' '+H+' L0 '+H+' Z" fill="'+col+'" opacity=".14"/><path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="'+last[0]+'" cy="'+last[1]+'" r="3" fill="'+col+'"/></svg>'}
+function ringSvg(pct,col,size){const R=(size-8)/2,C=2*Math.PI*R,l=Math.max(0,Math.min(1,pct))*C;
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" aria-hidden="true"><circle cx="'+size/2+'" cy="'+size/2+'" r="'+R+'" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="7"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+l+' '+C+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'}
+const htm=(tag,cls,html)=>{const e=h(tag,{class:cls});e.innerHTML=html;return e};
+function weekGlance(pid){const p=P(pid),n=tzNow(p.tz),ks=Array.from({length:7},(_,i)=>addDays(n.key,i-6));
+  const done=ks.map(k=>{try{const d=(p.days||{})[k];return (d?(d.tasks||[]).filter(x=>x.t&&x.d).length:0)+itemsFor(pid,k).filter(x=>x.done).length}catch(e){return 0}});
+  const foc=ks.map(k=>Object.values((p.focus||{})[k]||{}).reduce((a,v)=>a+(+v||0),0));
+  const chs=ks.map(k=>(p.habits||[]).reduce((a,x)=>a+(x.log||[]).filter(l=>l.d===k).length,0));
+  const plog=((S.shared||{}).prayer||{}).log||{},pr=ks.map(k=>plog[k]?1:0);let st=0;try{st=prayerStreak()}catch(e){}
+  const sum=a=>a.reduce((x,y)=>x+y,0),fm=sum(foc),hm=m=>m>=60?Math.floor(m/60)+"h"+(m%60?" "+m%60+"m":""):m+"m";
+  const card=(c,e,lab,val,sub,viz)=>h("div",{class:"wgc",style:"--wc:"+c},h("div",{class:"wgt"},h("span",{class:"wgi"},emo(e,18,false)),h("small",null,lab)),h("b",{class:"wgv"},val),viz,h("small",{class:"wgs"},sub));
+  const dots=htm("div","wgdots",pr.map((v,i)=>'<i class="'+(v?"on":"")+(i===6?" now":"")+'"></i>').join(""));
+  if(!sum(done)&&!fm&&!sum(chs)&&!st)return null;
+  return h("section",{class:"wg"},h("div",{class:"wgh"},h("b",null,"Your week ",h("em",null,"at a glance")),h("small",null,"Last 7 days")),
+    h("div",{class:"wgg"},
+      card("#7b6cf6","✅","Things done",String(sum(done)),done[6]?done[6]+" today":"none yet today",htm("div","wgspk",sparkSvg(done,"#7b6cf6"))),
+      card("#16a37f","⏱️","Focus time",fm?hm(fm):"0m",foc[6]?hm(foc[6])+" today":"start a focus",htm("div","wgspk",sparkSvg(foc,"#16a37f"))),
+      card("#e0a21e","🙏","Prayer streak",String(st),st===1?"night in a row":"nights in a row",dots),
+      card("#2a6f97","📖","Chapters read",String(sum(chs)),"this week",htm("div","wgspk",sparkSvg(chs,"#2a6f97")))))}
+function projGlance(pid){const p=P(pid),n=tzNow(p.tz),mon=addDays(n.key,-((n.dow+6)%7)),act=(p.projects||[]).filter(x=>!x.done);if(!act.length)return null;
+  let foc=0;for(let i=0;i<7;i++){const f=(p.focus||{})[addDays(mon,i)]||{};act.forEach(x=>{foc+=+f[x.id]||0})}
+  const steps=act.reduce((a,x)=>a+(x.steps||[]).filter(s=>s.date>=mon).length,0);
+  const due=act.filter(x=>x.target&&x.target>=n.key).sort((a,b)=>a.target.localeCompare(b.target))[0];
+  const hm=m=>m>=60?Math.floor(m/60)+"h"+(m%60?" "+m%60+"m":""):m+"m";
+  const t=(c,lab,val,sub)=>h("div",{class:"pgt",style:"--wc:"+c},h("small",null,lab),h("b",null,val),h("span",null,sub));
+  return h("section",{class:"wg pg"},h("div",{class:"wgh"},h("b",null,"Projects ",h("em",null,"at a glance")),h("small",null,"This week")),
+    h("div",{class:"pgg"},t("#2a6f97","Active",String(act.length),act.filter(x=>x.focus).length?act.filter(x=>x.focus).length+" in focus":"projects"),
+      t("#7b6cf6","Steps done",String(steps),"since Monday"),t("#16a37f","Focus",foc?hm(foc):"0m","this week"),
+      t("#e0662b","Next deadline",due?String(daysBetween(n.key,due.target)):"—",due?(daysBetween(n.key,due.target)===1?"day · ":"days · ")+due.title:"none set")))}
+function projStart(x){const c=[x.since,x.start,...(x.steps||[]).map(s=>s.date)].filter(Boolean).sort();return c[0]||null}
 function viewProjects(){
   const pid=me(),p=P(pid),n=tzNow(p.tz),mon=addDays(n.key,-((n.dow+6)%7));
   const tot={};for(let i=0;i<7;i++){const f=p.focus[addDays(mon,i)]||{};p.projects.forEach(x=>{if(f[x.id])tot[x.id]=(tot[x.id]||0)+f[x.id]})}
@@ -2582,6 +2631,7 @@ function viewProjects(){
     h("div",{class:"pjttop"},emo(e,26,false),h("span",{class:"pjtic"},"＋")),h("b",null,t),h("span",{class:"pjdue"},pid!==ME?"Example "+nm(pid)+" sees":"Example · tap to make it yours"))));
   p.projects.filter(x=>!x.done).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
   return [
+    projGlance(pid),
     papersSection(pid),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
       list)
@@ -2696,7 +2746,11 @@ function projectCard(pid,x){
   const open=ui.pjOpen===x.id||edit,dd=x.target?daysBetween(n.key,x.target):null;
   if(!open)return h("button",{type:"button",class:"pjt tap"+(x.focus?" focus":""),style:"--pc:"+colorOf(pid,x),"aria-label":x.title+". Open",onclick:()=>{ui.pjOpen=x.id;render()}},
     h("div",{class:"pjttop"},emo(kwEmoji(x.title)||"📁",26,false),h("span",{class:"pjtic"},(x.focus?"★ ":"")+(x.pinned?"📌":""))),
-    h("b",null,x.title),x.target?h("span",{class:"pjdue"+(dd<=7?" soon":"")},dd<0?(-dd)+" days overdue":dd===0?"Due today":"Due "+shortDate(x.target)):null);
+    h("b",null,x.title),x.target?h("span",{class:"pjdue"+(dd<=7?" soon":"")},dd<0?(-dd)+" days overdue":dd===0?"Due today":"Due "+shortDate(x.target)):null,
+    (()=>{const st=projStart(x),fm=focusMins(pid,fid),ns=(x.steps||[]).length;let ring=null;
+      if(x.target&&st&&x.target>st){const tot=daysBetween(st,x.target),gone=Math.max(0,daysBetween(st,n.key)),pc=Math.min(1,gone/tot);
+        ring=h("span",{class:"pjring"});ring.innerHTML=ringSvg(pc,dd<=7?"#e0662b":"#fff",46);ring.append(h("small",null,dd<0?"late":dd+"d"))}
+      return h("div",{class:"pjst"},ring,h("span",{class:"pjsn"},h("b",null,String(ns)),h("small",null,ns===1?"step":"steps")),fm?h("span",{class:"pjsn"},h("b",null,hmShort(fm)),h("small",null,"focused")):null)})());
   const c=h("div",{class:"pj open"+(x.focus?" focus":""),style:"--pc:"+colorOf(pid,x)});
   const meta=[];if(x.target){const d=daysBetween(n.key,x.target);meta.push(h("span",{class:d<=7?"soon":""},shortDate(x.target)+(d<0?" · "+(-d)+" days overdue":d===0?" · today":" · in "+d+" days")))}
   if(x.steps&&x.steps.length)meta.push(h("span",null,x.steps.length+" step"+(x.steps.length>1?"s":"")+" done"));
@@ -4991,7 +5045,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-21-a";
+const APP_VERSION="2026-11-21-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
