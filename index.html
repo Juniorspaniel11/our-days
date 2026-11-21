@@ -961,6 +961,20 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .bkbar{height:10px;border-radius:9px;background:color-mix(in srgb,#2a6f97 15%,transparent);overflow:hidden}.bkbar i{display:block;height:100%;background:linear-gradient(90deg,#2a6f97,#16a37f);border-radius:9px}
 .bkdots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}.bkdots span{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:12px;font-weight:700;background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--muted)}
 .bkdots span.on{background:#16a37f;color:#fff}.bkdots span.nx{outline:2px solid #16a37f;color:var(--ink)}.bkgo{font-size:17px!important;padding:14px!important}
+/* ---- money at a glance ---- */
+.mins{margin-top:12px;border-radius:24px;padding:16px 14px;background:linear-gradient(160deg,color-mix(in srgb,#7b6cf6 10%,var(--card)),var(--card) 60%);border:1px solid var(--line);box-shadow:0 10px 26px rgba(40,20,90,.08)}
+.minh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.minh b{font-size:21px;letter-spacing:-.02em}.minh em{font-family:"Crimson Pro",Georgia,serif;font-style:italic;font-weight:600;color:#7b6cf6;font-size:23px}
+.michg{font-size:12.5px;font-weight:800;padding:3px 9px;border-radius:99px}.michg.good{background:color-mix(in srgb,#16a37f 16%,transparent);color:#16a37f}.michg.bad{background:color-mix(in srgb,#e0662b 16%,transparent);color:#e0662b}
+.minsub{display:block;color:var(--muted);font-size:13px;margin:2px 0 8px}
+.mibarw svg{width:100%;height:auto;display:block}.mitrack{fill:color-mix(in srgb,#7b6cf6 7%,transparent)}.mibar{fill:color-mix(in srgb,#7b6cf6 45%,transparent)}.minow{fill:#7b6cf6}
+.miinc{stroke:#16a37f;stroke-width:1.5;stroke-dasharray:4 4}.miinct{fill:#16a37f;font-size:10px;font-weight:700}
+.mimon{fill:var(--muted);font-size:11px;font-weight:600}.mimon.now{fill:var(--ink);font-weight:800}
+.mitip rect{fill:var(--ink)}.mitip text{fill:var(--bg);font-size:11px;font-weight:800}
+.minsep{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.mid{display:flex;align-items:center;gap:14px}.midonw{position:relative;width:120px;height:120px;flex:0 0 auto}.midon{width:120px;height:120px}
+.mitrackc{fill:none;stroke:color-mix(in srgb,var(--ink) 7%,transparent);stroke-width:14}.miseg{fill:none;stroke-width:14;stroke-linecap:round}
+.midonc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.midonc b{font-size:16px;letter-spacing:-.02em}.midonc small{font-size:11.5px;color:var(--muted)}
+.mileg{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}.mileg>div{display:flex;align-items:center;gap:7px;font-size:13.5px}.mileg i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}.mileg span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mileg b{font-size:13.5px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3778,6 +3792,30 @@ function splitBalance(){return splitItems().filter(x=>!x.settled).reduce((s,x)=>
 const nextMk=mk=>addDays(mk+"-01",40).slice(0,7);
 function carryIn(c,mk){if(!c.roll||!c.rollFrom||c.rollFrom>=mk)return 0;let k=c.rollFrom,carry=0,n=0;while(k<mk&&n++<60){carry+=(+c.limit||0)-spentIn(k,c.id);k=nextMk(k)}return Math.round(carry*100)/100}
 const availIn=(c,mk)=>(+c.limit||0)+carryIn(c,mk);
+/* ---------- money at a glance: 6 month bars and this month's donut ---------- */
+function moneyInsights(mk,INC,show){const M=v=>show?money(v):"••••",ms=[];let k=mk;for(let i=0;i<6;i++){ms.unshift(k);k=addDays(k+"-01",-1).slice(0,7)}
+  const sp=ms.map(m=>spentIn(m)),any=sp.some(v=>v>0);if(!any)return null;
+  const top=Math.max(INC||0,...sp)*1.12||1,W=320,H=150,bw=W/6,cur=sp[5],prev=sp[4];
+  const mon=m=>parseKey(m+"-01").toLocaleDateString("en-US",{month:"short"});
+  let svg='<svg viewBox="0 0 '+W+' '+(H+24)+'" class="mibars" role="img" aria-label="Spending over the last 6 months">';
+  if(INC){const y=H-INC/top*H;svg+='<line x1="0" x2="'+W+'" y1="'+y+'" y2="'+y+'" class="miinc"/><text x="'+(W-2)+'" y="'+(y-5)+'" text-anchor="end" class="miinct">Money in '+(show?money(INC):"")+'</text>'}
+  sp.forEach((v,i)=>{const x=i*bw+bw*.2,w=bw*.6,hh=Math.max(v?4:0,v/top*H),y=H-hh,now=i===5;
+    svg+='<rect x="'+x+'" y="0" width="'+w+'" height="'+H+'" rx="10" class="mitrack"/>';
+    svg+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="10" class="'+(now?"minow":"mibar")+'"/>';
+    if(now&&v&&show){const tx=Math.min(W-74,Math.max(2,x+w/2-36)),ty=Math.max(0,y-30);svg+='<g class="mitip"><rect x="'+tx+'" y="'+ty+'" width="72" height="22" rx="11"/><text x="'+(tx+36)+'" y="'+(ty+15)+'" text-anchor="middle">'+money(v)+'</text></g>'}
+    svg+='<text x="'+(x+w/2)+'" y="'+(H+18)+'" text-anchor="middle" class="mimon'+(now?" now":"")+'">'+mon(ms[i])+'</text>'});
+  svg+='</svg>';const bars=h("div",{class:"mibarw"});bars.innerHTML=svg;
+  const chg=prev?Math.round((cur-prev)/prev*100):null;
+  /* donut of this month by category */
+  const cs=bcats().map(c=>({c,v:spentIn(mk,c.id)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v),tot=cs.reduce((a,x)=>a+x.v,0);
+  let don=null;if(tot){const R=46,C=2*Math.PI*R;let off=0,ring='<svg viewBox="0 0 120 120" class="midon" aria-hidden="true"><circle cx="60" cy="60" r="'+R+'" class="mitrackc"/>';
+    cs.forEach(x=>{const l=x.v/tot*C;ring+='<circle cx="60" cy="60" r="'+R+'" stroke="'+bcol(x.c)+'" stroke-dasharray="'+Math.max(0,l-3)+' '+C+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 60 60)" class="miseg"/>';off+=l});
+    ring+='</svg>';const rw=h("div",{class:"midonw"});rw.innerHTML=ring;rw.append(h("div",{class:"midonc"},h("b",null,M(tot)),h("small",null,"spent")));
+    don=h("div",{class:"mid"},rw,h("div",{class:"mileg"},cs.slice(0,5).map(x=>h("div",null,h("i",{style:"background:"+bcol(x.c)}),h("span",null,x.c.e+" "+x.c.name),h("b",null,Math.round(x.v/tot*100)+"%")))))}
+  return h("section",{class:"mins"},
+    h("div",{class:"minh"},h("b",null,"Your money ",h("em",null,"at a glance")),chg!==null&&isFinite(chg)?h("span",{class:"michg "+(chg<=0?"good":"bad")},(chg<=0?"↓ ":"↑ ")+Math.abs(chg)+"% vs "+mon(ms[4])):null),
+    h("small",{class:"minsub"},"Spending, last 6 months"),bars,
+    don?h("div",{class:"minsep"},h("small",{class:"minsub"},"Where "+mon(mk)+"'s money went"),don):null)}
 /* ---------- money in: stipends, pay, anything that comes in each month. Amounts and labels only ---------- */
 function incomes(){return Object.entries(MONEY().income||{}).map(([id,x])=>({id,...x})).filter(x=>!x.removed&&x.name).sort((a,b)=>(a.at||0)-(b.at||0))}
 const incomeTotal=()=>incomes().reduce((a,x)=>a+(+x.amt||0),0);
@@ -3887,6 +3925,7 @@ function moneySection(){const show=unlocked(),tab=ui.monTab||"budget",M=v=>show?
           INC?h("button",{type:"button",class:"mt tap",style:"--mc:#16a37f",onclick:()=>go(".bills.inc")},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),
             h("div",{class:"mtbar"},h("i",{style:"width:"+pct(used,INC)+"%"})),h("span",{class:"mtl"},h("b",null,M(INC))," a month"),h("span",{class:"mtl"},h("b",null,pct(used,INC)+"%")," already used"))
           :h("button",{type:"button",class:"mt tap add",style:"--mc:#16a37f",onclick:()=>incomeSheet(null)},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),h("span",{class:"mtl"},"Add your income to see what's free")))})(),
+      moneyInsights(mk,INC,show),
       (()=>{const IL=incomes(),ub=bills().filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0);
         return h("div",{class:"bills inc"},h("div",{class:"billh"},h("b",null,"💵 Money in"),h("button",{type:"button",class:"lnk",onclick:()=>incomeSheet(null)},"+ Add income")),
           IL.length?h("div",{class:"billrow"},IL.map(x=>h("button",{type:"button",class:"billr tap",style:"--bc:#1a9e7a",onclick:()=>incomeSheet(x)},h("span",{class:"bci"},emo("💵",20,false)),
@@ -4952,7 +4991,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-20-o";
+const APP_VERSION="2026-11-21-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
