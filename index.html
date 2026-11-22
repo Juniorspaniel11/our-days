@@ -1076,6 +1076,10 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .ptg{grid-template-columns:repeat(2,1fr)}
 }
 @media (min-width:1500px){.ptg{grid-template-columns:repeat(4,1fr)}}
+[data-id]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.dragging{position:relative;z-index:30;box-shadow:0 22px 44px rgba(0,0,0,.35)!important;opacity:.96;transition:none!important;cursor:grabbing}
+.sorting>[data-id]:not(.dragging){transition:transform .2s}
+.draghint{display:block;text-align:center;color:var(--muted);font-size:12.5px;margin-top:8px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2786,7 +2790,8 @@ function viewProjects(){
   const list=h("div",{class:"projs"});
   if(!p.projects.filter(x=>!x.done).length)[["My big goal this semester","🎯"],["A skill I'm building","🛠️"]].forEach(([t,e],i)=>list.appendChild(h("button",{type:"button",class:"pjt tap exmp",disabled:pid!==ME,style:"--pc:"+DPAL[i*3],onclick:()=>{if(pid!==ME)return;const id=uid();p.projects.push({id,title:t,focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;ui.pjOpen=id;persist();render()}},
     h("div",{class:"pjttop"},emo(e,26,false),h("span",{class:"pjtic"},"＋")),h("b",null,t),h("span",{class:"pjdue"},pid!==ME?"Example "+nm(pid)+" sees":"Example · tap to make it yours"))));
-  p.projects.filter(x=>!x.done&&(!ui.pjStar||x.focus)).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999")).forEach(x=>list.appendChild(projectCard(pid,x)));
+  const pl=p.projects.filter(x=>!x.done&&(!ui.pjStar||x.focus));(p.pjManual?pl:pl.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.focus?1:0)-(a.focus?1:0)||(a.target||"9999").localeCompare(b.target||"9999"))).forEach(x=>{const el=projectCard(pid,x);el.dataset.id=x.id;list.appendChild(el)});
+  if(pid===ME&&pl.length>1){dragSort(list,ids=>{p.projects=reorderBy(p.projects,ids);p.pjManual=true;persist();toast("Order saved ✓","");render()});if(!seen("dragtip"))list.after(h("small",{class:"draghint"},"Tip: press and hold a card, then drag it to reorder"))}
   return [
     papersSection(pid),
     h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
@@ -2894,9 +2899,33 @@ function papersSection(pid){
       h("button",{type:"button",class:"parr","aria-label":"One more",onclick:()=>{p.pubCount=(p.pubCount||0)+1;persist();render()}},"+"),
       h("button",{type:"button",class:"link",onclick:()=>{ui.pubEdit=false;render()}},"Done"))
     :!ro?h("button",{type:"button",class:"link",onclick:()=>{ui.pubEdit=true;render()}},"Edit"):null);
-  const out=h("section",{class:"panel papers ms"},h("div",{class:"mshead"},h("span",{class:"mskick"},"Manuscripts · "+tzNow(p.tz).key.slice(0,4)),h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add)),pubTile,summary,h("div",{class:"plist"},exPaper,live.map(x=>paperCard(pid,x))));
+  const out=h("section",{class:"panel papers ms"},h("div",{class:"mshead"},h("span",{class:"mskick"},"Manuscripts · "+tzNow(p.tz).key.slice(0,4)),h("div",{class:"sechead"},h("h2",null,"Papers in the pipeline"+(live.length?" · "+live.length:"")),add)),pubTile,summary,h("div",{class:"plist"},exPaper,live.map(x=>{const e=paperCard(pid,x);e.dataset.id=x.id;return e})));
+  const pll=out.querySelector(".plist");if(pid===ME&&live.length>1)dragSort(pll,ids=>{p.papers=reorderBy(p.papers,ids);persist();toast("Order saved ✓","");render()});
   return out}
 
+/* ---------- press and hold to reorder (cards in a list or grid) ---------- */
+function dragSort(list,onDone){let st=null;const sel="[data-id]";
+  const items=()=>[...list.children].filter(e=>e.matches&&e.matches(sel));
+  const cleanup=()=>{if(!st)return;clearTimeout(st.t);const it=st.it;if(st.drag){it.classList.remove("dragging");it.style.transform="";it.style.pointerEvents="";list.classList.remove("sorting");
+      const ids=items().map(e=>e.dataset.id),changed=ids.join()!==st.before;if(changed){onDone(ids);if(!seen("dragtip"))markSeen("dragtip")}
+      const stop=ev=>{ev.stopPropagation();ev.preventDefault()};it.addEventListener("click",stop,{capture:true,once:true});setTimeout(()=>it.removeEventListener("click",stop,{capture:true}),400)}
+    document.removeEventListener("touchmove",tm,{passive:false});st=null};
+  const tm=ev=>{if(st&&st.drag)ev.preventDefault()};
+  list.addEventListener("pointerdown",e=>{if(e.button>0||list.dataset.ro)return;const it=e.target.closest(sel);if(!it||it.parentElement!==list||e.target.closest("input,textarea,select,[contenteditable]"))return;
+    st={it,x0:e.clientX,y0:e.clientY,drag:false,id:e.pointerId,before:items().map(x=>x.dataset.id).join()};document.addEventListener("touchmove",tm,{passive:false});
+    st.t=setTimeout(()=>{if(!st)return;st.drag=true;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}it.classList.add("dragging");list.classList.add("sorting");try{list.setPointerCapture(st.id)}catch(_){}},380)});
+  list.addEventListener("pointermove",e=>{if(!st||e.pointerId!==st.id)return;const dx=e.clientX-st.x0,dy=e.clientY-st.y0;
+    if(!st.drag){if(Math.hypot(dx,dy)>8){clearTimeout(st.t);document.removeEventListener("touchmove",tm,{passive:false});st=null}return}
+    e.preventDefault();const it=st.it;it.style.transform="translate("+dx+"px,"+dy+"px) scale(1.04)";
+    if(e.clientY<90)window.scrollBy(0,-12);else if(e.clientY>innerHeight-110)window.scrollBy(0,12);
+    it.style.pointerEvents="none";const under=document.elementFromPoint(e.clientX,e.clientY);it.style.pointerEvents="";
+    const tgt=under&&under.closest(sel);if(!tgt||tgt===it||tgt.parentElement!==list)return;
+    const r1=it.getBoundingClientRect(),all=items(),a=all.indexOf(it),b=all.indexOf(tgt);
+    list.insertBefore(it,a<b?tgt.nextSibling:tgt);it.style.transform="";const r2=it.getBoundingClientRect();
+    st.x0+=r2.left-(r1.left-dx);st.y0+=r2.top-(r1.top-dy);st.x0-=0;const ndx=e.clientX-st.x0,ndy=e.clientY-st.y0;it.style.transform="translate("+ndx+"px,"+ndy+"px) scale(1.04)"});
+  list.addEventListener("pointerup",cleanup);list.addEventListener("pointercancel",cleanup);
+  list.addEventListener("contextmenu",e=>{if(st)e.preventDefault()})}
+const reorderBy=(arr,ids)=>{const ix=x=>{const i=ids.indexOf(x.id);return i<0?1e6:i};return arr.slice().sort((a,b)=>ix(a)-ix(b))};
 function projectCard(pid,x){
   const p=P(pid),n=tzNow(p.tz),fid=x.id,run=S.timer&&S.timer.id===fid,edit=ui.projEdit===x.id;
   const open=ui.pjOpen===x.id||edit,dd=x.target?daysBetween(n.key,x.target):null;
@@ -5198,7 +5227,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-21-g";
+const APP_VERSION="2026-11-22-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
