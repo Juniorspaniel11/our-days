@@ -1086,6 +1086,25 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .msce{font-size:22px}.msct{display:flex;flex-direction:column;min-width:0}.msct b{font-size:15.5px}.msct small{font-size:11.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mseg.two{grid-template-columns:repeat(2,1fr)!important}
 @media (min-width:1000px){body.tab-home .chapter .ju:has(.mseg)>.msc{grid-column:1/-1}}
+.movr{margin-top:16px;border-radius:24px;padding:14px;background:linear-gradient(160deg,color-mix(in srgb,#e0a21e 10%,var(--card)),var(--card) 60%);border:1px solid var(--line);box-shadow:0 10px 26px rgba(0,0,0,.08)}
+.movh{display:flex;flex-direction:column;margin:0 2px 10px}.movh b{font-size:20px;letter-spacing:-.02em}.movh em{font-family:"Crimson Pro",Georgia,serif;font-style:italic;font-weight:600;color:#e0a21e;font-size:22px}.movh small{color:var(--muted);font-size:12.5px}
+.ovr2{display:flex;flex-direction:column;gap:7px;width:100%;text-align:left;font:inherit;color:var(--ink);background:none;border:0;padding:11px 8px;border-radius:16px}
+.ovr2+.ovr2{border-top:1px solid var(--line)}.ovr2.tap{cursor:pointer}.ovr2.tap:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.ovt{display:flex;justify-content:space-between;align-items:center;gap:8px}.ovl b{font-size:19px;letter-spacing:-.02em;color:#16a37f}.ovl small{color:var(--muted);font-size:12.5px}.ovl.neg b{color:#e0662b}
+.mvbar{height:8px;width:100%;border-radius:9px;background:color-mix(in srgb,#16a37f 25%,transparent);display:flex;overflow:hidden}.mvbar>span{display:block;height:100%;flex:0 0 auto}.mvbar .ovb1{background:#8b7bff}.mvbar .ovb2{background:#ffcf5c}
+.ovd{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}.ovd b{color:var(--ink)}.ovd span{display:flex;align-items:center;gap:4px}.ovd .od1::before,.ovd .od2::before{content:"";width:8px;height:8px;border-radius:3px}.ovd .od1::before{background:#8b7bff}.ovd .od2::before{background:#ffcf5c}
+.ovr2.ovall{margin-top:6px;border-top:0!important;background:color-mix(in srgb,#e0a21e 14%,transparent)}
+.ovr>span,.ovr>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ovr.head{padding:2px 8px}.ovr.head small{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ovr.tap{cursor:pointer}.ovr.tap:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.ovr+.ovr:not(.head){border-top:1px solid var(--line)}
+.ovn{display:flex;align-items:center;gap:7px;text-align:left;min-width:0}.ovn i{font-style:normal;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 7%,transparent);flex:0 0 auto}.ovn b{font-size:14.5px;overflow:hidden;text-overflow:ellipsis}
+.ovl{color:#16a37f}.ovl.neg{color:#e0662b}.ovna{grid-column:2/-1;text-align:left;color:var(--muted);font-size:12.5px}
+@media (min-width:1000px){body.tab-home .chapter .ju:has(.mseg)>.movr{grid-column:1/-1}}
+/* typing in pop-ups stays readable on every page and theme */
+.sheet .inp,.sheet textarea.inp{background:var(--card)!important;color:var(--ink)!important}
+/* laptop: Future page uses the width */
+@media (min-width:1000px){body.tab-future main.wrap{column-count:1!important;max-width:1100px}body.tab-future main.wrap>*{column-span:all}}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1773,7 +1792,8 @@ function watchPerson(u,isMe){
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/need").onSnapshot(sn=>{if(S.people[u])S.people[u].need=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/partnerCycle").onSnapshot(sn=>{if(S.people[u])S.people[u].pcLog=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/cyclePub").onSnapshot(sn=>{if(S.people[u])S.people[u].cyclePub=sn.exists?sn.data():null;softRender()},()=>{}));
-  if(isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/money").onSnapshot(sn=>{if(S.people[u]){S.people[u].money=sn.exists?sn.data():{};S.people[u].moneyLoaded=true}softRender()},()=>{}));
+  if(isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/money").onSnapshot(sn=>{if(S.people[u]){S.people[u].money=sn.exists?sn.data():{};S.people[u].moneyLoaded=true;publishMoneySum()}softRender()},()=>{}));
+  if(!isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/moneySum").onSnapshot(sn=>{if(S.people[u])S.people[u].moneySum=sn.exists?sn.data():null;softRender()},()=>{}));
   if(isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/cycle").onSnapshot(sn=>{if(S.people[u]){S.people[u].cycle=sn.exists?sn.data():null;S.people[u].cycleLoaded=true;cyclePublish(false)}softRender()},()=>{if(S.people[u])S.people[u].cycleLoaded=true}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/avatar").onSnapshot(sn=>{if(S.people[u])S.people[u].avatar=sn.exists?sn.data().photo:null;softRender()},()=>{}));
   list.push(extraRef(u).onSnapshot(sn=>{if(sn.metadata.hasPendingWrites)return;const ph=sn.exists?sn.data().photo:null;
@@ -1962,8 +1982,10 @@ function skyFor(m){
 }
 /* ---------- sheet & toast ---------- */
 let sheetFn=null;
-function openSheet(title,body){sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);sheetShow();
-  setTimeout(()=>{const f=b.querySelector("input[type=text],textarea");if(f&&!f.value&&!b.querySelector("[data-nofocus]"))f.focus()},50)}
+function openSheet(title,body){sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}const pn=el("sheet").querySelector(".pn"),same=!el("sheet").hidden&&el("sheetTitle").textContent===title,keep=same?pn.scrollTop:0;
+  el("sheetTitle").textContent=title;const b=el("sheetBody");b.innerHTML="";b.appendChild(body);sheetShow();pn.scrollTop=keep;
+  setTimeout(()=>{const f=b.querySelector("input[type=text],textarea");if(same||!f||f.value||b.querySelector("[data-nofocus]"))return;
+    const fr=f.getBoundingClientRect(),pr=pn.getBoundingClientRect();if(fr.top-pr.top<pn.clientHeight*.55){try{f.focus({preventScroll:true})}catch(e){f.focus()}}},60)}
 /* sheets: slide up, slide back down the same way, drag the top to dismiss (Apple fluid interface rules) */
 const SHEET_EASE="cubic-bezier(.32,.72,0,1)";let sheetTok=0;
 const sheetRM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3955,7 +3977,27 @@ const myMoney=()=>(P(ME)||{}).money||{};
 const MONEY=()=>mScope()==="ours"?(US.money||{}):myMoney();
 const saveMoney=o=>{if(!DB||!CID)return;const ours=mScope()==="ours";
   if(!ours){const p=P(ME);if(p){const m=JSON.parse(JSON.stringify(p.money||{}));(function mg(a,b){for(const k in b){if(b[k]&&typeof b[k]==="object"&&!Array.isArray(b[k])){a[k]=a[k]&&typeof a[k]==="object"?a[k]:{};mg(a[k],b[k])}else a[k]=b[k]}})(m,o);p.money=m}}
-  DB.doc(ours?"couples/"+CID+"/us/money":"couples/"+CID+"/people/"+ME+"/extra/money").set(o,{merge:true}).catch(syncErr)};
+  DB.doc(ours?"couples/"+CID+"/us/money":"couples/"+CID+"/people/"+ME+"/extra/money").set(o,{merge:true}).catch(syncErr);if(!ours)setTimeout(publishMoneySum,50)};
+function sumMoney(m,mk){m=m||{};const inc=Object.values(m.income||{}).filter(x=>x&&!x.removed&&x.name).reduce((a,x)=>a+(+x.amt||0),0);
+  const bl=Object.values(m.bills||{}).filter(b=>b&&!b.removed&&b.name&&!(b.from&&b.from>mk)&&!(b.yearly&&+mk.slice(5)!==+b.mon));
+  const bills=bl.filter(b=>!b.sub).reduce((a,b)=>a+(+b.amt||0),0),subs=bl.filter(b=>b.sub).reduce((a,b)=>a+(+b.amt||0),0);
+  const spent=Object.values(m.spend||{}).filter(x=>x&&!x.skip&&x.mk===mk&&!x.bill).reduce((a,x)=>a+(+x.amt||0),0);
+  return {mk,inc,bills,subs,spent,left:inc-bills-subs-spent}}
+let _msumLast="";function publishMoneySum(){if(!DB||!CID||!P(ME)||!P(ME).moneyLoaded)return;const t=sumMoney(myMoney(),mKey()),k=JSON.stringify(t);if(k===_msumLast)return;_msumLast=k;
+  DB.doc("couples/"+CID+"/people/"+ME+"/extra/moneySum").set(Object.assign({at:Date.now()},t)).catch(()=>{})}
+function moneyOverall(show){const mk=mKey(),M=v=>show?money(v):"••••",o=PARTNER,op=o&&P(o)&&!P(o).placeholder?P(o):null;
+  const mine=sumMoney(myMoney(),mk),ours=sumMoney(US.money||{},mk),hs=op&&op.moneySum&&op.moneySum.mk===mk?op.moneySum:null;
+  const rows=[["me","👤","You",mine,()=>{setMScope("mine");window.scrollTo({top:0,behavior:"smooth"})}],op?["her","🌸",plainNm(o),hs,null]:null,["ours","💞","Shared",ours,()=>{setMScope("ours");window.scrollTo({top:0,behavior:"smooth"})}]].filter(Boolean);
+  const add=(...xs)=>{const r={inc:0,bills:0,subs:0,spent:0,left:0};xs.filter(Boolean).forEach(x=>{for(const k in r)r[k]+=+x[k]||0});return r},both=add(mine,hs,ours);
+  const tot=both.inc||1;
+  const bar=t=>{const p=v=>Math.max(0,Math.min(100,v/(t.inc||Math.max(1,t.bills+t.subs+t.spent))*100));return htm("div","mvbar",'<span class="ovb1" style="width:'+p(t.bills+t.subs)+'%"></span><span class="ovb2" style="width:'+p(t.spent)+'%"></span>')};
+  const row=([id,e,l,t,fn],big)=>h(fn?"button":"div",{type:fn?"button":null,class:"ovr2 "+id+(fn?" tap":"")+(big?" ovall":""),onclick:fn},
+    h("div",{class:"ovt"},h("span",{class:"ovn"},h("i",null,e),h("b",null,l)),t?h("span",{class:"ovl"+(t.left<0?" neg":"")},h("b",null,(t.left<0?"−":"")+M(Math.abs(t.left))),h("small",null,t.left<0?" over":" left")):null),
+    t?bar(t):null,
+    t?h("div",{class:"ovd"},h("span",null,"In ",h("b",null,M(t.inc))),h("span",{class:"od1"},"Bills & subs ",h("b",null,M(t.bills+t.subs))),h("span",{class:"od2"},"Spent ",h("b",null,M(t.spent))))
+     :h("small",{class:"ovna"},"Shows once "+l+" opens the new version of the app"));
+  return h("section",{class:"movr"},h("div",{class:"movh"},h("b",null,"Overall ",h("em",null,monthName(mk).split(" ")[0])),h("small",null,"Totals only · each person's details stay private")),
+    ...rows.map(r=>row(r)),row(["both","🏡","All together",both,null],true))}
 const setMScope=v=>{ui.mscope=v;try{localStorage.setItem("od-mscope",v)}catch(e){}if(v==="mine"&&ui.monTab==="split")ui.monTab="budget";render();setTimeout(autoBills,300)};
 const WISH=()=>US.wish||{};
 const saveWish=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/wish").set(o,{merge:true}).catch(syncErr)};
@@ -4219,7 +4261,8 @@ function moneySection(){const show=unlocked(),sc=mScope(),tab=sc==="mine"&&ui.mo
     h("div",{class:"msc",role:"tablist","aria-label":"Whose money"},[["mine","👤","My money","Only you see this"],["ours","💞","Our money","Shared with "+plainNm(PARTNER)]].map(([v,e,l,d])=>h("button",{type:"button",role:"tab",class:"mscb tap"+(sc===v?" on":""),"aria-selected":String(sc===v),onclick:()=>setMScope(v)},h("span",{class:"msce"},e),h("span",{class:"msct"},h("b",null,l),h("small",null,d))))),
     h("div",{class:"seg mseg"+(sc==="mine"?" two":"")},segb("budget","📊 Budget"),segb("save","🫙 Savings"),sc==="ours"?segb("split","🤝 Split"):null),
     ...(tab==="budget"?(()=>{const P0=pane.filter(Boolean),top=P0.filter(e=>e.classList&&/\b(mh2|mt2|mins|pc)\b/.test(e.className)),rest=P0.filter(e=>!top.includes(e));
-      return [h("div",{class:"mcolA"},...top),h("div",{class:"mcolB"},...rest)]})():pane))}
+      return [h("div",{class:"mcolA"},...top),h("div",{class:"mcolB"},...rest)]})():pane),
+    moneyOverall(show))}
 function spendSheet(cat){let c=cat?cat.id:(ui.lastCat||"food"),manual=!!cat;juSheet("Log spending",()=>{
   const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount, e.g. 24.50","aria-label":"Amount"}),n=h("input",{type:"text",class:"inp",placeholder:"What for, e.g. Walmart","aria-label":"What for"});
   const tip=h("small",{class:"autot"},"");
@@ -5241,7 +5284,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-22-b";
+const APP_VERSION="2026-11-22-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
