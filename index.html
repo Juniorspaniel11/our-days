@@ -1163,6 +1163,11 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .cdrow.pers .ttl small::before{content:"🎉 "}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cd.pers{background:linear-gradient(150deg,#4a2236,#4a2e22)!important;color:#ffd9e6!important}:root:not([data-theme="light"]) .cd.pers .num,:root:not([data-theme="light"]) .cd.pers .ttl{color:#ffe3ee!important}:root:not([data-theme="light"]) .cd.pers .kick,:root:not([data-theme="light"]) .cd.pers .unit,:root:not([data-theme="light"]) .cd.pers .dt{color:#ff9cc3!important}}
 :root[data-theme="dark"] .cd.pers{background:linear-gradient(150deg,#4a2236,#4a2e22)!important;color:#ffd9e6!important}:root[data-theme="dark"] .cd.pers .num,:root[data-theme="dark"] .cd.pers .ttl{color:#ffe3ee!important}:root[data-theme="dark"] .cd.pers .kick,:root[data-theme="dark"] .cd.pers .unit,:root[data-theme="dark"] .cd.pers .dt{color:#ff9cc3!important}
+.bkpick{max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:2px;border:1px solid var(--line);border-radius:14px;padding:10px}
+.bkpt{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+.bkpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px}
+.bkp{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 6px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.bkp[aria-pressed="true"]{background:#e0a21e;border-color:#e0a21e;color:#1b1436}.bkp.have{opacity:.5;cursor:default}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -3147,8 +3152,14 @@ function readingBlock(){
     h("small",{class:"fhint"},"Tap any of your squares to tick or untick that chapter."),
     h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(real?" · "+nm(o)+" reads the "+bVer(o):"")),bookShelf())}
 /* books of the Bible each of you finished: recorded automatically, earlier ones can be added */
-function bookShelf(){const pl=bplan(),F=BIB().finished||{},o=PARTNER,real=o&&P(o)&&!P(o).placeholder;
-  if(pl){const N=pl[3];[ME,o].filter(Boolean).forEach(u=>{if(bRead(u)>=N&&!(F[pl[0]]||{})[u]&&u===ME)setTimeout(()=>saveBible({finished:{[pl[0]]:{name:pl[1],[u]:tzNow(P(ME).tz).key}}}),0)})}
+/* a book goes on the shelf by itself once both of you have ticked every chapter (any book you've read, not only the current one) */
+const _shelfDone=new Set();
+function shelfScan(){const B=BIB(),R=B.read||{},F=B.finished||{},o=PARTNER;if(!o||!P(o)||P(o).placeholder)return;
+  Object.keys(R).forEach(id=>{const pl=(B.custom||{})[id]||BPLANS.find(x=>x[0]===id);if(!pl)return;const N=pl[3],a=R[id][ME]||{},b=R[id][o]||{};
+    if(Object.keys(a).length<N||Object.keys(b).length<N)return;const f=F[id]||{};if((f[ME]&&f[o]&&f.name)||f.removed||_shelfDone.has(id))return;_shelfDone.add(id);
+    const last=m=>Object.values(m).filter(v=>typeof v==="string").sort().pop()||tzNow(P(ME).tz).key;
+    setTimeout(()=>{saveBible({finished:{[id]:{name:pl[1],[ME]:last(a),[o]:last(b)}}});toast("📚 "+pl[1]+" is on your shelf","You both finished it 🎉")},0)})}
+function bookShelf(){shelfScan();const F=BIB().finished||{},o=PARTNER,real=o&&P(o)&&!P(o).placeholder;
   const L=Object.entries(F).map(([id,x])=>({id,...x})).filter(x=>x.name&&!x.removed).sort((a,b)=>((b[ME]||b[o]||"")).localeCompare(a[ME]||a[o]||""));
   return h("div",{class:"bshelf"},h("div",{class:"bshh"},h("b",null,"📚 Books we've finished"),h("button",{type:"button",class:"flink",style:"margin:0",onclick:shelfAddSheet},"+ Add")),
     L.length?h("div",{class:"bshl"},L.map(x=>{const both=x[ME]&&x[o];return h("button",{type:"button",class:"bshb tap"+(both?" both":""),onclick:()=>shelfAddSheet(x)},h("b",null,x.name),
@@ -3158,10 +3169,16 @@ function shelfAddSheet(x0){juSheet(x0?x0.name:"A book we finished",()=>{const o=
   if(x0)return h("div",{class:"body"},h("p",{class:"hint"},[x0[ME]?"You finished it "+shortDate(x0[ME]):null,real&&x0[o]?nm(o)+" finished it "+shortDate(x0[o]):null].filter(Boolean).join(" · ")||"Marked as read"),
     x0[ME]?null:h("button",{type:"button",class:"primary",onclick:()=>{saveBible({finished:{[x0.id]:{[ME]:tzNow(P(ME).tz).key}}});closeSheet()}},"I finished it too ✓"),
     confirmBtn("Remove from the shelf",()=>{saveBible({finished:{[x0.id]:{removed:true}}});closeSheet()}));
-  const inp=h("input",{type:"text",class:"inp",list:"bbooks2",placeholder:"Which book? e.g. Ruth","aria-label":"Book"}),dl=h("datalist",{id:"bbooks2"},BBOOKS.map(b=>h("option",{value:b[0]})));let who="me";
-  const ch=h("div",{class:"chips"},[["me","Me"],["both","Both of us"]].concat(real?[["her",nm(o)]]:[]).map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===who),onclick:ev=>{who=v;ch.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},l)));
-  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();const b=findBook(inp.value);if(!b){toast("Can't find that book","Check the spelling");return}const d=tzNow(P(ME).tz).key,o2={name:b[0]};
-      if(who!=="her")o2[ME]=d;if(who!=="me"&&real)o2[o]=d;saveBible({finished:{["b-"+b[1]]:o2}});closeSheet();toast("On the shelf 📚",b[0])}},inp,dl,h("p",{class:"hint",style:"margin:0"},"Who read it?"),ch,h("button",{type:"submit",class:"primary"},"Add to the shelf"))})}
+  const F=BIB().finished||{},have=new Set(Object.values(F).filter(x=>x&&x.name&&!x.removed).map(x=>x.name)),sel=new Set();let who="both";
+  const btn=h("button",{type:"submit",class:"primary",disabled:true},"Pick the books you finished");
+  const upd=()=>{btn.disabled=!sel.size;btn.textContent=sel.size?"Add "+sel.size+(sel.size===1?" book":" books")+" to the shelf":"Pick the books you finished"};
+  const grid=h("div",{class:"bkpick"},[["Old Testament",BBOOKS.slice(0,39)],["New Testament",BBOOKS.slice(39)]].map(([t,L])=>h("div",null,h("small",{class:"bkpt"},t),
+    h("div",{class:"bkpg"},L.map(b=>{const on=have.has(b[0]);return h("button",{type:"button",class:"bkp tap"+(on?" have":""),disabled:on,"aria-pressed":"false",onclick:ev=>{const e=ev.currentTarget;if(sel.has(b[0]))sel.delete(b[0]);else sel.add(b[0]);e.setAttribute("aria-pressed",String(sel.has(b[0])));upd()}},on?b[0]+" ✓":b[0])})))));
+  const ch=h("div",{class:"chips"},[["both","Both of us"],["me","Just me"]].concat(real?[["her","Just "+nm(o)]]:[]).map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===who),onclick:ev=>{who=v;ch.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},l)));
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();if(!sel.size)return;const d=tzNow(P(ME).tz).key,o2={};
+      BBOOKS.filter(b=>sel.has(b[0])).forEach(b=>{const x={name:b[0]};if(who!=="her")x[ME]=d;if(who!=="me"&&real)x[o]=d;o2["b-"+b[1]]=x});
+      saveBible({finished:o2});closeSheet();toast("On the shelf 📚",[...sel].join(", "))}},
+    h("p",{class:"hint",style:"margin:0"},"Who read them?"),ch,h("p",{class:"hint",style:"margin:4px 0 0"},"Tap every book you've finished"),grid,btn)})}
 function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
   return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
     h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
@@ -4575,7 +4592,7 @@ function bigBanner(){const bs=bigToday(PARTNER),mine=bigToday(ME);if(!bs.length&
       h("button",{type:"button",class:"fbtn",onclick:ev=>{if(DB&&CID)DB.collection("couples/"+CID+"/nudges").add({from:ME,at:Date.now(),kind:"big",title:"Good luck from "+nm(ME)+" ⭐",body:"Go shine today. I'm proud of you."}).catch(syncErr);hearts(ev.currentTarget,12);toast("Sent ⭐","Good luck is on the way")}},"⭐ Good luck")):null))}
 
 /* ---------- Bible reading plan together ---------- */
-const BPLANS=[["john","Gospel of John","JHN",21],["mark","Gospel of Mark","MRK",16],["proverbs","Proverbs","PRO",31],["psalms","Psalms 1 to 30","PSA",30],["romans","Romans","ROM",16],["acts","Acts","ACT",28],["philippians","Philippians to Colossians","PHP",4],["genesis","Genesis","GEN",50],["ruth","Ruth and Esther","RUT",4],["james","James","JAS",5]];
+const BPLANS=[["john","Gospel of John","JHN",21],["mark","Gospel of Mark","MRK",16],["proverbs","Proverbs","PRO",31],["psalms","Psalms 1 to 30","PSA",30],["romans","Romans","ROM",16],["acts","Acts","ACT",28],["philippians","Philippians","PHP",4],["genesis","Genesis","GEN",50],["ruth","Ruth and Esther","RUT",4],["james","James","JAS",5]];
 const BIB=()=>US.bible||{};
 const saveBible=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/bible").set(o,{merge:true}).catch(syncErr)};
 function bplan(){const b=BIB();if(!b.plan)return null;const c=(b.custom||{})[b.plan];return c&&c.length>=4?c:BPLANS.find(x=>x[0]===b.plan)||null}
@@ -5388,7 +5405,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-23-d";
+const APP_VERSION="2026-11-23-e";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
