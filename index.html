@@ -1199,6 +1199,15 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .c2next{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;text-align:left;border:0;border-radius:18px;padding:10px 12px;font:inherit;color:#fff;cursor:pointer;background:linear-gradient(120deg,color-mix(in srgb,#9b7bff 55%,transparent),color-mix(in srgb,#ff5d8f 45%,transparent));box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 10px 22px -14px #9b7bff}
 .c2next .c2ni{font-size:24px;width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.2)}.c2next span:nth-child(2){flex:1;display:flex;flex-direction:column}.c2next small{font-size:11.5px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.05em}.c2next b{font-size:16px}
 .c2next em{font-style:normal;font-size:12.5px;font-weight:850;padding:6px 11px;border-radius:99px;background:#fff;color:#7d4bea}
+/* section headings everywhere: a glowing 3D icon tile + bold title, so a heading reads as a heading */
+.sh3{display:inline-flex!important;align-items:center;gap:10px;margin:0;font-size:21px!important;font-weight:850!important;letter-spacing:-.02em;color:var(--ink)}
+.shi{display:inline-grid;place-items:center;flex:0 0 auto;width:38px;height:38px;border-radius:13px;background:radial-gradient(120% 100% at 20% 10%,rgba(255,255,255,.45),transparent 50%),linear-gradient(140deg,var(--shc,#7d8bff),color-mix(in srgb,var(--shc,#7d8bff) 55%,#5b3fd6));box-shadow:0 8px 18px -8px var(--shc,#7d8bff),0 1px 0 rgba(255,255,255,.5) inset}
+.shi img,.shi .emo{filter:drop-shadow(0 3px 3px rgba(0,0,0,.3))}
+.pulh b{display:inline-flex;align-items:center;gap:10px}
+.vgh2{display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:8px 14px 8px 8px;border-radius:16px;color:#fff;font-size:16px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;background:radial-gradient(120% 100% at 0 0,rgba(255,255,255,.3),transparent 55%),linear-gradient(120deg,var(--vc),color-mix(in srgb,var(--vc) 55%,#2a1850));box-shadow:0 10px 22px -12px var(--vc),0 1px 0 rgba(255,255,255,.35) inset}
+.vgh2 .shi{--shc:rgba(255,255,255,.25);width:34px;height:34px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);box-shadow:none}
+.cyou .sh3{font-size:18px!important}
+.sechead>button.link{background:var(--acc)!important;color:#fff!important;font-weight:850!important;border-radius:99px!important;padding:7px 14px!important;text-decoration:none!important;box-shadow:0 8px 16px -8px var(--acc)}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2178,7 +2187,7 @@ function countdownStrip(pid){
   const used=new Set(all.filter(x=>x.col).map(x=>x.col));let pi=0;
   all.forEach(x=>{if(x.col)return;let tries=0;while(used.has(PAL[pi%PAL.length])&&tries<PAL.length){pi++;tries++}x.col=PAL[pi%PAL.length];used.add(x.col);pi++});
   const big=all.slice(0,2),rest=all.slice(2);
-  const sec=h("section",null,h("div",{class:"sechead"},h("h2",null,"Coming up"),h("button",{type:"button",class:"link",onclick:()=>addCountdownSheet(pid)},"+ Countdown")));
+  const sec=h("section",null,h("div",{class:"sechead"},h("h2",{class:"sh3",style:"--shc:#ff6f91"},h("span",{class:"shi"},emo("⏳",24,false)),"Coming up"),h("button",{type:"button",class:"link",onclick:()=>addCountdownSheet(pid)},"+ Countdown")));
   if(!all.length){sec.appendChild(h("p",{class:"empty"},"No countdowns yet. Add a deadline, presentation or visit."));return sec}
   sec.appendChild(h("div",{class:"cdgrid"},big.map(it=>it.pin
     ?h("button",{type:"button",class:"cd pin",style:"--cdc:"+it.col,onclick:it.open},h("span",{class:"kick",style:"color:#ffd27a"},"Priority · no deadline"),
@@ -2513,7 +2522,7 @@ function tasksBlock(pid,k,editable){
 function dayCard(pid,k,title){
   const open=day(pid,k).tasks.filter(x=>x.t&&!x.d).length;
   return h("section",{class:"panel"},
-    h("div",{class:"sechead"},h("h2",null,"To do "+(title==="Today"||title==="Tomorrow"?title.toLowerCase():"· "+title)),h("button",{type:"button",class:"primary",onclick:()=>itemSheet(pid,k,null)},"+ Add")),
+    h("div",{class:"sechead"},h("h2",{class:"sh3",style:"--shc:#3fd0a6"},h("span",{class:"shi"},emo("✅",24,false)),"To do "+(title==="Today"||title==="Tomorrow"?title.toLowerCase():"· "+title)),h("button",{type:"button",class:"primary",onclick:()=>itemSheet(pid,k,null)},"+ Add")),
     pid===ME&&k===tzNow(P(pid).tz).key?null:(()=>{const it=itemsFor(pid,k).filter(x=>!x.skip),ts=day(pid,k).tasks.filter(x=>x.t),tot=it.length+ts.length,dn=it.filter(x=>x.done).length+ts.filter(x=>x.d).length;
       return tot?h("div",{class:"dprog"},h("span",null,h("i",{style:"width:"+Math.round(dn/tot*100)+"%"})),h("b",null,dn===tot?"All done 🎉":dn+" of "+tot+" done")):h("p",{class:"hint",style:"margin:-4px 0 10px"},"Give it a time to put it on your schedule, or leave the time empty for anytime")})(),
     pid===ME?null:nowNext(pid,k),
@@ -2560,7 +2569,7 @@ function checkinCard(pid,k){
     [h("option",{value:""},"Hours")].concat(Array.from({length:21},(_,i)=>3+i*0.5).map(v=>h("option",{value:String(v)},String(v)))));
   sl.value=c.sleep!=null?String(c.sleep):"";
   const av=sleepAvg(pid);
-  return h("section",{class:"panel"},h("div",{class:"sechead"},h("h2",null,"Check in"),h("span",{class:"hint"},av?"Sleep this week: "+av.avg+" h average":"5 seconds, once a day")),
+  return h("section",{class:"panel"},h("div",{class:"sechead"},h("h2",{class:"sh3",style:"--shc:#9b7bff"},h("span",{class:"shi"},emo("💬",24,false)),"Check in"),h("span",{class:"hint"},av?"Sleep this week: "+av.avg+" h average":"5 seconds, once a day")),
     h("div",{class:"ckrow"},h("span",{class:"ckl"},"Sleep"),sl,h("span",{class:"hint"},"hours last night")),
     h("div",{class:"ckrow"},h("span",{class:"ckl"},"Energy"),scale("energy",["1","2","3","4","5"])),
     h("div",{class:"ckrow"},h("span",{class:"ckl"},"Mood"),scale("mood",MOODS)));
@@ -2573,7 +2582,7 @@ function weekStrip(pid){
   for(let i=0;i<7;i++){const k=addDays(mon,i),cnt=itemsFor(pid,k).filter(x=>!x.skip&&!x.allDay).length+day(pid,k).tasks.filter(t=>t.t&&!t.d).length;
     wk.appendChild(h("button",{type:"button",class:"day"+(k===n.key?" today":"")+(k===ui.sel?" sel":""),"aria-pressed":String(k===ui.sel),"aria-label":longDate(k)+", "+cnt+" planned",onclick:()=>{ui.sel=k;render()}},
       h("b",null,SH[parseKey(k).getDay()]),h("span",{class:"num"},String(parseKey(k).getDate())),h("span",{class:"dots"},cnt?"•".repeat(Math.min(cnt,4)):"")))}
-  return h("section",{class:"wksec"},h("div",{class:"sechead"},h("h2",{style:"font-size:18px"},label),h("div",{class:"nav"},
+  return h("section",{class:"wksec"},h("div",{class:"sechead"},h("h2",{class:"sh3",style:"--shc:#ffb03b"},h("span",{class:"shi"},emo("🗓️",24,false)),label),h("div",{class:"nav"},
       pid===ME&&PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?h("button",{type:"button",class:"owk",onclick:ourWeekSheet},"👫 Our week"):null,
       h("button",{type:"button","aria-label":"Previous week",onclick:()=>{ui.weekOff--;render()}},"‹"),
       ui.weekOff!==0||ui.sel!==n.key?h("button",{type:"button",onclick:()=>{ui.weekOff=0;ui.sel=n.key;render()}},"Today"):null,
@@ -2607,7 +2616,7 @@ function careSection(){const o=PARTNER,nmO=plainNm(o),on=needOf(o),mine=needOf(M
   const hero=h("section",{class:"chero"},h("div",{class:"chtop"},h("div",{class:"chtx"},h("small",null,nmO+" today"),h("b",null,head),h("span",null,sub)),right),
     tiles.map((x,i)=>h(x.open?"button":"div",{type:x.open?"button":null,class:"chtile"+(x.open?" tap":""),style:"--tc:"+DPAL[(i*3+1)%DPAL.length],onclick:x.open||null},h("span",{class:"chte"},emo(x.e,28,false)),h("span",{class:"chtt"},h("b",null,x.t),x.tip?h("small",null,x.tip):null))));
   const myCyc=CYC().on?(()=>{const Rm=cycCalc(CYC(),tzNow(P(ME).tz).key);return Rm?h("button",{type:"button",class:"cymini tap",onclick:cycleSheet},cycleRing(Rm,56,tzNow(P(ME).tz).key),h("span",null,h("b",null,CPH[Rm.phase][0]),h("small",null,Rm.late?"Period due":"Period in "+daysBetween(tzNow(P(ME).tz).key,Rm.next)+" days"))):null})():null;
-  const you=h("section",{class:"cyou"},h("small",{class:"cyh"},"You today"),
+  const you=h("section",{class:"cyou"},h("b",{class:"sh3",style:"--shc:#ff8fb1;margin-bottom:10px"},h("span",{class:"shi"},emo("🫶",22,false)),"You today"),
     h("div",{class:"ngrid"},NEEDS.map(([k,l,e,t,sh])=>h("button",{type:"button",class:"nbtn"+(mine&&mine[0]===k?" on":""),"aria-pressed":String(!!mine&&mine[0]===k),"aria-label":l,onclick:()=>mine&&mine[0]===k?clearNeed():setNeed(k)},h("span",{class:"nbe"},emo(e,34,false)),h("small",null,sh)))),
     myCyc,
     myhu.length?h("div",{class:"seesme"},h("small",null,nmO+" sees"),myhu.map(x=>h("span",{class:"seechip"},x.e+" "+x.t))):null);
@@ -2858,7 +2867,7 @@ function pulse(pid){if(pid!==ME)return null;if(_mBuild!==ME)return inMoney(ME,()
   const tFaith=h("button",{type:"button",class:"pt tap",style:"--g1:#7a4a12;--g2:#3a240c;--gc:#ffc65c",onclick:()=>goTo("us",".faith",()=>setUsPage("together"))},
     h("div",{class:"pth"},h("span",{class:"pti"},emo("🙏",18,false)),h("small",null,"Faith")),h("b",{class:"ptv"},String(strk)),h("small",{class:"pts"},strk===1?"night praying":"nights praying"),
     htm("div","ptdots",nights.map((k,i)=>'<i class="'+(plog[k]?"on":"")+(i===6?" tn":"")+'"></i>').join("")),h("span",{class:"ptf"},chap||(plog[nk]?"Prayed tonight ✓":"Pray together tonight")));
-  return h("section",{class:"pulse"},h("div",{class:"pulh"},h("b",null,"Everything ",h("em",null,"at a glance")),h("span",{class:"live"},h("i"),"Live")),week,h("div",{class:"ptg"},tMoney,tWork,tUs,tFaith))}
+  return h("section",{class:"pulse"},h("div",{class:"pulh"},h("b",null,h("span",{class:"shi",style:"--shc:#7d8bff"},emo("⚡",24,false)),"Everything ",h("em",null,"at a glance")),h("span",{class:"live"},h("i"),"Live")),week,h("div",{class:"ptg"},tMoney,tWork,tUs,tFaith))}
 function viewToday(){
   const pid=me(),p=P(pid),n=tzNow(p.tz);if(pid===ME)carry(pid);
   if(!ui.sel)ui.sel=n.key;const sel=ui.sel,isT=sel===n.key;
@@ -2947,7 +2956,7 @@ function viewProjects(){
   if(pid===ME&&pl.length>1){dragSort(list,ids=>{p.projects=reorderBy(p.projects,ids);p.pjManual=true;persist();toast("Order saved ✓","");render()});if(!seen("dragtip"))list.after(h("small",{class:"draghint"},"Tip: press and hold a card, then drag it to reorder"))}
   return [
     papersSection(pid),
-    h("section",null,h("div",{class:"sechead"},h("h2",null,"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
+    h("section",null,h("div",{class:"sechead"},h("h2",{class:"sh3",style:"--shc:#3fb6d6"},h("span",{class:"shi"},emo("📁",24,false)),"Projects"),h("button",{type:"button",class:"link",onclick:()=>{const id=uid();p.projects.push({id,title:"New project",focus:false,next:"",target:"",items:[],steps:[]});ui.projEdit=id;persist();render()}},"Add project")),
       list)
   ];
 }
@@ -3196,7 +3205,7 @@ function shelfScan(){const B=BIB(),R=B.read||{},F=B.finished||{},o=PARTNER;if(!o
     setTimeout(()=>{saveBible({finished:{[id]:{name:pl[1],[ME]:last(a),[o]:last(b)}}});toast("📚 "+pl[1]+" is on your shelf","You both finished it 🎉")},0)})}
 function bookShelf(){shelfScan();const F=BIB().finished||{},o=PARTNER,real=o&&P(o)&&!P(o).placeholder;
   const L=Object.entries(F).map(([id,x])=>({id,...x})).filter(x=>x.name&&!x.removed).sort((a,b)=>((b[ME]||b[o]||"")).localeCompare(a[ME]||a[o]||""));
-  return h("div",{class:"bshelf"},h("div",{class:"bshh"},h("b",null,"📚 Books we've finished"),h("button",{type:"button",class:"flink",style:"margin:0",onclick:shelfAddSheet},"+ Add")),
+  return h("div",{class:"bshelf"},h("div",{class:"bshh"},h("b",{class:"sh3",style:"--shc:#e0a21e;font-size:18px"},h("span",{class:"shi"},emo("📚",22,false)),"Books we've finished"),h("button",{type:"button",class:"flink",style:"margin:0",onclick:shelfAddSheet},"+ Add")),
     L.length?h("div",{class:"bshl"},L.map(x=>{const both=x[ME]&&x[o];return h("button",{type:"button",class:"bshb tap"+(both?" both":""),onclick:()=>shelfAddSheet(x)},h("b",null,x.name),
       h("small",null,both?"Both ✓":x[ME]?"You ✓":real?nm(o)+" ✓":""))}))
     :h("small",{class:"fhint",style:"display:block"},"Finish a book and it lands here. Tap + Add for books you've already read."))}
@@ -4595,7 +4604,7 @@ function visionSection(pid){pid=pid||ME;const ro=pid!==ME,p=P(pid);if(!ro){p.vis
     VCATS.filter(([id])=>VQ[id]).map(([id,lab,e])=>h("button",{type:"button",class:"vq tap",onclick:()=>{ui.visAdd=true;ui.visCat=id;render();setTimeout(()=>{const t=document.querySelector(".vform textarea");if(t)t.focus()},80)}},
       h("span",{class:"vemo"},emo(e,24,false)),h("span",{class:"vqt"},h("small",null,lab),h("b",null,VQ[id])),h("span",{class:"vqp"},"＋"))));
   const groups=VCATS.map(([id,lab,e])=>{const mine=L.filter(x=>vCat(x)===id).sort((a,b)=>ord(a)-ord(b)),ex=exs.filter(z=>z[0]===id);if(!mine.length&&!ex.length)return null;
-    return h("div",{class:"vgroup"},h("span",{class:"vgh"},lab),mine.map(x=>card(x)),ex.map(([c,e,t])=>card({c,e,t},true)))});
+    return h("div",{class:"vgroup"},h("span",{class:"vgh2",style:"--vc:"+({faith:"#4f6cf0",character:"#8a6cff",family:"#e0569a",health:"#1fae7a",career:"#2a8fd6",impact:"#e07a1e",wealth:"#c99a12",growth:"#14a3a3",life:"#b65be8"}[id]||"#8a6cff")},h("span",{class:"shi"},emo(e,24,false)),lab),mine.map(x=>card(x)),ex.map(([c,e,t])=>card({c,e,t},true)))});
   const fn=fullName(pid);
   return h("section",{class:"vboard",id:"visionBoard"},
     h("div",{class:"vhead"},h("div",null,h("small",null,ro?"Future "+plainNm(pid):"Future me"),h("h2",null,ro?plainNm(pid)+"'s vision":"My vision")),ro?null:h("button",{type:"button",class:"vbtn",onclick:()=>{ui.visAdd=!adding;render()}},adding?"Close":"＋ Add")),
@@ -5440,7 +5449,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-23-f";
+const APP_VERSION="2026-11-23-g";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
