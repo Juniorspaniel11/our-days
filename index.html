@@ -758,6 +758,9 @@ body.tab-us #subline{display:none}body.tab-us #title{display:block!important}bod
 .chaphd{display:flex;align-items:center;gap:10px}
 .chape{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--acc);color:#fff;font-size:19px;box-shadow:0 6px 14px color-mix(in srgb,var(--acc) 40%,transparent)}
 .chaphd b{font-family:var(--fun);font-size:21px;letter-spacing:-.01em}
+.chaphd{gap:12px!important;margin-top:6px}.chape{width:44px!important;height:44px!important;border-radius:15px!important;background:radial-gradient(120% 100% at 20% 10%,rgba(255,255,255,.45),transparent 50%),linear-gradient(140deg,var(--acc),color-mix(in srgb,var(--acc) 50%,#7d4bea))!important;box-shadow:0 10px 22px -8px color-mix(in srgb,var(--acc) 75%,transparent),0 1px 0 rgba(255,255,255,.5) inset!important}
+.chape img,.chape .emo{filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+.chaphd b{font-size:25px!important;font-weight:850;background:linear-gradient(95deg,var(--ink) 30%,color-mix(in srgb,var(--acc) 70%,var(--ink)));-webkit-background-clip:text;background-clip:text;color:transparent}
 .chaphd i{flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 55%,transparent),transparent)}
 .chapter>section>.sechd>h2,.chapter>section>h2.sh,.chapter>section>.sechd>.sh{display:none}
 .chapter{position:relative}.chapter>section>.sechd{position:absolute;top:6px;right:0;margin:0;background:var(--bg);padding-left:8px}
@@ -1133,21 +1136,46 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mro .lnk{display:none}
 .mshared{margin-top:14px;border-radius:22px;padding:12px;background:linear-gradient(150deg,color-mix(in srgb,#d9468f 12%,var(--card)),var(--card) 65%);border:1px solid color-mix(in srgb,#d9468f 30%,transparent)}
 .mshared .mce{--mcol:#d9468f}
+.mshared{padding:0 12px 12px!important;overflow:hidden;border-radius:24px!important;border:1px solid color-mix(in srgb,#c04bd8 45%,transparent)!important}
+.mshared>.mch{position:relative;margin:0 -12px 12px;padding:14px;color:#fff;background:radial-gradient(120% 90% at 0 0,rgba(255,255,255,.3),transparent 55%),linear-gradient(125deg,#c2338a,#7d4bea);box-shadow:0 1px 0 rgba(255,255,255,.35) inset}
+.mshared>.mch b{font-size:20px;font-weight:850;color:#fff}.mshared>.mch small{color:rgba(255,255,255,.88)}
+.mshared>.mch .mce{width:46px;height:46px;border-radius:16px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.45)}
+.mshared>.mch .lnk{background:#fff!important;color:#a43a9a!important;font-weight:850!important}
 .mshadd{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1.5px dashed color-mix(in srgb,#d9468f 45%,transparent);border-radius:16px;padding:12px;background:none;font:inherit;color:var(--ink);cursor:pointer}.mshadd span{display:flex;flex-direction:column}.mshadd small{color:var(--muted);font-size:12.5px}
 @media (min-width:1000px){
   body.tab-home main.wrap>.chapter:has(.money2){column-span:all}
   body.tab-home .money2 .mperson{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-items:start}
   body.tab-home .money2 .mcolA{position:sticky;top:16px}
 }
-/* ---- money sections: each heading its own color band ---- */
-.mcard{padding:0 12px 12px!important;overflow:hidden;border:1.5px solid color-mix(in srgb,var(--mcol) 35%,transparent)!important;background:linear-gradient(180deg,color-mix(in srgb,var(--mcol) 7%,var(--card)),var(--card) 60%)!important}
-.mcard>.mch{margin:0 -12px 10px;padding:12px 12px 11px;background:linear-gradient(120deg,color-mix(in srgb,var(--mcol) 32%,var(--card)),color-mix(in srgb,var(--mcol) 10%,var(--card)));border-bottom:1px solid color-mix(in srgb,var(--mcol) 30%,transparent)}
-.mcard>.mch .mce{background:var(--mcol);box-shadow:0 4px 12px color-mix(in srgb,var(--mcol) 45%,transparent)}
-.mcard>.mch b{font-size:18px;color:color-mix(in srgb,var(--mcol) 55%,var(--ink))}
-.mcard>.mch .lnk{background:var(--mcol)!important;color:#fff!important}
-.mcard.inc{--mcol:#16a37f}.mcard.bil{--mcol:#6d5ce8}.mcard.tob{--mcol:#d9468f}.mcard.spd{--mcol:#e0841e}.mcard.sav{--mcol:#2a7fc0}
-.mrow.mtb{cursor:default;padding:6px 6px 6px 8px;flex-direction:row!important;text-transform:none!important}.mtbk{width:26px;height:26px;border-radius:50%;border:2px solid #d9468f;background:transparent;flex:0 0 auto;cursor:pointer}
-.mtbm{flex:1;display:flex;align-items:center;gap:10px;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:3px 0;cursor:pointer;min-width:0}.mtbm .bcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+/* ---- money sections: solid "liquid glass" heading bands, each with its own color and texture ---- */
+.mcard{position:relative;padding:0 12px 12px!important;overflow:hidden;border-radius:24px!important;border:1px solid color-mix(in srgb,var(--mcol) 50%,transparent)!important;background:linear-gradient(180deg,color-mix(in srgb,var(--mcol) 9%,var(--card)),var(--card) 55%)!important;box-shadow:0 18px 34px -18px color-mix(in srgb,var(--mcol) 70%,transparent),0 1px 0 rgba(255,255,255,.05) inset!important}
+.mcard>.mch{position:relative;isolation:isolate;margin:0 -12px 12px;padding:14px 14px 15px;border:0;color:#fff;background:var(--mpat,none),linear-gradient(125deg,var(--mcol),var(--mcol2));box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -10px 24px -14px rgba(0,0,0,.45) inset}
+.mcard>.mch::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(120% 90% at 0% 0%,rgba(255,255,255,.32),transparent 55%)}
+.mcard>.mch b{font-size:20px;font-weight:850;letter-spacing:-.02em;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.mcard>.mch small{color:rgba(255,255,255,.88)!important;font-weight:650}
+.mcard>.mch .mce{width:46px;height:46px;border-radius:16px;background:rgba(255,255,255,.22)!important;border:1px solid rgba(255,255,255,.45);box-shadow:0 8px 18px -6px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.6) inset!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mcard>.mch .mce img,.mcard>.mch .mce .emo{filter:drop-shadow(0 4px 5px rgba(0,0,0,.3));transform:translateY(-1px)}
+.mcard>.mch .lnk{background:#fff!important;color:var(--mcol)!important;font-weight:850!important;box-shadow:0 6px 14px -6px rgba(0,0,0,.45);border:0}
+.mcard.inc{--mcol:#0f9f78;--mcol2:#3ad29f;--mpat:repeating-linear-gradient(135deg,rgba(255,255,255,.09) 0 2px,transparent 2px 13px)}
+.mcard.bil{--mcol:#5b48e0;--mcol2:#9b6cff;--mpat:radial-gradient(rgba(255,255,255,.2) 1.3px,transparent 1.8px) 0 0/13px 13px}
+.mcard.spd{--mcol:#e06a12;--mcol2:#ffae3d;--mpat:repeating-radial-gradient(circle at 105% -10%,rgba(255,255,255,.12) 0 2px,transparent 2px 15px)}
+.mcard.sav{--mcol:#1f6fd1;--mcol2:#41b8f5;--mpat:radial-gradient(circle at 82% 30%,rgba(255,255,255,.22) 0 7px,transparent 8px),radial-gradient(circle at 92% 70%,rgba(255,255,255,.16) 0 4px,transparent 5px),radial-gradient(circle at 70% 78%,rgba(255,255,255,.14) 0 3px,transparent 4px)}
+.mcard .mrow{background:color-mix(in srgb,var(--bc) 10%,rgba(255,255,255,.02));border-left-width:4px}
+/* To buy: a wish ticket, nothing like the others */
+.mcard.tob{--mcol:#e0367f;--mcol2:#ff8a3d;border:0!important;background:linear-gradient(var(--card),var(--card)) padding-box,conic-gradient(from 210deg,#ff5fa2,#ffb03b,#8f6bff,#3fd0c9,#ff5fa2) border-box!important;border:2px solid transparent!important}
+.mcard.tob>.mch{background:radial-gradient(circle at 0 100%,var(--card) 0 9px,transparent 10px),radial-gradient(circle at 100% 100%,var(--card) 0 9px,transparent 10px),conic-gradient(from 200deg at 30% 120%,#ff4f9a,#ff8a3d,#ffcf4a,#b06bff,#ff4f9a);padding-bottom:18px;margin-bottom:14px}
+.mcard.tob>.mch::before{content:"";position:absolute;left:14px;right:14px;bottom:-1px;border-bottom:2.5px dashed color-mix(in srgb,var(--card) 92%,transparent)}
+.mcard.tob>.mch .mce{border-radius:50%}
+.mcard.tob>.mch b::after{content:"WISH LIST";margin-left:8px;vertical-align:3px;font-size:9.5px;letter-spacing:.14em;font-weight:900;padding:3px 7px;border-radius:99px;background:rgba(0,0,0,.22);color:#fff}
+.mrow.mtb{position:relative;cursor:default;padding:8px 8px 8px 10px!important;gap:10px;border:0!important;border-radius:16px!important;background:color-mix(in srgb,#ff5fa2 9%,rgba(255,255,255,.03))!important;box-shadow:0 0 0 1px color-mix(in srgb,#ff5fa2 22%,transparent) inset}
+.mrow.mtb.soon{background:linear-gradient(110deg,color-mix(in srgb,#ff5fa2 22%,transparent),color-mix(in srgb,#ffb03b 14%,transparent))!important;box-shadow:0 0 0 1.5px #ff7aa8 inset,0 10px 22px -14px #ff4f9a}
+.mtbk{width:28px;height:28px;border-radius:50%;border:2.5px solid #ff6fa5;background:transparent;flex:0 0 auto;cursor:pointer;display:grid;place-items:center;color:transparent;font-size:15px;font-weight:900;transition:.2s}.mtbk:hover{background:#ff6fa5;color:#fff}.mtbk::after{content:"✓"}
+.mtbm{flex:1;display:flex;align-items:center;gap:10px;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:2px 0;cursor:pointer;min-width:0}.mtbm .bcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.mtbm .bcn b{font-size:16px!important;font-weight:800}
+.tbwhen{align-self:flex-start;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.08);color:var(--muted)}.mtb.soon .tbwhen{background:#ff4f9a;color:#fff}
+.tbtag{position:relative;flex:0 0 auto;display:flex;align-items:center;font-size:15px;font-weight:900;color:#2a1020;padding:7px 11px 7px 20px;background:linear-gradient(135deg,#ffd36b,#ff9f59);clip-path:polygon(12px 0,100% 0,100% 100%,12px 100%,0 50%);border-radius:0 9px 9px 0}
+.tbtag::before{content:"";position:absolute;left:9px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--card)}
+.tbtag.none{background:rgba(255,255,255,.12);color:var(--muted);font-weight:700;font-size:12px}
 .tbgot{display:block;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .bkin{display:flex;flex-direction:column;gap:8px}.bkrng{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.bkrng .inp{width:80px;flex:0 0 auto}.bkrng span:first-child{flex:1}
 .bkpv{color:var(--ink);font-weight:700;font-size:14px;min-height:18px}
@@ -1168,6 +1196,9 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .bkpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px}
 .bkp{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 6px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .bkp[aria-pressed="true"]{background:#e0a21e;border-color:#e0a21e;color:#1b1436}.bkp.have{opacity:.5;cursor:default}
+.c2next{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;text-align:left;border:0;border-radius:18px;padding:10px 12px;font:inherit;color:#fff;cursor:pointer;background:linear-gradient(120deg,color-mix(in srgb,#9b7bff 55%,transparent),color-mix(in srgb,#ff5d8f 45%,transparent));box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 10px 22px -14px #9b7bff}
+.c2next .c2ni{font-size:24px;width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.2)}.c2next span:nth-child(2){flex:1;display:flex;flex-direction:column}.c2next small{font-size:11.5px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.05em}.c2next b{font-size:16px}
+.c2next em{font-style:normal;font-size:12.5px;font-weight:850;padding:6px 11px;border-radius:99px;background:#fff;color:#7d4bea}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2678,10 +2709,12 @@ function careCycle(){const o=PARTNER,nmO=plainNm(o);if(!o||!P(o)||P(o).placehold
       onclick:ok?ev=>{const b=ev.currentTarget;if(b.dataset.arm!=="1"){wk.querySelectorAll(".arm").forEach(x=>{x.classList.remove("arm");x.dataset.arm=""});b.dataset.arm="1";b.classList.add("arm");toast("Tap again",fut?"to set "+shortDate(k)+" as when her next period starts":"to log "+shortDate(k)+" as the first day");return}fut?setNext(k):log(k)}:null},
       h("small",null,k===today?"Today":d.toLocaleDateString("en-US",{weekday:"narrow"})),h("b",null,String(d.getDate())),h("i",null,st?"🌸":""))}));
   const ring=cycleRing(R,112,today);
+  const nxp=h("input",{type:"date",class:"inp cydate",min:addDays(R.last,15),max:addDays(R.last,60),value:R.next,"aria-label":"When her next period should start"});nxp.onchange=()=>{if(nxp.value)setNext(nxp.value)};
+  const nextChip=ro?null:h("button",{type:"button",class:"c2next tap",onclick:()=>{nxp.style.display="block";try{nxp.showPicker()}catch(e){nxp.focus()}}},h("span",{class:"c2ni"},"🔮"),h("span",null,h("small",null,R.nextSet?"Next period · set by you":"Next period · estimate"),h("b",null,parseKey(R.next).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+" · in "+Math.max(0,toNext)+(toNext===1?" day":" days"))),h("em",null,R.nextSet?"Change":"Set date"));
   return h("section",{class:"cyc2",style:"--pc:"+PHC[ph]},
     h("button",{type:"button",class:"c2top tap","aria-label":"Open the full cycle",onclick:ro?takeOverSheet:logHerSheet},ring,
       h("div",{class:"c2tx"},h("small",null,ro?"Your cycle":nmO+"'s cycle"),h("b",null,CPH[ph][1]+" "+CPH[ph][2]),h("span",{class:"c2chip"},sub),h("p",null,CPH[ph][3]))),
-    wk,
+    wk,nextChip,nxp,
     ro?h("button",{type:"button",class:"c2btn tap",onclick:takeOverSheet},plainNm(o)+" logs this for you · take over"):
     ui.cq?quick():h("div",{class:"c2row"},h("button",{type:"button",class:"c2btn main tap",onclick:()=>{ui.cq=true;render()}},"🌸 Period started"),h("button",{type:"button",class:"c2btn tap",onclick:logHerSheet},"✏️ Edit")))}
 const PHC={period:"#ff5d8f",follicular:"#3fd0a6",ovulation:"#ffc94d",luteal:"#d4a35f",pre:"#9b7bff",late:"#ff8a5b"};
@@ -2749,6 +2782,8 @@ function cycVisual(R,today,logFn,who,ed){const out=[];
       R.fixed?h("button",{type:"button",class:"lnk",onclick:()=>{ed.save({clen:0});ed.re()}},R.n>1?"Use her real average ("+R.auto+" days)":"Back to the usual 28"):h("small",null,R.n>1?"Worked out from the dates you logged":"Usual 28 until you log a second month"),
       h("small",{style:"margin-top:4px"},"Period starts you logged (tap × to remove):"),
       h("div",{class:"cychips"},(ed.L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button",class:"tap","aria-label":"Remove "+shortDate(k),onclick:()=>{ed.save({starts:(ed.L.starts||[]).filter(x=>x!==k)});ed.re()}},"🌸 "+shortDate(k)+"  ×")))):null,
+    ed?(()=>{const np=h("input",{type:"date",class:"inp cydate",min:addDays(R.last,15),max:addDays(R.last,60),value:R.next,"aria-label":"When the next period should start"});np.onchange=()=>{if(np.value){ed.save({nextAt:np.value});toast("Next period set 🌸",shortDate(np.value));ed.re()}};
+      return h("div",{class:"cylog"},h("small",null,"Know when the next one is due, e.g. from her period app? Set it:"),h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"cyother tap",onclick:()=>{np.style.display="block";try{np.showPicker()}catch(e){np.focus()}}},"🔮 Next period date"),R.nextSet?h("button",{type:"button",class:"cyother tap",onclick:()=>{ed.save({nextAt:""});ed.re()}},"Use the estimate"):null),np)})():null,
     h("div",{class:"cylog"},h("small",null,"When a new period starts, log it here:"),h("div",{class:"row",style:"justify-content:center;gap:8px"},logBtn,otherBtn),other));
   return out}
 const cycKnobs=(L,save,re)=>[(L.starts||[]).length?h("div",{class:"chips"},(L.starts||[]).slice().sort().reverse().slice(0,8).map(k=>h("button",{type:"button","aria-label":"Remove "+shortDate(k),onclick:()=>{save({starts:(L.starts||[]).filter(x=>x!==k)});re()}},shortDate(k)+" ×"))):null,
@@ -4335,7 +4370,7 @@ function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••�
     plan?h("div",{class:"mh3bar"},h("i",{class:"b",style:"width:"+pc(billsM)+"%"}),h("i",{class:"s",style:"width:"+pc(other)+"%"}),h("i",{class:"l",style:"width:"+pc(left)+"%"})):null,
     plan?h("div",{class:"mh3k"},h("span",{class:"i"},"In ",h("b",null,M(plan))),h("span",{class:"b"},"Bills ",h("b",null,M(billsM))),h("span",{class:"s"},"Spent ",h("b",null,M(other)))):null,
     ro?null:h("div",{class:"macts"},act("💵","Income",()=>incomeSheet(null),!INC),act("🛒","Spending",()=>spendSheet(null),!!INC),act("🔁","Bill",()=>billSheet(null)),act("🔄","Subscription",()=>subSheet(null))));
-  const card=(e,t,sub,add,body,cls)=>h("div",{class:"mcard"+(cls?" "+cls:"")},h("div",{class:"mch"},h("span",{class:"mce"},emo(e,20,false)),h("div",null,h("b",null,t),sub?h("small",null,sub):null),add&&!ro?h("button",{type:"button",class:"lnk",onclick:add[1]},add[0]):null),body);
+  const card=(e,t,sub,add,body,cls)=>h("div",{class:"mcard"+(cls?" "+cls:"")},h("div",{class:"mch"},h("span",{class:"mce"},emo(e,30,false)),h("div",null,h("b",null,t),sub?h("small",null,sub):null),add&&!ro?h("button",{type:"button",class:"lnk",onclick:add[1]},add[0]):null),body);
   const row=(e,col,t,sub,amt,fn,cls)=>h(ro?"div":"button",{type:ro?null:"button",class:"mrow"+(ro?"":" tap")+(cls?" "+cls:""),style:"--bc:"+col,onclick:ro?null:fn},h("span",{class:"bci"},emo(e,18,false)),h("span",{class:"bcn"},h("b",null,t),sub?h("small",null,sub):null),h("b",{class:"spa"},amt));
   const empty=t=>h("p",{class:"mempty"},t);
   const incC=card("💵","Money in",IL.length?M(INC)+" a month":null,["+ Add",()=>incomeSheet(null)],IL.length?h("div",{class:"mrows"},IL.map(x=>row("💵","#16a37f",x.name,null,"+ "+M(x.amt),()=>incomeSheet(x)))):empty(ro?"None added":"Stipend, pay, side gigs. Add each one once."),"inc");
@@ -4353,10 +4388,10 @@ function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••�
         h("span",{class:"bcn"},h("b",null,c.name),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"}))),h("span",{class:"bca"},h("b",null,M(s2)),l?h("small",null,"of "+M(l)):null))})):empty(ro?"Nothing logged yet":"Nothing logged yet this month."),
       hid&&!ro?h("button",{type:"button",class:"lnk madd2",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show fewer":"All categories · set limits"):null),"spd");
   const TB=toBuy(),open=TB.filter(x=>!x.bought).sort((a,b)=>(a.ord??1e9)-(b.ord??1e9)||(a.when||"9999").localeCompare(b.when||"9999")),got=TB.filter(x=>x.bought&&x.boughtAt&&x.boughtAt.slice(0,7)===mk),estT=open.reduce((t,x)=>t+(+x.est||0),0);
-  const tbRow=x=>{const d=x.when?daysBetween(today,x.when):null,sub=[x.when?(d<0?"Planned "+shortDate(x.when):d===0?"Today":d===1?"Tomorrow":shortDate(x.when)+" · in "+d+" days"):null,x.note||null].filter(Boolean).join(" · ");
+  const tbRow=x=>{const d=x.when?daysBetween(today,x.when):null,wh=x.when?(d<0?"Planned "+shortDate(x.when):d===0?"🎉 Today":d===1?"Tomorrow":shortDate(x.when)+" · "+d+" days"):null;
     return h("div",{"data-id":x.id,class:"mrow mtb"+(d!==null&&d<=3&&d>=0?" soon":""),style:"--bc:#d9468f"},
       ro?h("span",{class:"bci"},emo("🛍️",18,false)):h("button",{type:"button",class:"mtbk tap","aria-label":"Bought "+x.name,onclick:()=>boughtSheet(x)}),
-      h(ro?"span":"button",{type:ro?null:"button",class:"mtbm"+(ro?"":" tap"),onclick:ro?null:()=>toBuySheet(x)},h("span",{class:"bcn"},h("b",null,x.name),sub?h("small",null,sub):null),h("b",{class:"spa"},x.est?"≈ "+M(x.est):"")))};
+      h(ro?"span":"button",{type:ro?null:"button",class:"mtbm"+(ro?"":" tap"),onclick:ro?null:()=>toBuySheet(x)},h("span",{class:"bcn"},h("b",null,x.name),wh?h("span",{class:"tbwhen"},wh):null,x.note?h("small",null,x.note):null),h("span",{class:"tbtag"+(x.est?"":" none")},x.est?M(x.est):"no price")))};
   const tbC=card("🛍️","To buy",open.length?M(estT)+" planned"+(INC&&plan?" · "+Math.round(estT/plan*100)+"% of this month's income":""):null,["+ Add",()=>toBuySheet(null)],
     h("div",null,open.length?(()=>{const L=h("div",{class:"mrows"},open.map(tbRow));if(!ro&&open.length>1)dragSort(L,ids=>{const o={};ids.forEach((id,i)=>o[id]={ord:i});saveMoney({tobuy:o});toast("Order saved ✓","")});return L})():empty(ro?"Nothing planned":"Plan a purchase before you make it, e.g. GTA 6 on Black Friday, with an estimated price."),
       got.length?h("small",{class:"tbgot"},"Bought this month: "+got.map(x=>x.name+" "+M(x.paid||0)).join(" · ")):null),"tob");
@@ -4367,7 +4402,7 @@ function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••�
     h("div",{class:"mcolA"},hero,moneyInsights(mk,INC,show),h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" summary"),spentIn(lm)?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]):null)),
     h("div",{class:"mcolB"},incC,billC,tbC,spC,svC))}
 function sharedMoney(){const show=unlocked(),M=v=>show?money(v):"••••",raw=MONEY().goals||{},gs=goals().filter(g=>raw[g.id]||goalSaved(g.id)>0),tot=gs.reduce((x,g)=>x+goalSaved(g.id),0);
-  return h("div",{class:"mshared","data-mctx":"shared"},h("div",{class:"mch"},h("span",{class:"mce"},emo("💞",20,false)),h("div",null,h("b",null,"Together"),h("small",null,gs.length?M(tot)+" put in by both of you":"For things you both chip in for: visits, trips, gifts")),
+  return h("div",{class:"mshared","data-mctx":"shared"},h("div",{class:"mch"},h("span",{class:"mce"},emo("💞",30,false)),h("div",null,h("b",null,"Together"),h("small",null,gs.length?M(tot)+" put in by both of you":"For things you both chip in for: visits, trips, gifts")),
       h("button",{type:"button",class:"lnk",onclick:()=>goalEditSheet(null)},"+ New")),
     gs.length?h("div",{class:"goals"},gs.map(goalCard)):h("button",{type:"button",class:"mshadd tap",onclick:()=>goalEditSheet({id:"visits",name:"Visit fund",e:"✈️",target:0,date:"",order:0})},emo("✈️",22,false),h("span",null,h("b",null,"Start a visit fund"),h("small",null,"Each of you adds what you put in"))))}
 function spendSheet(cat){let c=cat?cat.id:(ui.lastCat||"food"),manual=!!cat;juSheet("Log spending",()=>{
@@ -4429,7 +4464,7 @@ function home3dSheet(){const link=US.main.homeLink||"",inp=h("input",{type:"url"
   openSheet("3D home",h("div",{class:"body"},h("div",{class:"row"},h("a",{class:"btn",href:"https://planner5d.com/",target:"_blank",rel:"noopener"},"Planner 5D"),h("a",{class:"btn gh",href:"https://www.homestyler.com/",target:"_blank",rel:"noopener"},"Homestyler")),
     h("form",{class:"row",onsubmit:e=>{e.preventDefault();let l=inp.value.trim();if(l&&!/^https?:\/\//.test(l))l="https://"+l;saveUs({homeLink:l});closeSheet();toast(l?"Saved":"Removed","")}},h("div",{style:"flex:1 1 200px"},inp),h("button",{type:"submit",class:"ghost"},"Save"))))}
 /* a clear chapter header, so moving from one part of a tab to the next is obvious */
-function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},e),h("b",null,title),h("i")),node)}
+function chapter(e,title,node,cls){if(!node)return null;return h("div",{class:"chapter"+(cls?" "+cls:"")},h("div",{class:"chaphd"},h("span",{class:"chape"},emo(e,28,false)),h("b",null,title),h("i")),node)}
 function viewHome(){return [ui.ovOpen?visionPoster():null,chapter("💰","Money",moneySection()),chapter("🏡","Dream home",homeDesignSection())]}
 /* The Aboagye home: one vision statement and the pillars you live by */
 const HOME0={stmt:"A home that belongs to God, where love is spoken every day, and where our science, music and faith lift the poor, the disabled, and the brilliant but needy.",
@@ -5405,7 +5440,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-23-e";
+const APP_VERSION="2026-11-23-f";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
