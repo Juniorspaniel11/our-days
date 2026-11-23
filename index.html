@@ -1149,6 +1149,8 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .mrow.mtb{cursor:default;padding:6px 6px 6px 8px;flex-direction:row!important;text-transform:none!important}.mtbk{width:26px;height:26px;border-radius:50%;border:2px solid #d9468f;background:transparent;flex:0 0 auto;cursor:pointer}
 .mtbm{flex:1;display:flex;align-items:center;gap:10px;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:3px 0;cursor:pointer;min-width:0}.mtbm .bcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .tbgot{display:block;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.bkin{display:flex;flex-direction:column;gap:8px}.bkrng{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.bkrng .inp{width:80px;flex:0 0 auto}.bkrng span:first-child{flex:1}
+.bkpv{color:var(--ink);font-weight:700;font-size:14px;min-height:18px}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -4541,13 +4543,18 @@ function bigBanner(){const bs=bigToday(PARTNER),mine=bigToday(ME);if(!bs.length&
 const BPLANS=[["john","Gospel of John","JHN",21],["mark","Gospel of Mark","MRK",16],["proverbs","Proverbs","PRO",31],["psalms","Psalms 1 to 30","PSA",30],["romans","Romans","ROM",16],["acts","Acts","ACT",28],["philippians","Philippians to Colossians","PHP",4],["genesis","Genesis","GEN",50],["ruth","Ruth and Esther","RUT",4],["james","James","JAS",5]];
 const BIB=()=>US.bible||{};
 const saveBible=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/bible").set(o,{merge:true}).catch(syncErr)};
-function bplan(){const b=BIB();return b.plan?BPLANS.find(x=>x[0]===b.plan):null}
+function bplan(){const b=BIB();if(!b.plan)return null;const c=(b.custom||{})[b.plan];return c&&c.length>=4?c:BPLANS.find(x=>x[0]===b.plan)||null}
+/* all 66 books: name, code used by bible.com, chapters */
+const BBOOKS="Genesis GEN 50|Exodus EXO 40|Leviticus LEV 27|Numbers NUM 36|Deuteronomy DEU 34|Joshua JOS 24|Judges JDG 21|Ruth RUT 4|1 Samuel 1SA 31|2 Samuel 2SA 24|1 Kings 1KI 22|2 Kings 2KI 25|1 Chronicles 1CH 29|2 Chronicles 2CH 36|Ezra EZR 10|Nehemiah NEH 13|Esther EST 10|Job JOB 42|Psalms PSA 150|Proverbs PRO 31|Ecclesiastes ECC 12|Song of Songs SNG 8|Isaiah ISA 66|Jeremiah JER 52|Lamentations LAM 5|Ezekiel EZK 48|Daniel DAN 12|Hosea HOS 14|Joel JOL 3|Amos AMO 9|Obadiah OBA 1|Jonah JON 4|Micah MIC 7|Nahum NAM 3|Habakkuk HAB 3|Zephaniah ZEP 3|Haggai HAG 2|Zechariah ZEC 14|Malachi MAL 4|Matthew MAT 28|Mark MRK 16|Luke LUK 24|John JHN 21|Acts ACT 28|Romans ROM 16|1 Corinthians 1CO 16|2 Corinthians 2CO 13|Galatians GAL 6|Ephesians EPH 6|Philippians PHP 4|Colossians COL 4|1 Thessalonians 1TH 5|2 Thessalonians 2TH 3|1 Timothy 1TI 6|2 Timothy 2TI 4|Titus TIT 3|Philemon PHM 1|Hebrews HEB 13|James JAS 5|1 Peter 1PE 5|2 Peter 2PE 3|1 John 1JN 5|2 John 2JN 1|3 John 3JN 1|Jude JUD 1|Revelation REV 22".split("|").map(x=>{const m=x.match(/^(.*) (\S+) (\d+)$/);return [m[1],m[2],+m[3]]});
+function findBook(q){let t=(q||"").toLowerCase().replace(/\./g,"").replace(/\s+/g," ").trim();if(!t)return null;
+  t=t.replace(/^(first|1st|i) /,"1 ").replace(/^(second|2nd|ii) /,"2 ").replace(/^(third|3rd|iii) /,"3 ").replace(/^(the )?(gospel of|book of) /,"").replace(/\bjn\b|\bjhn\b/,"john").replace(/^mt$|^matt$/,"matthew").replace(/^mk$/,"mark").replace(/^lk$/,"luke").replace(/^ps$|^psa$/,"psalms").replace(/^prov$|^pr$/,"proverbs").replace(/^rom$/,"romans").replace(/^heb$/,"hebrews").replace(/^jas$/,"james").replace(/^rev$/,"revelation").replace(/^psalm$/,"psalms").replace(/^revelations$/,"revelation").replace(/^song of solomon$|^songs$|^song$/,"song of songs");
+  const k=x=>x.toLowerCase().replace(/ /g,""),tt=k(t);let b=BBOOKS.find(x=>k(x[0])===tt);if(b)return b;b=BBOOKS.filter(x=>k(x[0]).startsWith(tt));return b.length===1?b[0]:b.find(x=>k(x[0])===tt)||(tt.length>=3?b[0]:null)||null}
 const bRead=u=>Object.keys(((BIB().read||{})[BIB().plan]||{})[u]||{}).length;
-const bName=(pl,n)=>(pl[0]==="psalms"?"Psalm ":pl[1].replace(/^Gospel of /,"").replace(/ to .*| and .*/,"")+" ")+n;
+const bName=(pl,n)=>pl[5]?(pl[5]==="Psalms"?"Psalm":pl[5])+" "+(n+((pl[4]||1)-1)):(pl[0]==="psalms"?"Psalm ":pl[1].replace(/^Gospel of /,"").replace(/ to .*| and .*/,"")+" ")+n;
 const BVERS=[["NIV",111],["KJV",1],["NKJV",114],["ESV",59],["NLT",116],["MSG",97],["AMP",1588],["CSB",1713]];
 const bVer=u=>(BIB().ver||{})[u]||"NIV";
 const bVid=v=>(BVERS.find(x=>x[0]===v)||BVERS[0])[1];
-const bUrl=(pl,n,v)=>{v=v||bVer(ME);return "https://www.bible.com/bible/"+bVid(v)+"/"+pl[2]+"."+n+"."+v};
+const bUrl=(pl,n,v)=>{v=v||bVer(ME);return "https://www.bible.com/bible/"+bVid(v)+"/"+pl[2]+"."+(n+((pl[4]||1)-1))+"."+v};
 function bibleStrip(){const pl=bplan(),o=PARTNER;
   if(!pl)return h("button",{type:"button",class:"pc tap",style:"--c:#8a5a2b",onclick:bibleSheet},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Read the Bible together"),h("span",{class:"tx"},"Pick a book. You each read a chapter a day")),emo("📖",56,true)),h("div",{class:"foot"},h("span",{class:"hint"},"John, Proverbs, Psalms and more"),h("span",{class:"go"},"Choose")));
   const a=bRead(ME),b=bRead(o),next=Math.min(a+1,pl[3]),done=a>=pl[3];
@@ -4564,6 +4571,15 @@ function bibleSheet(){juSheet("Read the Bible together",()=>[h("p",{class:"hint"
   h("div",{class:"chips"},BVERS.map(([x])=>h("button",{type:"button","aria-pressed":String(x===bVer(ME)),onclick:()=>{saveBible({ver:{[ME]:x}});toast("Reading in the "+x,"Chapters open in the "+x)}},x))),
   h("p",{class:"hint",style:"font-size:14px"},"Chapters open in your version on bible.com, or in the Bible app if you have it."+(PARTNER&&P(PARTNER)&&!P(PARTNER).placeholder?" "+nm(PARTNER)+" reads the "+bVer(PARTNER)+".":"")),
   h("h2",{style:"font-size:19px"},"Choose a book"),
+  (()=>{const inp=h("input",{type:"text",class:"inp",list:"bbooks",placeholder:"Type any book, e.g. Ephesians, 1 Peter","aria-label":"Book"}),dl=h("datalist",{id:"bbooks"},BBOOKS.map(b=>h("option",{value:b[0]})));
+    const fr=h("input",{type:"number",min:"1",class:"inp",placeholder:"From","aria-label":"From chapter"}),to=h("input",{type:"number",min:"1",class:"inp",placeholder:"To","aria-label":"To chapter"});
+    const pv=h("small",{class:"bkpv"},"");const upd=()=>{const b=findBook(inp.value);if(!b){pv.textContent=inp.value.trim()?"Can't find that book. Check the spelling.":"";return}
+      fr.max=to.max=String(b[2]);const a=Math.max(1,Math.min(b[2],+fr.value||1)),z=Math.max(a,Math.min(b[2],+to.value||b[2]));pv.textContent="📖 "+b[0]+(a>1||z<b[2]?" "+a+" to "+z:"")+" · "+(z-a+1)+(z-a+1===1?" chapter":" chapters")+", one a day"};
+    [inp,fr,to].forEach(x=>x.addEventListener("input",upd));
+    return h("form",{class:"bkin",onsubmit:e=>{e.preventDefault();const b=findBook(inp.value);if(!b){inp.focus();upd();return}const a=Math.max(1,Math.min(b[2],+fr.value||1)),z=Math.max(a,Math.min(b[2],+to.value||b[2]));
+        const id="c-"+b[1]+"-"+a+"-"+z,nm0=b[0]+(a>1||z<b[2]?" "+a+" to "+z:"");saveBible({plan:id,custom:{[id]:[id,nm0,b[1],z-a+1,a,b[0]]},startedBy:ME,at:Date.now()});closeSheet();toast("Reading "+nm0,nm(PARTNER)+" sees it too")}},
+      inp,dl,h("div",{class:"bkrng"},h("span",null,"Chapters (optional)"),fr,h("span",null,"to"),to),pv,h("button",{type:"submit",class:"primary"},"Start reading"))})(),
+  h("p",{class:"hint",style:"margin:14px 0 6px"},"Or pick one of these"),
   h("div",{class:"actgrid"},BPLANS.map(pl=>h("button",{type:"button",class:"act tap",onclick:()=>{saveBible({plan:pl[0],startedBy:ME,at:Date.now()});closeSheet();toast("Reading "+pl[1],nm(PARTNER)+" sees it too")}},emo("📖",30,false),h("small",null,pl[1]+" · "+pl[3]+" days"))))])}
 
 /* ---------- Game night: games with a winner ---------- */
@@ -5337,7 +5353,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-23-b";
+const APP_VERSION="2026-11-23-c";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
