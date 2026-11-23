@@ -1151,6 +1151,18 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .tbgot{display:block;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .bkin{display:flex;flex-direction:column;gap:8px}.bkrng{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.bkrng .inp{width:80px;flex:0 0 auto}.bkrng span:first-child{flex:1}
 .bkpv{color:var(--ink);font-weight:700;font-size:14px;min-height:18px}
+/* books shelf */
+.bshelf{display:block;width:100%;box-sizing:border-box;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.14)}.bshh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;width:100%}.bshh b{font-size:15px;white-space:nowrap}.bshh .flink{white-space:nowrap;text-decoration:none!important;background:rgba(255,255,255,.14)!important;color:#fff!important;border-radius:99px;padding:5px 12px!important}
+.bshl{display:flex;flex-wrap:wrap;gap:7px}.bshb{display:flex;flex-direction:column;align-items:flex-start;border:0;border-radius:12px;padding:7px 11px;font:inherit;color:#fff;cursor:pointer;background:rgba(255,255,255,.12);border-left:4px solid #e0a21e}
+.bshb b{font-size:14px}.bshb small{font-size:11px;opacity:.8}.bshb.both{background:linear-gradient(135deg,rgba(224,162,30,.35),rgba(255,255,255,.1))}
+/* personal countdowns look playful, not like deadlines */
+.cd.pers{background:linear-gradient(150deg,#ffe3ef,#ffd9c2)!important;color:#5a2a3a!important;border:2px dashed #e46f9b!important}
+.cd.pers .num,.cd.pers .ttl{color:#5a2a3a!important}.cd.pers .kick,.cd.pers .unit,.cd.pers .dt{color:#a0466b!important}
+.perstag{position:absolute;top:8px;right:8px;font-size:11px;font-weight:800;background:#fff;color:#c2377a;border-radius:99px;padding:2px 8px}.cd{position:relative}
+.cdrow.pers{background:linear-gradient(90deg,color-mix(in srgb,#e46f9b 18%,var(--card)),var(--card))!important;border-left:4px dashed #e46f9b!important}
+.cdrow.pers .ttl small::before{content:"🎉 "}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cd.pers{background:linear-gradient(150deg,#4a2236,#4a2e22)!important;color:#ffd9e6!important}:root:not([data-theme="light"]) .cd.pers .num,:root:not([data-theme="light"]) .cd.pers .ttl{color:#ffe3ee!important}:root:not([data-theme="light"]) .cd.pers .kick,:root:not([data-theme="light"]) .cd.pers .unit,:root:not([data-theme="light"]) .cd.pers .dt{color:#ff9cc3!important}}
+:root[data-theme="dark"] .cd.pers{background:linear-gradient(150deg,#4a2236,#4a2e22)!important;color:#ffd9e6!important}:root[data-theme="dark"] .cd.pers .num,:root[data-theme="dark"] .cd.pers .ttl{color:#ffe3ee!important}:root[data-theme="dark"] .cd.pers .kick,:root[data-theme="dark"] .cd.pers .unit,:root[data-theme="dark"] .cd.pers .dt{color:#ff9cc3!important}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -2029,7 +2041,7 @@ function prayerBest(from,to){const log=S.shared.prayer.log,ks=Object.keys(log).s
 
 /* colors */
 const CAT={lab:["Lab & research","#246a73"],meeting:["Meeting","#3557a8"],class:["Class","#5b45a8"],workout:["Workout","#3f7d4e"],faith:["Faith","#22397a"],together:["Together","#8c2f55"],personal:["Personal","#56607a"]};
-const CDT={deadline:["Deadline","#8f2d36"],presentation:["Presentation","#5b45a8"],conference:["Conference","#2d5f9a"],visit:["Visit","#8c2f55"],project:["Project","#246a73"],other:["Countdown","#56607a"]};
+const CDT={personal:["Personal","#d9468f"],deadline:["Deadline","#8f2d36"],presentation:["Presentation","#5b45a8"],conference:["Conference","#2d5f9a"],visit:["Visit","#8c2f55"],project:["Project","#246a73"],other:["Countdown","#56607a"]};
 const PAL=["#8c2f55","#3557a8","#246a73","#5b45a8","#2d5f9a","#3f7d4e","#22397a","#6a4a7a"];
 function catOf(x){if(!x)return "personal";if(x.cat&&CAT[x.cat])return x.cat;const t=(x.title||"").toLowerCase();
   if(/meet|1:1|seminar|advisor|committee/.test(t))return "meeting";if(/lab|research|experiment|writing|analysis/.test(t))return "lab";
@@ -2122,6 +2134,9 @@ function countdownStrip(pid){
     const type=c.src==="project"?"project":(CDT[c.kind]?c.kind:"other");
     all.push({c,n,proj,title:c.title,col:proj?colorOf(pid,proj):c.color||null,
       kick:proj&&proj.pinned?"Priority":c.src==="shared"&&c.by&&c.by!==pid?"From "+P(c.by).name:CDT[type][0],open:()=>proj?pinProjSheet(pid,proj):countdownSheet(pid,c)})});
+  if(pid===ME)inMoney(ME,()=>toBuy()).filter(x=>!x.bought&&x.when&&x.when>=t).forEach(x=>{const n=daysBetween(t,x.when);all.push({c:{date:x.when,title:x.name,kind:"personal",e:"🛍️"},n,title:x.name,col:"#d9468f",kick:"🎉 To buy",pers:true,open:()=>{ui.mctxSheet=ME;toBuySheet(x)}})});
+  all.forEach(x=>{if(x.c&&(x.c.kind==="personal"||x.c.kind==="holiday")){x.pers=true;if(!/^🎉/.test(x.kick||""))x.kick="🎉 "+(x.c.kind==="holiday"?"Holiday":"Personal")}});
+  all.sort((a,b)=>(a.pin?-1:0)-(b.pin?-1:0)||(a.n??-1)-(b.n??-1));
   {const hol=nextHoliday(t);if(hol){const n=daysBetween(t,hol.date),it={c:{date:hol.date,title:hol.name,kind:"holiday",e:HOLE[hol.name]||"🇺🇸"},n,title:hol.name,col:"#3a4a8c",kick:"US holiday",open:holidaysSheet};
     let ix=all.findIndex(x=>!x.pin&&x.c&&x.c.date>hol.date);if(ix<0)ix=all.length;all.splice(ix,0,it)}}
   const used=new Set(all.filter(x=>x.col).map(x=>x.col));let pi=0;
@@ -2132,13 +2147,13 @@ function countdownStrip(pid){
   sec.appendChild(h("div",{class:"cdgrid"},big.map(it=>it.pin
     ?h("button",{type:"button",class:"cd pin",style:"--cdc:"+it.col,onclick:it.open},h("span",{class:"kick",style:"color:#ffd27a"},"Priority · no deadline"),
       h("span",{class:"ttl"},it.title),h("span",{class:"dt"},it.proj.next?"Next: "+it.proj.next:"Tap to add the next step"))
-    :h("button",{type:"button",class:"cd",style:"--cdc:"+it.col,onclick:it.open},
+    :h("button",{type:"button",class:"cd"+(it.pers?" pers":""),style:"--cdc:"+it.col,onclick:it.open},
       it.n<=7?h("span",{class:"soonchip"},it.n===0?"Today":"This week"):null,h("span",{class:"cdemo"},emo(it.c.e||kwEmoji(it.title)||CD_EMOJI[it.c.src==="project"?"project":(CDT[it.c.kind]?it.c.kind:"other")],34,false)),h("span",{class:"kick"},it.kick),
       h("span",{class:"num"},it.n===0?"Today":String(it.n)),it.n===0?null:h("span",{class:"unit"},it.n===1?"day left":"days left"),
       h("span",{class:"ttl"},it.title),h("span",{class:"dt"},shortDate(it.c.date))))));
   if(rest.length){
     const shown=ui.cdAll?rest:rest.slice(0,4),list=h("div",{class:"cdlist"});
-    shown.forEach(it=>list.appendChild(h("button",{type:"button",class:"cdrow",style:"--cdc:"+it.col,onclick:it.open},
+    shown.forEach(it=>list.appendChild(h("button",{type:"button",class:"cdrow"+(it.pers?" pers":""),style:"--cdc:"+it.col,onclick:it.open},
       h("span",{class:"ttl"},h("span",{class:"inemo"},emo((it.c&&it.c.e)||kwEmoji(it.title)||(it.pin?"📌":CD_EMOJI[it.c&&CDT[it.c.kind]?it.c.kind:"other"]),22,false)),it.title,h("small",null,it.pin?"Priority · no deadline":it.kick+" · "+longDate(it.c.date))),
       it.pin?h("span",{class:"n"},"Pinned"):h("span",{class:"n"},it.n===0?"Today":String(it.n),it.n===0?null:h("small",null,it.n===1?"day left":"days left")))));
     if(rest.length>4)list.appendChild(h("button",{type:"button",class:"link",style:"align-self:flex-start",onclick:()=>{ui.cdAll=!ui.cdAll;render()}},ui.cdAll?"Show less":"Show "+(rest.length-4)+" more"));
@@ -2201,7 +2216,7 @@ function addCountdownSheet(pid,existing,src){
   const colpick=h("div",{class:"catpick",role:"radiogroup","aria-label":"Color"},
     [h("label",null,h("input",{type:"radio",name:"cdcol",value:"",checked:!curCol}),h("span",{style:"background:var(--muted)"},"Auto"))]
     .concat(PAL.map((c,i)=>h("label",{title:"Color "+(i+1)},h("input",{type:"radio",name:"cdcol",value:c,checked:curCol===c,"aria-label":"Color "+(i+1)}),h("span",{style:"background:"+c+";width:34px;height:30px;padding:0"},"")))));
-  const kind=h("select",{class:"inp"},[["deadline","Deadline"],["presentation","Presentation"],["conference","Conference"],["visit","Visit"],["other","Other"]].map(([v,l])=>h("option",{value:v},l)));
+  const kind=h("select",{class:"inp"},[["deadline","Deadline"],["presentation","Presentation"],["conference","Conference"],["visit","Visit"],["personal","🎉 Personal (not work or school)"],["other","Other"]].map(([v,l])=>h("option",{value:v},l)));
   kind.value=existing?existing.kind||"other":"deadline";
 
   const sugg=h("input",{type:"checkbox",checked:!existing});
@@ -2249,14 +2264,17 @@ function todayHero(pid){
       if(!o.isDone)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>{toggleIn(pid,k,"skip",o.x.id);closeSheet();toast("Skipped for today",o.t)}},"⏭ Skip for today"));
       if(o.x.agenda)box.appendChild(h("button",{type:"button",class:"tmbtn",onclick:()=>agendaSheet(pid,o.x)},"📝 Agenda"))}
     box.appendChild(h("small",{class:"hint"},o.sub));openSheet(o.t,box)};
+  const okey=o=>o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id);
+  if(d.order&&d.order.length){const ix=new Map(d.order.map((x,i)=>[x,i]));list.forEach((o,i)=>o._i=i);list.sort((a,b)=>(ix.has(okey(a))?ix.get(okey(a)):999+a._i)-(ix.has(okey(b))?ix.get(okey(b)):999+b._i))}
   const MAX=20,used=new Map(),taken=new Set();
-  list.forEach((o,i)=>used.set(o,DPAL[i%DPAL.length]));
+  list.forEach((o,i)=>used.set(o,DPAL[(o._i??i)%DPAL.length]));
   const tile=o=>{const col=used.get(o),e=kwEmoji(o.t),run=S.timer&&S.timer.id===(o.task?"t:"+o.task.id:"e:"+(o.x&&o.x.id));
-    return h("div",{class:"dt"+(o.wide?" wide":"")+(o.st==="cur"?" cur":"")+(o.st==="miss"?" miss":"")+(o.one&&!o.isDone?" one":"")+(o.isDone?" isdone":"")+(o.st==="skip"?" skipped":""),style:"--tc:"+col},
+    return h("div",{"data-id":okey(o),class:"dt"+(o.wide?" wide":"")+(o.st==="cur"?" cur":"")+(o.st==="miss"?" miss":"")+(o.one&&!o.isDone?" one":"")+(o.isDone?" isdone":"")+(o.st==="skip"?" skipped":""),style:"--tc:"+col},
       h("button",{type:"button",class:"dtick",disabled:ro,"aria-pressed":String(!!o.isDone),"aria-label":o.isDone?(o.st==="skip"?"Restore "+o.t:o.t+" is done. Tap to undo"):"Mark "+o.t+" done",onclick:ev=>{if(ro)return;if(!o.isDone)cheer(ev);o.done()}},o.st==="skip"?"↺":"✓"),
       h("button",{type:"button",class:"dtx","aria-label":o.t+(ro?"":". More options"),onclick:()=>{if(!ro)menu(o)}},h("small",null,(run?"⏱ Focusing · ":"")+o.sub),h("b",null,e?h("span",{class:"inemo"},emo(e,20,false)):null,o.t),
         o.isDone?h("span",{class:"dstamp"},o.st==="skip"?"SKIPPED":"DONE ✓"):null,ro?null:h("span",{class:"dmenu","aria-hidden":"true"},"⋯")))};
   const tiles=h("div",{class:"dtiles"},list.slice(0,MAX).map(tile));
+  if(!ro&&list.length>1)dragSort(tiles,ids=>{d.order=ids;persist();toast("Order saved ✓","");render()});
   /* daily habits, editable right here */
   const ai=h("input",{type:"text",placeholder:"Add something for today","aria-label":"Add something for today"}),at=h("input",{type:"time","aria-label":"Time (optional)",title:"Time (optional)"});
   return h("section",{class:"dhero"},
@@ -2302,7 +2320,7 @@ function bookSheet(pid,hid){const p=P(pid),x=(p.habits||[]).find(y=>y.id===hid);
 function growWeek(pid,hid){const p=P(pid),k=tzNow(p.tz).key;let c=0;for(let i=0;i<7;i++){const dd=p.days[addDays(k,-i)];if(dd&&(dd.habits||[]).includes(hid))c++}return c}
 function growMe(pid){
   const ro=pid!==ME,p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hb=p.habits||[];
-  return h("section",{class:"notebook"},
+  const sec=h("section",{class:"notebook"},
     h("div",{class:"nbhead"},h("span",{class:"nbtitle"},ro?nm(pid)+" is growing 🌱":"Growing me 🌱"),hb.length?h("span",{class:"nbsub"},"this week"):null,ro?null:h("button",{type:"button",class:"nbedit",onclick:()=>growSheet(pid)},hb.length?"edit":"add")),
     hb.map(x=>{const on=d.habits.includes(x.id),w=growWeek(pid,x.id);
       if(isBookH(x)){const c=x.ch||0,T=x.total||0;return h("button",{type:"button",class:"nbrow nbbook"+(on?" on":""),disabled:ro,"aria-label":(x.book||x.title)+(x.book?", chapter "+c+" done":", set up the book"),onclick:()=>{if(!ro)bookSheet(pid,x.id)}},
@@ -2314,7 +2332,8 @@ function growMe(pid){
     !hb.length?["Read a book","Learn a new language","Learn a skill"].map(t=>h("button",{type:"button",class:"nbrow nbex",disabled:ro,"aria-label":"Add "+t,onclick:()=>{if(ro)return;(p.habits=p.habits||[]).push({id:uid(),title:t,goal:0});persist();render();toast("Added 🌱",t)}},
       h("span",{class:"nbbox"},"+"),h("span",{class:"nbtext"},t),h("span",{class:"nbcount"},"example"))):null,
     !hb.length?h("small",{class:"nbhint"},ro?nm(pid)+" sees these examples":"Tap one to keep it, or add your own"):null);
-}
+  if(hb.length){[...sec.querySelectorAll(":scope>.nbrow:not(.nbex)")].forEach((el,i)=>{if(hb[i])el.dataset.id=hb[i].id});if(!ro&&hb.length>1)dragSort(sec,ids=>{p.habits=reorderBy(p.habits,ids);persist();toast("Order saved ✓","");render()})}
+  return sec}
 function growSheet(pid){const p=P(pid),k=tzNow(p.tz).key,d=day(pid,k),hn=h("input",{type:"text",class:"inp",placeholder:"e.g. Read a book, learn a skill","aria-label":"New thing to grow"});
   const box=h("div",{class:"gsheet"},h("p",{class:"hint"},"Things you'd love to keep doing, not daily duties. Tap a bubble on the Today page on days you did it."),
     ...(p.habits||[]).map(x=>{const w=growWeek(pid,x.id),e=kwEmoji(x.title)||"🌱";return h("div",{class:"gsitem"},emo(e,28,false),h("div",{class:"tx"},h("b",null,x.title),h("small",null,w?w+"× in the last 7 days":"Not yet this week")),
@@ -3126,7 +3145,23 @@ function readingBlock(){
       nx&&!rt?h("button",{type:"button",class:"fbig mine",onclick:ev=>{saveBible({read:{[pl[0]]:{[ME]:{[nx]:mn.key}}}});hearts(ev.currentTarget,8);confetti(nx===N?160:40);toast(nx===N?"You finished "+pl[1]+" 🎉":"Chapter done ✓",real?nm(o)+" sees your progress":"")}},"✓ I read it"):null),
     lane(ME),real?lane(o):null,
     h("small",{class:"fhint"},"Tap any of your squares to tick or untick that chapter."),
-    h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(real?" · "+nm(o)+" reads the "+bVer(o):"")))}
+    h("button",{type:"button",class:"flink",onclick:bibleSheet},"Change book or Bible version"+(real?" · "+nm(o)+" reads the "+bVer(o):"")),bookShelf())}
+/* books of the Bible each of you finished: recorded automatically, earlier ones can be added */
+function bookShelf(){const pl=bplan(),F=BIB().finished||{},o=PARTNER,real=o&&P(o)&&!P(o).placeholder;
+  if(pl){const N=pl[3];[ME,o].filter(Boolean).forEach(u=>{if(bRead(u)>=N&&!(F[pl[0]]||{})[u]&&u===ME)setTimeout(()=>saveBible({finished:{[pl[0]]:{name:pl[1],[u]:tzNow(P(ME).tz).key}}}),0)})}
+  const L=Object.entries(F).map(([id,x])=>({id,...x})).filter(x=>x.name&&!x.removed).sort((a,b)=>((b[ME]||b[o]||"")).localeCompare(a[ME]||a[o]||""));
+  return h("div",{class:"bshelf"},h("div",{class:"bshh"},h("b",null,"📚 Books we've finished"),h("button",{type:"button",class:"flink",style:"margin:0",onclick:shelfAddSheet},"+ Add")),
+    L.length?h("div",{class:"bshl"},L.map(x=>{const both=x[ME]&&x[o];return h("button",{type:"button",class:"bshb tap"+(both?" both":""),onclick:()=>shelfAddSheet(x)},h("b",null,x.name),
+      h("small",null,both?"Both ✓":x[ME]?"You ✓":real?nm(o)+" ✓":""))}))
+    :h("small",{class:"fhint",style:"display:block"},"Finish a book and it lands here. Tap + Add for books you've already read."))}
+function shelfAddSheet(x0){juSheet(x0?x0.name:"A book we finished",()=>{const o=PARTNER,real=o&&P(o)&&!P(o).placeholder;
+  if(x0)return h("div",{class:"body"},h("p",{class:"hint"},[x0[ME]?"You finished it "+shortDate(x0[ME]):null,real&&x0[o]?nm(o)+" finished it "+shortDate(x0[o]):null].filter(Boolean).join(" · ")||"Marked as read"),
+    x0[ME]?null:h("button",{type:"button",class:"primary",onclick:()=>{saveBible({finished:{[x0.id]:{[ME]:tzNow(P(ME).tz).key}}});closeSheet()}},"I finished it too ✓"),
+    confirmBtn("Remove from the shelf",()=>{saveBible({finished:{[x0.id]:{removed:true}}});closeSheet()}));
+  const inp=h("input",{type:"text",class:"inp",list:"bbooks2",placeholder:"Which book? e.g. Ruth","aria-label":"Book"}),dl=h("datalist",{id:"bbooks2"},BBOOKS.map(b=>h("option",{value:b[0]})));let who="me";
+  const ch=h("div",{class:"chips"},[["me","Me"],["both","Both of us"]].concat(real?[["her",nm(o)]]:[]).map(([v,l])=>h("button",{type:"button","aria-pressed":String(v===who),onclick:ev=>{who=v;ch.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},l)));
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();const b=findBook(inp.value);if(!b){toast("Can't find that book","Check the spelling");return}const d=tzNow(P(ME).tz).key,o2={name:b[0]};
+      if(who!=="her")o2[ME]=d;if(who!=="me"&&real)o2[o]=d;saveBible({finished:{["b-"+b[1]]:o2}});closeSheet();toast("On the shelf 📚",b[0])}},inp,dl,h("p",{class:"hint",style:"margin:0"},"Who read it?"),ch,h("button",{type:"submit",class:"primary"},"Add to the shelf"))})}
 function ppMini(x){const f=PFOR.find(y=>y[0]===x.for)||PFOR[1];
   return h("div",{class:"ppitem"},emo(f[2],28,false),h("div",{class:"tx"},h("b",null,x.text),h("small",null,(x.by===ME?"You":nm(x.by))+" · "+f[1])),
     h("button",{type:"button",class:"ghost",onclick:()=>{saveDoc("prayer",{items:PP().map(y=>y.id===x.id?{...y,answered:true,answeredAt:Date.now(),answeredBy:ME}:y)});confetti(120);toast("Prayer answered 🙌","Thank God. It moves to your answered prayers")}},"Answered"))}
@@ -4300,13 +4335,13 @@ function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••�
       return h(ro?"div":"button",{type:ro?null:"button",class:"mrow cat"+(ro?"":" tap")+(l&&s2>l?" over":""),style:"--bc:"+bcol(c),onclick:ro?null:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,18,false)),
         h("span",{class:"bcn"},h("b",null,c.name),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"}))),h("span",{class:"bca"},h("b",null,M(s2)),l?h("small",null,"of "+M(l)):null))})):empty(ro?"Nothing logged yet":"Nothing logged yet this month."),
       hid&&!ro?h("button",{type:"button",class:"lnk madd2",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show fewer":"All categories · set limits"):null),"spd");
-  const TB=toBuy(),open=TB.filter(x=>!x.bought).sort((a,b)=>(a.when||"9999").localeCompare(b.when||"9999")),got=TB.filter(x=>x.bought&&x.boughtAt&&x.boughtAt.slice(0,7)===mk),estT=open.reduce((t,x)=>t+(+x.est||0),0);
+  const TB=toBuy(),open=TB.filter(x=>!x.bought).sort((a,b)=>(a.ord??1e9)-(b.ord??1e9)||(a.when||"9999").localeCompare(b.when||"9999")),got=TB.filter(x=>x.bought&&x.boughtAt&&x.boughtAt.slice(0,7)===mk),estT=open.reduce((t,x)=>t+(+x.est||0),0);
   const tbRow=x=>{const d=x.when?daysBetween(today,x.when):null,sub=[x.when?(d<0?"Planned "+shortDate(x.when):d===0?"Today":d===1?"Tomorrow":shortDate(x.when)+" · in "+d+" days"):null,x.note||null].filter(Boolean).join(" · ");
-    return h("div",{class:"mrow mtb"+(d!==null&&d<=3&&d>=0?" soon":""),style:"--bc:#d9468f"},
+    return h("div",{"data-id":x.id,class:"mrow mtb"+(d!==null&&d<=3&&d>=0?" soon":""),style:"--bc:#d9468f"},
       ro?h("span",{class:"bci"},emo("🛍️",18,false)):h("button",{type:"button",class:"mtbk tap","aria-label":"Bought "+x.name,onclick:()=>boughtSheet(x)}),
       h(ro?"span":"button",{type:ro?null:"button",class:"mtbm"+(ro?"":" tap"),onclick:ro?null:()=>toBuySheet(x)},h("span",{class:"bcn"},h("b",null,x.name),sub?h("small",null,sub):null),h("b",{class:"spa"},x.est?"≈ "+M(x.est):"")))};
   const tbC=card("🛍️","To buy",open.length?M(estT)+" planned"+(INC&&plan?" · "+Math.round(estT/plan*100)+"% of this month's income":""):null,["+ Add",()=>toBuySheet(null)],
-    h("div",null,open.length?h("div",{class:"mrows"},open.map(tbRow)):empty(ro?"Nothing planned":"Plan a purchase before you make it, e.g. GTA 6 on Black Friday, with an estimated price."),
+    h("div",null,open.length?(()=>{const L=h("div",{class:"mrows"},open.map(tbRow));if(!ro&&open.length>1)dragSort(L,ids=>{const o={};ids.forEach((id,i)=>o[id]={ord:i});saveMoney({tobuy:o});toast("Order saved ✓","")});return L})():empty(ro?"Nothing planned":"Plan a purchase before you make it, e.g. GTA 6 on Black Friday, with an estimated price."),
       got.length?h("small",{class:"tbgot"},"Bought this month: "+got.map(x=>x.name+" "+M(x.paid||0)).join(" · ")):null),"tob");
   const gs=goals().filter(g=>(MONEY().goals||{})[g.id]||goalSaved(g.id)>0);
   const svC=card("🫙","Savings",gs.length?M(gs.reduce((x,g)=>x+goalSaved(g.id),0))+" saved":null,["+ Goal",()=>goalEditSheet(null)],gs.length?h("div",{class:"goals"},gs.map(goalCard)):empty(ro?"No goals yet":"Emergency fund, a trip, a new laptop… Add a goal and put money towards it."),"sav");
@@ -5353,7 +5388,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-23-c";
+const APP_VERSION="2026-11-23-d";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
