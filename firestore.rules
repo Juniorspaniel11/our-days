@@ -33,9 +33,9 @@ service cloud.firestore {
           allow write: if isMember(cid) && request.auth.uid == uid;
         }
         // Photo, status, needs and the shared cycle view: both can see them, only the owner changes them.
-        // Private to their owner: the cycle dates ("cycle") and personal money ("money").
+        // The private cycle dates ("cycle") can only be read by their owner.
         match /extra/{doc} {
-          allow read: if isMember(cid) && ((doc != 'cycle' && doc != 'money') || request.auth.uid == uid);
+          allow read: if isMember(cid) && (doc != 'cycle' || request.auth.uid == uid);
           allow write: if isMember(cid) && request.auth.uid == uid;
         }
       }

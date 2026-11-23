@@ -1105,6 +1105,40 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .sheet .inp,.sheet textarea.inp{background:var(--card)!important;color:var(--ink)!important}
 /* laptop: Future page uses the width */
 @media (min-width:1000px){body.tab-future main.wrap{column-count:1!important;max-width:1100px}body.tab-future main.wrap>*{column-span:all}}
+/* ---- money v3 ---- */
+.money2 .mcolA,.money2 .mcolB{display:flex;flex-direction:column;gap:12px}
+.mperson{display:flex;flex-direction:column;gap:12px}
+.mwhos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mwho{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--line);border-radius:16px;padding:11px;background:var(--card);color:var(--ink);font:inherit;font-size:15.5px;cursor:pointer}
+.mwho.on{border-color:transparent;background:linear-gradient(135deg,#1a9e7a,#1f6f8b);color:#fff;box-shadow:0 8px 20px rgba(26,158,122,.3)}.mwe{font-size:19px}
+.mh3{border-radius:24px;padding:16px;color:#fff;display:flex;flex-direction:column;gap:6px;background:radial-gradient(120% 90% at 100% 0%,#3ad1a5 0%,transparent 55%),linear-gradient(140deg,#11806f,#1d5f8a);box-shadow:0 12px 28px rgba(17,128,111,.3)}
+.mh3.over{background:radial-gradient(120% 90% at 100% 0%,#ffb35c 0%,transparent 55%),linear-gradient(140deg,#c2562d,#8a2d4a)}
+.mh3t{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;opacity:.95}
+.mh3big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:-6px}.mh3big b{font-family:var(--fun);font-size:44px;line-height:1}.mh3big b.sm{font-size:32px}.mh3big span{font-size:16px;font-weight:700;opacity:.92}
+.mh3bar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.22);margin-top:6px}.mh3bar i{display:block;height:100%}.mh3bar .b{background:#b9a6ff}.mh3bar .s{background:#ffcf5c}.mh3bar .l{background:#7dffcf}
+.mh3k{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;opacity:.95}.mh3k span{display:flex;align-items:center;gap:5px}.mh3k span::before{content:"";width:9px;height:9px;border-radius:3px}.mh3k .i::before{background:#fff}.mh3k .b::before{background:#b9a6ff}.mh3k .s::before{background:#ffcf5c}
+.macts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.mact{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;border-radius:15px;padding:9px 4px;font:inherit;font-size:12.5px;font-weight:800;color:#fff;background:rgba(255,255,255,.16);cursor:pointer}.mact span{font-size:20px}
+.mact.main{background:#fff;color:#11806f}
+.mcard{border-radius:20px;background:var(--card);border:1px solid var(--line);padding:12px;box-shadow:0 6px 16px rgba(0,0,0,.05)}
+.mch{display:flex;align-items:center;gap:10px;margin-bottom:8px}.mch>div{flex:1;min-width:0;display:flex;flex-direction:column}.mch b{font-size:17px;letter-spacing:-.01em}.mch small{font-size:12.5px;color:var(--muted)}
+.mce{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--mcol,#7b6cf6) 16%,transparent);flex:0 0 auto}
+.mcard.inc{--mcol:#16a37f}.mcard.bil{--mcol:#7b6cf6}.mcard.spd{--mcol:#e0841e}.mcard.sav{--mcol:#2a6f97}
+.mrows{display:flex;flex-direction:column;gap:6px}
+.mrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-radius:14px;padding:9px 10px;background:color-mix(in srgb,var(--bc) 8%,transparent);border-left:4px solid var(--bc);font:inherit;color:var(--ink);cursor:pointer}
+.mrow .bcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.mrow .bcn b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mrow .bcn small{font-size:12.5px;color:var(--muted)}
+.mrow .spa{font-size:15px;white-space:nowrap}.mrow.paid{opacity:.65}.mrow.soon .bcn small{color:#e0662b;font-weight:700}.mrow.over .bca b{color:#e0662b}
+.mrow .bca{display:flex;flex-direction:column;align-items:flex-end}.mrow .bca small{font-size:11.5px;color:var(--muted)}
+.mempty{margin:2px 0 0;font-size:14px;color:var(--muted)}.madd2{margin-top:8px}
+.mro .lnk{display:none}
+.mshared{margin-top:14px;border-radius:22px;padding:12px;background:linear-gradient(150deg,color-mix(in srgb,#d9468f 12%,var(--card)),var(--card) 65%);border:1px solid color-mix(in srgb,#d9468f 30%,transparent)}
+.mshared .mce{--mcol:#d9468f}
+.mshadd{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1.5px dashed color-mix(in srgb,#d9468f 45%,transparent);border-radius:16px;padding:12px;background:none;font:inherit;color:var(--ink);cursor:pointer}.mshadd span{display:flex;flex-direction:column}.mshadd small{color:var(--muted);font-size:12.5px}
+@media (min-width:1000px){
+  body.tab-home main.wrap>.chapter:has(.money2){column-span:all}
+  body.tab-home .money2 .mperson{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-items:start}
+  body.tab-home .money2 .mcolA{position:sticky;top:16px}
+}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -1811,7 +1845,7 @@ function watchPerson(u,isMe){
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/need").onSnapshot(sn=>{if(S.people[u])S.people[u].need=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/partnerCycle").onSnapshot(sn=>{if(S.people[u])S.people[u].pcLog=sn.exists?sn.data():null;softRender()},()=>{}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/cyclePub").onSnapshot(sn=>{if(S.people[u])S.people[u].cyclePub=sn.exists?sn.data():null;softRender()},()=>{}));
-  if(isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/money").onSnapshot(sn=>{if(S.people[u]){S.people[u].money=sn.exists?sn.data():{};S.people[u].moneyLoaded=true;publishMoneySum()}softRender()},()=>{}));
+  list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/money").onSnapshot(sn=>{if(S.people[u]){S.people[u].money=sn.exists?sn.data():{};S.people[u].moneyLoaded=true;if(isMe)publishMoneySum()}softRender()},()=>{}));
   if(!isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/moneySum").onSnapshot(sn=>{if(S.people[u])S.people[u].moneySum=sn.exists?sn.data():null;softRender()},()=>{}));
   if(isMe)list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/cycle").onSnapshot(sn=>{if(S.people[u]){S.people[u].cycle=sn.exists?sn.data():null;S.people[u].cycleLoaded=true;cyclePublish(false)}softRender()},()=>{if(S.people[u])S.people[u].cycleLoaded=true}));
   list.push(DB.doc("couples/"+CID+"/people/"+u+"/extra/avatar").onSnapshot(sn=>{if(S.people[u])S.people[u].avatar=sn.exists?sn.data().photo:null;softRender()},()=>{}));
@@ -2029,7 +2063,7 @@ function sheetHide(){const sh=el("sheet"),pn=sh.querySelector(".pn"),bd=el("shee
       if(proj>pn.offsetHeight*.38&&y>0){closeSheet();return}
       pn.style.transform="";if(!sheetRM())pn.animate([{transform:"translateY("+y+"px)"},{transform:"translateY(0)"}],{duration:380,easing:SHEET_EASE})};
     z.addEventListener("pointerup",end);z.addEventListener("pointercancel",end)})})();
-function closeSheet(){sheetHide();sheetFn=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}render()}
+function closeSheet(){sheetHide();sheetFn=null;ui.mctxSheet=null;if(typeof sheetCleanup==="function"){sheetCleanup();sheetCleanup=null}render()}
 el("sheetClose").onclick=closeSheet;el("sheetBd").onclick=closeSheet;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!el("sheet").hidden)closeSheet()});
 let toastT=null;
@@ -2712,7 +2746,7 @@ function smoothPath(pts){if(pts.length<2)return pts.length?"M"+pts[0][0]+" "+pts
   for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
     d+=" C"+c1[0].toFixed(1)+" "+c1[1].toFixed(1)+" "+c2[0].toFixed(1)+" "+c2[1].toFixed(1)+" "+p2[0].toFixed(1)+" "+p2[1].toFixed(1)}return d}
 function goTo(tab,sel,after){go(tab);if(after)after();setTimeout(()=>{const t=sel&&document.querySelector(sel);if(t)t.scrollIntoView({behavior:sheetRM()?"auto":"smooth",block:"start"});else window.scrollTo({top:0})},80)}
-function pulse(pid){if(pid!==ME)return null;const p=P(pid),n=tzNow(p.tz),mon=addDays(n.key,-((n.dow+6)%7)),wk=Array.from({length:7},(_,i)=>addDays(mon,i));
+function pulse(pid){if(pid!==ME)return null;if(_mBuild!==ME)return inMoney(ME,()=>pulse(pid));const p=P(pid),n=tzNow(p.tz),mon=addDays(n.key,-((n.dow+6)%7)),wk=Array.from({length:7},(_,i)=>addDays(mon,i));
   const doneOn=k=>{const d=(p.days||{})[k];let c=d?(d.tasks||[]).filter(x=>x.t&&x.d).length:0;try{c+=itemsFor(pid,k).filter(x=>x.done).length}catch(e){}return c};
   const vals=wk.map(k=>k<=n.key?doneOn(k):null),tot=vals.reduce((a,v)=>a+(v||0),0);
   let left=0;try{const d=day(pid,n.key);left=itemsFor(pid,n.key).filter(x=>!x.done&&!x.skip).length+(d.tasks||[]).filter(x=>x.t&&!x.d).length}catch(e){}
@@ -3991,12 +4025,18 @@ function photoSheet(){let img=null;juSheet("Photo of the day",()=>{
 
 /* ---------- Home tab: saving together, wish lists, home design ---------- */
 /* money has two spaces: "mine" (private to each person, people/{me}/extra/money) and "ours" (shared, us/money) */
-const mScope=()=>ui.mscope||(()=>{try{return localStorage.getItem("od-mscope")||"mine"}catch(e){return "mine"}})();
+let _mBuild=null;
+const mWho=()=>{const w=ui.mwho;return w&&w!==ME&&!(P(w)&&!P(w).placeholder)?ME:(w||ME)};
+const mCtx=()=>_mBuild||ui.mctxSheet||mWho();
+const mScope=()=>mCtx()==="shared"?"ours":"mine";
 const myMoney=()=>(P(ME)||{}).money||{};
-const MONEY=()=>mScope()==="ours"?(US.money||{}):myMoney();
-const saveMoney=o=>{if(!DB||!CID)return;const ours=mScope()==="ours";
-  if(!ours){const p=P(ME);if(p){const m=JSON.parse(JSON.stringify(p.money||{}));(function mg(a,b){for(const k in b){if(b[k]&&typeof b[k]==="object"&&!Array.isArray(b[k])){a[k]=a[k]&&typeof a[k]==="object"?a[k]:{};mg(a[k],b[k])}else a[k]=b[k]}})(m,o);p.money=m}}
-  DB.doc(ours?"couples/"+CID+"/us/money":"couples/"+CID+"/people/"+ME+"/extra/money").set(o,{merge:true}).catch(syncErr);if(!ours)setTimeout(publishMoneySum,50)};
+const MONEY=()=>{const c=mCtx();return c==="shared"?(US.money||{}):c===ME?myMoney():((P(c)||{}).money||{})};
+const inMoney=(c,fn)=>{const p=_mBuild;_mBuild=c;try{return fn()}finally{_mBuild=p}};
+const saveMoney=o=>{if(!DB||!CID)return;const c=mCtx();
+  if(c!=="shared"&&c!==ME){toast("That's "+plainNm(c)+"'s money","Only "+plainNm(c)+" can change it");return}
+  if(c===ME){const p=P(ME);if(p){const m=JSON.parse(JSON.stringify(p.money||{}));(function mg(a,b){for(const k in b){if(b[k]&&typeof b[k]==="object"&&!Array.isArray(b[k])){a[k]=a[k]&&typeof a[k]==="object"?a[k]:{};mg(a[k],b[k])}else a[k]=b[k]}})(m,o);p.money=m}}
+  DB.doc(c==="shared"?"couples/"+CID+"/us/money":"couples/"+CID+"/people/"+ME+"/extra/money").set(o,{merge:true}).catch(syncErr);if(c===ME)setTimeout(publishMoneySum,50)};
+const setMScope=v=>{ui.mwho=v==="ours"?ME:v;render()};
 function sumMoney(m,mk){m=m||{};const inc=Object.values(m.income||{}).filter(x=>x&&!x.removed&&x.name).reduce((a,x)=>a+(+x.amt||0),0);
   const bl=Object.values(m.bills||{}).filter(b=>b&&!b.removed&&b.name&&!(b.from&&b.from>mk)&&!(b.yearly&&+mk.slice(5)!==+b.mon));
   const bills=bl.filter(b=>!b.sub).reduce((a,b)=>a+(+b.amt||0),0),subs=bl.filter(b=>b.sub).reduce((a,b)=>a+(+b.amt||0),0);
@@ -4004,20 +4044,6 @@ function sumMoney(m,mk){m=m||{};const inc=Object.values(m.income||{}).filter(x=>
   return {mk,inc,bills,subs,spent,left:inc-bills-subs-spent}}
 let _msumLast="";function publishMoneySum(){if(!DB||!CID||!P(ME)||!P(ME).moneyLoaded)return;const t=sumMoney(myMoney(),mKey()),k=JSON.stringify(t);if(k===_msumLast)return;_msumLast=k;
   DB.doc("couples/"+CID+"/people/"+ME+"/extra/moneySum").set(Object.assign({at:Date.now()},t)).catch(()=>{})}
-function moneyOverall(show){const mk=mKey(),M=v=>show?money(v):"••••",o=PARTNER,op=o&&P(o)&&!P(o).placeholder?P(o):null;
-  const mine=sumMoney(myMoney(),mk),ours=sumMoney(US.money||{},mk),hs=op&&op.moneySum&&op.moneySum.mk===mk?op.moneySum:null;
-  const rows=[["me","👤","You",mine,()=>{setMScope("mine");window.scrollTo({top:0,behavior:"smooth"})}],op?["her","🌸",plainNm(o),hs,null]:null,["ours","💞","Shared",ours,()=>{setMScope("ours");window.scrollTo({top:0,behavior:"smooth"})}]].filter(Boolean);
-  const add=(...xs)=>{const r={inc:0,bills:0,subs:0,spent:0,left:0};xs.filter(Boolean).forEach(x=>{for(const k in r)r[k]+=+x[k]||0});return r},both=add(mine,hs,ours);
-  const tot=both.inc||1;
-  const bar=t=>{const p=v=>Math.max(0,Math.min(100,v/(t.inc||Math.max(1,t.bills+t.subs+t.spent))*100));return htm("div","mvbar",'<span class="ovb1" style="width:'+p(t.bills+t.subs)+'%"></span><span class="ovb2" style="width:'+p(t.spent)+'%"></span>')};
-  const row=([id,e,l,t,fn],big)=>h(fn?"button":"div",{type:fn?"button":null,class:"ovr2 "+id+(fn?" tap":"")+(big?" ovall":""),onclick:fn},
-    h("div",{class:"ovt"},h("span",{class:"ovn"},h("i",null,e),h("b",null,l)),t?h("span",{class:"ovl"+(t.left<0?" neg":"")},h("b",null,(t.left<0?"−":"")+M(Math.abs(t.left))),h("small",null,t.left<0?" over":" left")):null),
-    t?bar(t):null,
-    t?h("div",{class:"ovd"},h("span",null,"In ",h("b",null,M(t.inc))),h("span",{class:"od1"},"Bills & subs ",h("b",null,M(t.bills+t.subs))),h("span",{class:"od2"},"Spent ",h("b",null,M(t.spent))))
-     :h("small",{class:"ovna"},"Shows once "+l+" opens the new version of the app"));
-  return h("section",{class:"movr"},h("div",{class:"movh"},h("b",null,"Overall ",h("em",null,monthName(mk).split(" ")[0])),h("small",null,"Totals only · each person's details stay private")),
-    ...rows.map(r=>row(r)),row(["both","🏡","All together",both,null],true))}
-const setMScope=v=>{ui.mscope=v;try{localStorage.setItem("od-mscope",v)}catch(e){}if(v==="mine"&&ui.monTab==="split")ui.monTab="budget";render();setTimeout(autoBills,300)};
 const WISH=()=>US.wish||{};
 const saveWish=o=>{if(DB&&CID)DB.doc("couples/"+CID+"/us/wish").set(o,{merge:true}).catch(syncErr)};
 const DEL=()=>firebase.firestore.FieldValue.delete();
@@ -4131,7 +4157,7 @@ const incomeTotal=()=>incomes().reduce((a,x)=>a+(+x.amt||0),0);
 function incomeSheet(i0){let who=i0?i0.by||ME:ME;juSheet(i0?"Edit income":"Money coming in",()=>{
   const n=h("input",{type:"text",class:"inp",placeholder:"Name, e.g. Stipend, Job, Side gig","aria-label":"Income name"});n.value=i0?i0.name:"";
   const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount each month (after tax)","aria-label":"Amount"});a.value=i0?i0.amt:"";
-  const people=(mScope()==="mine"?[ME]:[ME,PARTNER]).filter(u=>P(u)&&!P(u).placeholder),wc=h("div",{class:"chips"},people.map(u=>h("button",{type:"button","aria-pressed":String(u===who),onclick:ev=>{who=u;wc.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},u===ME?"Me":plainNm(u))));
+  const people=[ME].filter(u=>P(u)&&!P(u).placeholder),wc=h("div",{class:"chips"},people.map(u=>h("button",{type:"button","aria-pressed":String(u===who),onclick:ev=>{who=u;wc.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},u===ME?"Me":plainNm(u))));
   return [h("form",{class:"body",onsubmit:e=>{e.preventDefault();const nm0=n.value.trim(),v=amtIn(a.value);if(!nm0){n.focus();return}if(!v){toast("Amount needed","");return}if(!noSensitive(nm0))return;
       saveMoney({income:{[i0?i0.id:uid()]:{name:nm0,amt:v,by:who,at:i0?i0.at||Date.now():Date.now()}}});closeSheet();toast(i0?"Updated":"Added 💵",nm0+" · "+money2(v)+" a month")}},
     n,a,people.length>1?h("p",{class:"hint"},"Whose is it?"):null,people.length>1?wc:null,h("button",{type:"submit",class:"primary"},i0?"Save":"Add")),
@@ -4144,7 +4170,7 @@ const billEntry=(b,mk)=>(MONEY().spend||{})[billSid(b,mk)];
 function billLog(b,mk){return {cat:b.cat,amt:+b.amt,note:b.name,by:b.by||ME,at:Date.now(),mk,bill:b.id}}
 const billDue=(b,mk)=>!(b.yearly&&+mk.slice(5)!==+b.mon);
 const subMonthly=b=>b.yearly?(+b.amt||0)/12:(+b.amt||0);
-function autoBills(){if(PREVIEW||!DB||!CID)return;const mk=mKey(),today=usDay(),o={};
+function autoBills(){if(PREVIEW||!DB||!CID)return;if(_mBuild!==ME)return inMoney(ME,autoBills);const mk=mKey(),today=usDay(),o={};
   bills().forEach(b=>{if(b.from&&b.from>mk)return;if(!billDue(b,mk))return;if(billEntry(b,mk))return;if(billDayIn(b,mk)<=today)o[billSid(b,mk)]=billLog(b,mk)});
   if(Object.keys(o).length)saveMoney({spend:o})}
 function upcomingBills(mk){const today=usDay();return bills().filter(b=>!(b.from&&b.from>mk)&&billDue(b,mk)&&!billEntry(b,mk)&&billDayIn(b,mk)>today)}
@@ -4206,82 +4232,55 @@ function moneySummarySheet(mk){juSheet("Money summary",()=>{const R=moneyMonth(m
     R.byCat.length?h("div",{class:"rctable"},h("b",{style:"padding:6px 0 2px"},"Where it went"),R.byCat.slice(0,6).map(x=>h("div",{class:"msr"},h("span",null,emo(x.c.e,20,false),x.c.name),h("span",{class:"gbar"},h("i",{style:"width:"+Math.round(x.v/max*100)+"%;background:"+bcol(x.c)})),h("b",null,M(x.v))))):null,
     R.who.some(([,v])=>v)?h("p",{class:"hint",style:"text-align:center;font-size:14px"},"Logged by "+R.who.map(([u,v])=>(u===ME?"you":plainNm(u))+" "+M(v)).join(" · ")+(R.settled?" · "+M(R.settled)+" settled between you":"")):null]})}
 function moneySummaryDue(){const d=+usDay().slice(8);if(d>7)return null;const lm=addDays(mKey()+"-01",-1).slice(0,7);return moneyMonth(lm).n&&!seen("ms:"+lm)?lm:null}
-function moneySection(){const show=unlocked(),sc=mScope(),tab=sc==="mine"&&ui.monTab==="split"?"budget":(ui.monTab||"budget"),M=v=>show?money2(v):"••••";
-  const segb=(id,lab)=>h("button",{type:"button","aria-pressed":String(tab===id),onclick:()=>{ui.monTab=id;render()}},lab);
-  const lockLink=h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Turn lock off":"🔒 Unlock"):"🔒 Lock");
-  let pane;
-  if(tab==="budget"){setTimeout(autoBills,0);const mk=mKey(),cs=bcats();let lim=cs.reduce((a,c)=>a+Math.max(0,availIn(c,mk)),0),sp=spentIn(mk);
-    const lm=addDays(mk+"-01",-1).slice(0,7),lsp=spentIn(lm),up=upcomingBills(mk),upv=up.reduce((a,b)=>a+(+b.amt||0),0);
-    const upC=id=>up.filter(b=>b.cat===id).reduce((a,b)=>a+(+b.amt||0),0),used=sp+upv;
-    const INC=incomeTotal(),planV=INC||lim;lim=planV;const leftv=lim-used,paidB=spendIn(mk).filter(x=>x.bill).reduce((a,x)=>a+(+x.amt||0),0),billsM=paidB+upv,other=sp-paidB;
-    const BL=bills().filter(b=>!b.sub),SL=bills().filter(b=>b.sub),today=usDay();
-    const due=moneySummaryDue();
-    pane=[due?h("button",{type:"button",class:"pc tap",style:"--c:#2a9d8f",onclick:()=>{markSeen("ms:"+due);moneySummarySheet(due)}},h("div",{class:"pcrow"},h("div",{class:"pctext"},h("span",{class:"k"},"Your "+monthName(due).split(" ")[0]+" in money"),h("span",{class:"tx"},(()=>{const R=moneyMonth(due);return show?money2(R.tot)+" spent · "+money2(R.saved)+" saved":"Tap to see it"})())),emo("📊",48,true)),h("div",{class:"foot"},h("span",{class:"hint"},"Monthly summary"),h("span",{class:"go"},"See"))):null,
-      lim?(()=>{const dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1,base=Math.max(lim,used)||1,pc=v=>Math.max(0,v)/base*100;
-        return h("div",{class:"mh2"+(leftv<0?" over":"")},
-          h("div",{class:"mh2top"},h("span",null,monthName(mk).split(" ")[0]+" · "+dl+(dl===1?" day":" days")+" left"),emo(leftv<0?"😬":leftv<lim*0.15?"🫣":"🤑",40,true)),
-          h("div",{class:"mh2big"},h("b",null,leftv>=0?M(leftv):M(-leftv)),h("span",null,leftv>=0?"left to spend":"over the plan")),
-          leftv>0?h("small",{class:"mh2day"},"That's about "+(show?money2(Math.floor(leftv/dl)):"••")+" a day"):h("small",{class:"mh2day"},"Bills and spending are more than the plan"),
-          h("div",{class:"mh2bar"},h("i",{class:"b",style:"width:"+pc(billsM)+"%"}),h("i",{class:"s",style:"width:"+pc(other)+"%"}),h("i",{class:"l",style:"width:"+pc(leftv)+"%"})),
-          h("div",{class:"mh2key"},h("span",{class:"b"},"Bills"),h("span",{class:"s"},"Spent "+M(other)),h("span",{class:"l"},leftv>=0?"Left":"Over")),
-          h("div",{class:"mh2foot"},INC?h("span"):h("span",null,"Monthly plan "+M(lim)),h("button",{type:"button",class:"primary mlog",onclick:()=>spendSheet(null)},"+ Log spending")))})()
-      :h("div",{class:"mh2 empty"},emo("💰",56,true),h("b",{class:"mh2t"},"Start with what comes in"),h("small",{class:"mh2day"},"Add your monthly income. Bills and spending come out of it, and you'll see what's left."),
-          h("div",{class:"row",style:"justify-content:center;gap:8px"},h("button",{type:"button",class:"primary",onclick:()=>incomeSheet(null)},"💵 Add income"),h("button",{type:"button",class:"ghost",onclick:()=>spendSheet(null)},"+ Log spending"))),
-      (()=>{const pct=(a,b)=>b>0?Math.min(100,Math.round(a/b*100)):0,go=sel=>{const t=document.querySelector(sel);if(t)t.scrollIntoView({behavior:sheetRM()?"auto":"smooth",block:"start"})};
-        return h("div",{class:"mt2"},
-          h("button",{type:"button",class:"mt tap",style:"--mc:#7b6cf6",onclick:()=>go(".bills:not(.inc):not(.cats)")},h("span",{class:"mti"},emo("🔁",22,false)),h("b",null,"Bills"),
-            h("div",{class:"mtbar"},h("i",{style:"width:"+pct(paidB,billsM)+"%"})),h("span",{class:"mtl"},h("b",null,M(paidB))," paid"),h("span",{class:"mtl"},h("b",null,M(upv))," to go")),
-          INC?h("button",{type:"button",class:"mt tap",style:"--mc:#16a37f",onclick:()=>go(".bills.inc")},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),
-            h("div",{class:"mtbar"},h("i",{style:"width:"+pct(used,INC)+"%"})),h("span",{class:"mtl"},h("b",null,M(INC))," a month"),h("span",{class:"mtl"},h("b",null,pct(used,INC)+"%")," already used"))
-          :h("button",{type:"button",class:"mt tap add",style:"--mc:#16a37f",onclick:()=>incomeSheet(null)},h("span",{class:"mti"},emo("💵",22,false)),h("b",null,"Money in"),h("span",{class:"mtl"},"Add your income to see what's free")))})(),
-      moneyInsights(mk,INC,show),
-      (()=>{const IL=incomes(),ub=bills().filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0);
-        return h("div",{class:"bills inc"},h("div",{class:"billh"},h("b",null,"💵 Money in"),h("button",{type:"button",class:"lnk",onclick:()=>incomeSheet(null)},"+ Add income")),
-          IL.length?h("div",{class:"billrow"},IL.map(x=>h("button",{type:"button",class:"billr tap",style:"--bc:#1a9e7a",onclick:()=>incomeSheet(x)},h("span",{class:"bci"},emo("💵",20,false)),
-            h("span",{class:"bcn"},h("b",null,x.name),h("small",null,x.by===ME?"Yours":plainNm(x.by)+"'s")),h("b",{class:"spa",style:"color:#1a9e7a"},"+ "+M(x.amt)))))
-          :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Stipend, pay, side gigs. Add each one once."),
-          null)})(),
-      h("div",{class:"bills"},h("div",{class:"billh"},h("b",null,"🔁 Bills",BL.length?h("small",{class:"billtot"}," "+M(BL.filter(b=>!(b.from&&b.from>mk)).reduce((a,b)=>a+(+b.amt||0),0))+" a month"):null),h("button",{type:"button",class:"lnk",onclick:()=>billSheet(null)},"+ Add a bill")),
-        BL.length?h("div",{class:"billrow"},BL.map(b=>{const e=billEntry(b,mk),paid=e&&!e.skip,skip=e&&e.skip,notyet=b.from&&b.from>mk,dd=billDayIn(b,mk),dleft=daysBetween(today,dd);
-          const c=bcats().find(x=>x.id===b.cat)||{e:"✨",id:"other"};
-          return h("button",{type:"button",class:"billr tap"+(paid?" paid":"")+(!paid&&!skip&&!notyet&&dleft<=3?" soon":""),style:"--bc:"+bcol(c),onclick:()=>billSheet(b)},h("span",{class:"bci"},emo(c.e,20,false)),
-            h("span",{class:"bcn"},h("b",null,b.name),h("small",null,paid?"Paid ✓ "+shortDate(dd):skip?"Skipped this month":notyet?"Starts next month":dleft===0?"Due today":dleft===1?"Due tomorrow":"Due "+shortDate(dd))),
-            h("b",{class:"spa"},M(b.amt)))}))
-          :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Add rent, phone, tithe once. They log themselves.")),
-      (()=>{const tot=SL.reduce((a,b)=>a+subMonthly(b),0),srt=SL.slice().sort((x,y)=>subNext(x)<subNext(y)?-1:1);
-        return h("div",{class:"bills subs"},h("div",{class:"billh"},h("b",null,"🔄 Subscriptions"),h("button",{type:"button",class:"lnk",onclick:()=>subSheet(null)},"+ Add")),
-          SL.length?h("div",{class:"subsum"},h("div",null,h("b",null,M(tot)),h("small",null,"a month")),h("div",null,h("b",null,M(tot*12)),h("small",null,"a year")),h("div",null,h("b",null,String(SL.length)),h("small",null,SL.length===1?"subscription":"subscriptions"))):null,
-          SL.length?h("div",{class:"billrow"},srt.map(b=>{const nx=subNext(b),dl=daysBetween(today,nx);
-            return h("button",{type:"button",class:"billr tap"+(dl<=3?" soon":""),style:"--bc:#d9468f",onclick:()=>subSheet(b)},h("span",{class:"bci"},emo(subEmo(b.name),20,false)),
-              h("span",{class:"bcn"},h("b",null,b.name),h("small",null,(dl===0?"Renews today":dl===1?"Renews tomorrow":"Renews "+shortDate(nx))+(b.yearly?" · yearly":""))),
-              h("span",{class:"spa"},h("b",null,M(b.amt)),h("small",{style:"display:block;font-size:11.5px;color:var(--muted);text-align:right"},b.yearly?"/yr ≈ "+M(subMonthly(b))+"/mo":"/mo")))}))
-          :h("p",{class:"hint",style:"font-size:14px;margin:0"},"Netflix, Spotify, iCloud, gym… Add each once to see what they cost you every month."))})(),
-      h("div",{class:"bills cats"},h("div",{class:"billh"},h("b",null,"🗂️ Categories"),h("small",{class:"billtot"},"tap one to log or set an amount")),
-      h("div",{class:"bcl"},cs.map(c=>{const ub=upC(c.id),s2=spentIn(mk,c.id)+ub,cr=carryIn(c,mk),l=availIn(c,mk),p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;
-        return h("button",{type:"button",class:"bcr tap"+(s2>l&&(+c.limit||cr)?" over":""),style:"--bc:"+bcol(c),onclick:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,22,false)),
-          h("span",{class:"bcn"},h("b",null,c.name,c.roll?h("span",{class:"rollb",title:"Rolls over"}," 🔁"):null),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"})),ub?h("small",{class:"carry"},"incl. "+M(ub)+" in bills due later"):null,cr?h("small",{class:"carry"+(cr<0?" neg":"")},(cr>0?"+"+M(cr)+" rolled in":M(-cr)+" over from before")):null),
-          l||+c.limit?h("span",{class:"bca"+(s2>l?" ov":" ok")},h("b",null,s2>l?M(s2-l)+" over":M(l-s2)+" left"),h("small",null,M(s2)+" of "+M(l))):h("span",{class:"bca"},M(s2),h("small",null,"tap to set amount")))}))),
-      h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" so far"),lsp?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]+" summary"):null)]}
-  else if(tab==="split"){const bal=splitBalance(),it=splitItems(),open=it.filter(x=>!x.settled);
-    const line=Math.abs(bal)<0.005?"You're all square 🤝":bal>0?nm(PARTNER)+" owes you "+M(bal):"You owe "+nm(PARTNER)+" "+M(-bal);
-    const from=bal>0?PARTNER:ME,to=bal>0?ME:PARTNER,sq=Math.abs(bal)<0.005;
-    pane=[h("div",{class:"shero"},
-        h("div",{class:"sflow"},initialEl(sq?ME:from),h("div",{class:"sline"+(sq?" sq":"")},h("b",null,sq?"🤝":M(Math.abs(bal))),h("i")),initialEl(sq?PARTNER:to)),
-        h("b",{class:"stxt"},line),h("small",null,open.length?open.length+(open.length===1?" expense":" expenses")+" not settled":"Log what one of you paid for both"),
-        h("button",{type:"button",class:"primary mlog",onclick:splitSheet},"+ Add an expense")),
-      open.length?h("div",{class:"row"},confirmBtn("Settle up ✓",()=>{const o={};open.forEach(x=>{o[x.id]={settled:true,settledAt:Date.now(),settledBy:ME}});saveMoney({split:o});confetti(80);toast("Settled","You're all square")})):null,
-      h("div",{class:"spl"},it.slice(0,ui.monMore?40:6).map(x=>h("div",{class:"spr"+(x.settled?" done":"")},h("span",{class:"spw"},h("b",null,x.what),h("small",null,(x.paid===ME?"You":nm(x.paid))+" paid · "+(x.share==="for"?"for "+(x.paid===ME?nm(PARTNER):"you"):"split 50/50")+" · "+new Date(x.at).toLocaleDateString("en-US",{month:"short",day:"numeric"})+(x.settled?" · settled":""))),
-        h("b",{class:"spa"},M(x.amt)),!x.settled&&x.by===ME?h("button",{type:"button",class:"x","aria-label":"Remove "+x.what,onclick:()=>saveMoney({split:{[x.id]:{removed:true}}})},"×"):null))),
-      it.length>6?h("button",{type:"button",class:"link",onclick:()=>{ui.monMore=!ui.monMore;render()}},ui.monMore?"Show fewer":"Show all"):null]}
-  else{const gs=goals(),tot=gs.reduce((a,g)=>a+goalSaved(g.id),0);
-    pane=[h("div",{class:"savetot"},emo("🫙",44,true),h("div",null,h("span",{class:"k"},"Saved together"),h("b",null,show?money(tot):"••••"))),
-      h("div",{class:"goals"},gs.map(goalCard)),h("button",{type:"button",class:"link",onclick:()=>goalEditSheet(null)},"+ New goal")]}
-  return h("section",{class:"ju"},h("div",{class:"sechd"},h("h2",null,"Our money"),lockLink),
-    h("div",{class:"msc",role:"tablist","aria-label":"Whose money"},[["mine","👤","My money","Only you see this"],["ours","💞","Our money","Shared with "+plainNm(PARTNER)]].map(([v,e,l,d])=>h("button",{type:"button",role:"tab",class:"mscb tap"+(sc===v?" on":""),"aria-selected":String(sc===v),onclick:()=>setMScope(v)},h("span",{class:"msce"},e),h("span",{class:"msct"},h("b",null,l),h("small",null,d))))),
-    h("div",{class:"seg mseg"+(sc==="mine"?" two":"")},segb("budget","📊 Budget"),segb("save","🫙 Savings"),sc==="ours"?segb("split","🤝 Split"):null),
-    ...(tab==="budget"?(()=>{const P0=pane.filter(Boolean),top=P0.filter(e=>e.classList&&/\b(mh2|mt2|mins|pc)\b/.test(e.className)),rest=P0.filter(e=>!top.includes(e));
-      return [h("div",{class:"mcolA"},...top),h("div",{class:"mcolB"},...rest)]})():pane),
-    moneyOverall(show))}
+function moneySection(){const who=mWho(),ro=who!==ME,o=PARTNER,op=o&&P(o)&&!P(o).placeholder;
+  const lockLink=h("button",{type:"button",class:"lnk",onclick:()=>{if(!lockOn())pinSheet("set");else if(!unlocked())pinSheet("unlock");else{try{localStorage.removeItem(pinKey)}catch(e){}toast("Lock off","Amounts show on this phone");render()}}},lockOn()?(unlocked()?"🔓 Lock":"🔒 Unlock"):"🔒 Lock");
+  const pill=(u,e)=>h("button",{type:"button",role:"tab",class:"mwho tap"+(who===u?" on":""),"aria-selected":String(who===u),onclick:()=>{ui.mwho=u;render()}},h("span",{class:"mwe"},e),h("b",null,u===ME?"My money":plainNm(u)+"'s"));
+  const person=inMoney(who,()=>personMoney(who,ro)),shared=inMoney("shared",()=>sharedMoney());
+  const wrap=h("section",{class:"ju money2"},h("div",{class:"sechd"},h("h2",null,"Money"),lockLink),
+    op?h("div",{class:"mwhos",role:"tablist"},pill(ME,"👤"),pill(o,"🌸")):null,person,shared);
+  wrap.addEventListener("click",e=>{const c=e.target.closest("[data-mctx]");if(c)ui.mctxSheet=c.dataset.mctx},true);
+  return wrap}
+function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••••",nmW=who===ME?"You":plainNm(who);
+  if(!ro)setTimeout(autoBills,0);
+  const mk=mKey(),cs=bcats(),today=usDay(),INC=incomeTotal(),IL=incomes();
+  const ALL=bills().filter(b=>!(b.from&&b.from>mk)),due=ALL.filter(b=>billDue(b,mk)),billsM=due.reduce((x,b)=>x+(+b.amt||0),0);
+  const sp=spentIn(mk),paidB=spendIn(mk).filter(x=>x.bill).reduce((x,e)=>x+(+e.amt||0),0),other=sp-paidB,catLim=cs.reduce((x,c)=>x+Math.max(0,availIn(c,mk)),0);
+  const plan=INC||catLim,left=plan-billsM-other,dl=new Date(+mk.slice(0,4),+mk.slice(5),0).getDate()-(+today.slice(8))+1,base=Math.max(plan,billsM+other)||1,pc=v=>Math.max(0,v)/base*100;
+  const act=(e,l,fn,main)=>ro?null:h("button",{type:"button",class:"mact tap"+(main?" main":""),onclick:fn},h("span",null,e),l);
+  const hero=h("div",{class:"mh3"+(plan&&left<0?" over":"")},
+    h("div",{class:"mh3t"},h("span",null,(ro?plainNm(who)+"'s ":"")+monthName(mk).split(" ")[0]+(plan?" · "+dl+(dl===1?" day":" days")+" left":"")),emo(!plan?"💰":left<0?"😬":left<plan*.15?"🫣":"🤑",38,true)),
+    plan?h("div",{class:"mh3big"},h("b",null,M(Math.abs(left))),h("span",null,left>=0?"left this month":"over this month"))
+      :h("div",{class:"mh3big"},h("b",{class:"sm"},ro?"Nothing yet":"Start here"),h("span",null,ro?plainNm(who)+" hasn't added money yet":"Add your income, then bills and spending")),
+    plan?h("div",{class:"mh3bar"},h("i",{class:"b",style:"width:"+pc(billsM)+"%"}),h("i",{class:"s",style:"width:"+pc(other)+"%"}),h("i",{class:"l",style:"width:"+pc(left)+"%"})):null,
+    plan?h("div",{class:"mh3k"},h("span",{class:"i"},"In ",h("b",null,M(plan))),h("span",{class:"b"},"Bills ",h("b",null,M(billsM))),h("span",{class:"s"},"Spent ",h("b",null,M(other)))):null,
+    ro?null:h("div",{class:"macts"},act("💵","Income",()=>incomeSheet(null),!INC),act("🛒","Spending",()=>spendSheet(null),!!INC),act("🔁","Bill",()=>billSheet(null)),act("🔄","Subscription",()=>subSheet(null))));
+  const card=(e,t,sub,add,body,cls)=>h("div",{class:"mcard"+(cls?" "+cls:"")},h("div",{class:"mch"},h("span",{class:"mce"},emo(e,20,false)),h("div",null,h("b",null,t),sub?h("small",null,sub):null),add&&!ro?h("button",{type:"button",class:"lnk",onclick:add[1]},add[0]):null),body);
+  const row=(e,col,t,sub,amt,fn,cls)=>h(ro?"div":"button",{type:ro?null:"button",class:"mrow"+(ro?"":" tap")+(cls?" "+cls:""),style:"--bc:"+col,onclick:ro?null:fn},h("span",{class:"bci"},emo(e,18,false)),h("span",{class:"bcn"},h("b",null,t),sub?h("small",null,sub):null),h("b",{class:"spa"},amt));
+  const empty=t=>h("p",{class:"mempty"},t);
+  const incC=card("💵","Money in",IL.length?M(INC)+" a month":null,["+ Add",()=>incomeSheet(null)],IL.length?h("div",{class:"mrows"},IL.map(x=>row("💵","#16a37f",x.name,null,"+ "+M(x.amt),()=>incomeSheet(x)))):empty(ro?"None added":"Stipend, pay, side gigs. Add each one once."),"inc");
+  const srt=ALL.slice().sort((x,y)=>(x.sub?subNext(x):billDayIn(x,mk)).localeCompare(y.sub?subNext(y):billDayIn(y,mk))),subTot=ALL.filter(b=>b.sub).reduce((x,b)=>x+subMonthly(b),0);
+  const billC=card("🔁","Bills & subscriptions",ALL.length?M(ALL.reduce((x,b)=>x+(b.sub?subMonthly(b):+b.amt||0),0))+" a month"+(subTot?" · "+M(subTot)+" in subscriptions":""):null,["+ Add",()=>billSheet(null)],
+    ALL.length?h("div",{class:"mrows"},srt.map(b=>{if(b.sub){const nx=subNext(b),d=daysBetween(today,nx);return row(subEmo(b.name),"#d9468f",b.name,"Subscription · "+(d===0?"renews today":d===1?"renews tomorrow":"renews "+shortDate(nx))+(b.yearly?" · yearly":""),M(b.amt)+(b.yearly?"/yr":"/mo"),()=>subSheet(b),d<=3?"soon":"")}
+      const e2=billEntry(b,mk),paid=e2&&!e2.skip,dd=billDayIn(b,mk),d=daysBetween(today,dd),c=cs.find(x=>x.id===b.cat)||{e:"✨"};
+      return row(c.e,bcol(c),b.name,paid?"Paid ✓ "+shortDate(dd):!billDue(b,mk)?"Not due this month":d===0?"Due today":d===1?"Due tomorrow":"Due "+shortDate(dd),M(b.amt),()=>billSheet(b),paid?"paid":d<=3?"soon":"")}),
+      ro?null:h("button",{type:"button",class:"lnk madd2",onclick:()=>subSheet(null)},"+ Add a subscription"))
+    :h("div",null,empty(ro?"None added":"Rent, phone, tithe, Netflix, Spotify… Add each once. They count every month by themselves."),ro?null:h("button",{type:"button",class:"lnk madd2",onclick:()=>subSheet(null)},"+ Add a subscription")),"bil");
+  const sx=spendIn(mk).filter(x=>!x.bill),used=cs.map(c=>({c,s:sx.filter(x=>x.cat===c.id).reduce((t,x)=>t+(+x.amt||0),0),l:availIn(c,mk)})),shown=used.filter(x=>x.s||+x.c.limit||ui.monAll),hid=used.length-shown.length;
+  const spC=card("🛒","Spending",other?M(other)+" so far in "+monthName(mk).split(" ")[0]:null,["+ Log",()=>spendSheet(null)],
+    h("div",null,shown.length?h("div",{class:"mrows"},shown.map(({c,s:s2,l})=>{const p2=l>0?Math.min(100,Math.round(s2/l*100)):s2?100:0;
+      return h(ro?"div":"button",{type:ro?null:"button",class:"mrow cat"+(ro?"":" tap")+(l&&s2>l?" over":""),style:"--bc:"+bcol(c),onclick:ro?null:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,18,false)),
+        h("span",{class:"bcn"},h("b",null,c.name),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"}))),h("span",{class:"bca"},h("b",null,M(s2)),l?h("small",null,"of "+M(l)):null))})):empty(ro?"Nothing logged yet":"Nothing logged yet this month."),
+      hid&&!ro?h("button",{type:"button",class:"lnk madd2",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show fewer":"All categories · set limits"):null),"spd");
+  const gs=goals().filter(g=>(MONEY().goals||{})[g.id]||goalSaved(g.id)>0);
+  const svC=card("🫙","Savings",gs.length?M(gs.reduce((x,g)=>x+goalSaved(g.id),0))+" saved":null,["+ Goal",()=>goalEditSheet(null)],gs.length?h("div",{class:"goals"},gs.map(goalCard)):empty(ro?"No goals yet":"Emergency fund, a trip, a new laptop… Add a goal and put money towards it."),"sav");
+  const lm=addDays(mk+"-01",-1).slice(0,7);
+  return h("div",{class:"mperson"+(ro?" mro":""),"data-mctx":who},
+    h("div",{class:"mcolA"},hero,moneyInsights(mk,INC,show),h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" summary"),spentIn(lm)?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]):null)),
+    h("div",{class:"mcolB"},incC,billC,spC,svC))}
+function sharedMoney(){const show=unlocked(),M=v=>show?money(v):"••••",raw=MONEY().goals||{},gs=goals().filter(g=>raw[g.id]||goalSaved(g.id)>0),tot=gs.reduce((x,g)=>x+goalSaved(g.id),0);
+  return h("div",{class:"mshared","data-mctx":"shared"},h("div",{class:"mch"},h("span",{class:"mce"},emo("💞",20,false)),h("div",null,h("b",null,"Together"),h("small",null,gs.length?M(tot)+" put in by both of you":"For things you both chip in for: visits, trips, gifts")),
+      h("button",{type:"button",class:"lnk",onclick:()=>goalEditSheet(null)},"+ New")),
+    gs.length?h("div",{class:"goals"},gs.map(goalCard)):h("button",{type:"button",class:"mshadd tap",onclick:()=>goalEditSheet({id:"visits",name:"Visit fund",e:"✈️",target:0,date:"",order:0})},emo("✈️",22,false),h("span",null,h("b",null,"Start a visit fund"),h("small",null,"Each of you adds what you put in"))))}
 function spendSheet(cat){let c=cat?cat.id:(ui.lastCat||"food"),manual=!!cat;juSheet("Log spending",()=>{
   const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Amount, e.g. 24.50","aria-label":"Amount"}),n=h("input",{type:"text",class:"inp",placeholder:"What for, e.g. Walmart","aria-label":"What for"});
   const tip=h("small",{class:"autot"},"");
@@ -5303,7 +5302,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-22-d";
+const APP_VERSION="2026-11-23-a";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
