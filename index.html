@@ -1139,6 +1139,16 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   body.tab-home .money2 .mperson{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-items:start}
   body.tab-home .money2 .mcolA{position:sticky;top:16px}
 }
+/* ---- money sections: each heading its own color band ---- */
+.mcard{padding:0 12px 12px!important;overflow:hidden;border:1.5px solid color-mix(in srgb,var(--mcol) 35%,transparent)!important;background:linear-gradient(180deg,color-mix(in srgb,var(--mcol) 7%,var(--card)),var(--card) 60%)!important}
+.mcard>.mch{margin:0 -12px 10px;padding:12px 12px 11px;background:linear-gradient(120deg,color-mix(in srgb,var(--mcol) 32%,var(--card)),color-mix(in srgb,var(--mcol) 10%,var(--card)));border-bottom:1px solid color-mix(in srgb,var(--mcol) 30%,transparent)}
+.mcard>.mch .mce{background:var(--mcol);box-shadow:0 4px 12px color-mix(in srgb,var(--mcol) 45%,transparent)}
+.mcard>.mch b{font-size:18px;color:color-mix(in srgb,var(--mcol) 55%,var(--ink))}
+.mcard>.mch .lnk{background:var(--mcol)!important;color:#fff!important}
+.mcard.inc{--mcol:#16a37f}.mcard.bil{--mcol:#6d5ce8}.mcard.tob{--mcol:#d9468f}.mcard.spd{--mcol:#e0841e}.mcard.sav{--mcol:#2a7fc0}
+.mrow.mtb{cursor:default;padding:6px 6px 6px 8px;flex-direction:row!important;text-transform:none!important}.mtbk{width:26px;height:26px;border-radius:50%;border:2px solid #d9468f;background:transparent;flex:0 0 auto;cursor:pointer}
+.mtbm{flex:1;display:flex;align-items:center;gap:10px;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:3px 0;cursor:pointer;min-width:0}.mtbm .bcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tbgot{display:block;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .robtns{display:flex;gap:8px;flex-wrap:wrap}.robar .pv{background:linear-gradient(135deg,#e2557c,#7b5fcf)!important;color:#fff!important}
 .robar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--calm-soft);color:var(--ink);border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
 .robar span{min-width:0}
@@ -4105,8 +4115,8 @@ function goalCard(g){const sv=goalSaved(g.id),pc=g.target>0?Math.min(100,Math.ro
       h("button",{type:"button",class:"link",onclick:()=>addMoneySheet(g,true)},"Take money out")))}
   return c}
 /* ---------- Our money: budget, savings goals and shared expenses. Amounts and labels only ---------- */
-const BCATS=[["home","Rent and bills","🏠"],["food","Groceries","🛒"],["out","Eating out","🍽️"],["move","Transport","🚗"],["give","Church and giving","🙏"],["fun","Dates and fun","💞"],["fam","Family back home","🇬🇭"],["other","Other","✨"]];
-const BCOL={home:"#4b5bc4",food:"#2a9d8f",out:"#e2557c",move:"#2b7bb9",give:"#d08a2e",fun:"#c0398a",fam:"#3a9e7a",other:"#7b5fcf"};
+const BCATS=[["home","Rent and bills","🏠"],["food","Groceries","🛒"],["out","Eating out","🍽️"],["move","Transport","🚗"],["give","Church and giving","🙏"],["fun","Dates and fun","💞"],["fam","Family back home","🇬🇭"],["shop","Shopping","🛍️"],["other","Other","✨"]];
+const BCOL={home:"#4b5bc4",food:"#2a9d8f",out:"#e2557c",move:"#2b7bb9",give:"#d08a2e",fun:"#c0398a",fam:"#3a9e7a",shop:"#d9468f",other:"#7b5fcf"};
 const bcol=c=>BCOL[c.id]||c.col||"#6f6ad8";
 function budgetRing(segs,total,size){const r=size/2-9,C=2*Math.PI*r,c=size/2;let off=0;
   const arcs=segs.filter(x=>x.v>0).map(x=>{const len=Math.min(x.v/total,1)*C,a=`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${x.col}" stroke-width="14" stroke-dasharray="${Math.max(len-2,0.1)} ${C}" stroke-dashoffset="${-off}" stroke-linecap="butt"/>`;off+=len;return a}).join("");
@@ -4240,6 +4250,23 @@ function moneySection(){const who=mWho(),ro=who!==ME,o=PARTNER,op=o&&P(o)&&!P(o)
     op?h("div",{class:"mwhos",role:"tablist"},pill(ME,"👤"),pill(o,"🌸")):null,person,shared);
   wrap.addEventListener("click",e=>{const c=e.target.closest("[data-mctx]");if(c)ui.mctxSheet=c.dataset.mctx},true);
   return wrap}
+/* ---------- to buy: planned purchases with an estimate; tick when bought and it becomes spending ---------- */
+function toBuy(){return Object.entries(MONEY().tobuy||{}).map(([id,x])=>({id,...x})).filter(x=>x&&x.name&&!x.removed)}
+function toBuySheet(x0){juSheet(x0?"Edit":"Add to buy",()=>{const x=x0||{};
+  const n=h("input",{type:"text",class:"inp",placeholder:"What, e.g. GTA 6","aria-label":"Item"});n.value=x.name||"";
+  const a=h("input",{type:"text",inputmode:"decimal",class:"inp",placeholder:"Estimated price","aria-label":"Estimated price"});a.value=x.est||"";
+  const w=h("input",{type:"date",class:"inp","aria-label":"When"});w.value=x.when||"";
+  const wl=h("input",{type:"text",class:"inp",placeholder:"Note (optional), e.g. Black Friday deal","aria-label":"Note"});wl.value=x.note||"";
+  return [h("form",{class:"body",onsubmit:e=>{e.preventDefault();const nm0=n.value.trim();if(!nm0){n.focus();return}if(!noSensitive(nm0+" "+wl.value))return;
+      saveMoney({tobuy:{[x0?x0.id:uid()]:{name:nm0,est:amtIn(a.value)||0,when:w.value||"",note:wl.value.trim(),at:x.at||Date.now()}}});closeSheet();toast(x0?"Updated":"Added 🛍️",nm0)}},
+    n,a,h("p",{class:"hint",style:"margin:0"},"When do you plan to buy it? (optional)"),w,wl,h("button",{type:"submit",class:"primary"},x0?"Save":"Add")),
+    x0?h("div",{class:"row",style:"gap:8px;justify-content:center"},h("button",{type:"button",class:"primary",onclick:()=>boughtSheet(x0)},"✓ I bought it"),confirmBtn("Remove",()=>{saveMoney({tobuy:{[x0.id]:{removed:true}}});closeSheet()})):null]})}
+function boughtSheet(x){juSheet("Bought "+x.name,()=>{const a=h("input",{type:"text",inputmode:"decimal",class:"inp","aria-label":"What it cost"});a.value=x.est||"";
+  let c=x.cat||"shop";const chips=h("div",{class:"chips"},bcats().map(k=>h("button",{type:"button","aria-pressed":String(k.id===c),onclick:ev=>{c=k.id;chips.querySelectorAll("button").forEach(q=>q.setAttribute("aria-pressed",String(q===ev.currentTarget)))}},k.e+" "+k.name)));
+  return h("form",{class:"body",onsubmit:e=>{e.preventDefault();const v=amtIn(a.value);if(!v){a.focus();return}const sid=uid();
+      saveMoney({spend:{[sid]:{cat:c,amt:v,note:x.name,by:ME,at:Date.now(),mk:mKey()}},tobuy:{[x.id]:{bought:true,paid:v,boughtAt:usDay(),sid}}});closeSheet();hearts(null,8);
+      toast("Bought ✓",x.name+" · "+money2(v)+(x.est&&v<x.est?" · saved "+money2(x.est-v)+" 🎉":""))}},
+    h("p",{class:"hint",style:"margin:0"},"What did it actually cost?"),a,h("p",{class:"hint"},"Category"),chips,h("button",{type:"submit",class:"primary"},"Log it as spending"))})}
 function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••••",nmW=who===ME?"You":plainNm(who);
   if(!ro)setTimeout(autoBills,0);
   const mk=mKey(),cs=bcats(),today=usDay(),INC=incomeTotal(),IL=incomes();
@@ -4271,12 +4298,20 @@ function personMoney(who,ro){const show=unlocked(),M=v=>show?money2(v):"••�
       return h(ro?"div":"button",{type:ro?null:"button",class:"mrow cat"+(ro?"":" tap")+(l&&s2>l?" over":""),style:"--bc:"+bcol(c),onclick:ro?null:()=>catSheet(c)},h("span",{class:"bci"},emo(c.e,18,false)),
         h("span",{class:"bcn"},h("b",null,c.name),h("span",{class:"gbar"},h("i",{style:"width:"+p2+"%"}))),h("span",{class:"bca"},h("b",null,M(s2)),l?h("small",null,"of "+M(l)):null))})):empty(ro?"Nothing logged yet":"Nothing logged yet this month."),
       hid&&!ro?h("button",{type:"button",class:"lnk madd2",onclick:()=>{ui.monAll=!ui.monAll;render()}},ui.monAll?"Show fewer":"All categories · set limits"):null),"spd");
+  const TB=toBuy(),open=TB.filter(x=>!x.bought).sort((a,b)=>(a.when||"9999").localeCompare(b.when||"9999")),got=TB.filter(x=>x.bought&&x.boughtAt&&x.boughtAt.slice(0,7)===mk),estT=open.reduce((t,x)=>t+(+x.est||0),0);
+  const tbRow=x=>{const d=x.when?daysBetween(today,x.when):null,sub=[x.when?(d<0?"Planned "+shortDate(x.when):d===0?"Today":d===1?"Tomorrow":shortDate(x.when)+" · in "+d+" days"):null,x.note||null].filter(Boolean).join(" · ");
+    return h("div",{class:"mrow mtb"+(d!==null&&d<=3&&d>=0?" soon":""),style:"--bc:#d9468f"},
+      ro?h("span",{class:"bci"},emo("🛍️",18,false)):h("button",{type:"button",class:"mtbk tap","aria-label":"Bought "+x.name,onclick:()=>boughtSheet(x)}),
+      h(ro?"span":"button",{type:ro?null:"button",class:"mtbm"+(ro?"":" tap"),onclick:ro?null:()=>toBuySheet(x)},h("span",{class:"bcn"},h("b",null,x.name),sub?h("small",null,sub):null),h("b",{class:"spa"},x.est?"≈ "+M(x.est):"")))};
+  const tbC=card("🛍️","To buy",open.length?M(estT)+" planned"+(INC&&plan?" · "+Math.round(estT/plan*100)+"% of this month's income":""):null,["+ Add",()=>toBuySheet(null)],
+    h("div",null,open.length?h("div",{class:"mrows"},open.map(tbRow)):empty(ro?"Nothing planned":"Plan a purchase before you make it, e.g. GTA 6 on Black Friday, with an estimated price."),
+      got.length?h("small",{class:"tbgot"},"Bought this month: "+got.map(x=>x.name+" "+M(x.paid||0)).join(" · ")):null),"tob");
   const gs=goals().filter(g=>(MONEY().goals||{})[g.id]||goalSaved(g.id)>0);
   const svC=card("🫙","Savings",gs.length?M(gs.reduce((x,g)=>x+goalSaved(g.id),0))+" saved":null,["+ Goal",()=>goalEditSheet(null)],gs.length?h("div",{class:"goals"},gs.map(goalCard)):empty(ro?"No goals yet":"Emergency fund, a trip, a new laptop… Add a goal and put money towards it."),"sav");
   const lm=addDays(mk+"-01",-1).slice(0,7);
   return h("div",{class:"mperson"+(ro?" mro":""),"data-mctx":who},
     h("div",{class:"mcolA"},hero,moneyInsights(mk,INC,show),h("div",{class:"row",style:"gap:8px"},h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(mk)},"📊 "+monthName(mk).split(" ")[0]+" summary"),spentIn(lm)?h("button",{type:"button",class:"ghost",onclick:()=>moneySummarySheet(lm)},"📊 "+monthName(lm).split(" ")[0]):null)),
-    h("div",{class:"mcolB"},incC,billC,spC,svC))}
+    h("div",{class:"mcolB"},incC,billC,tbC,spC,svC))}
 function sharedMoney(){const show=unlocked(),M=v=>show?money(v):"••••",raw=MONEY().goals||{},gs=goals().filter(g=>raw[g.id]||goalSaved(g.id)>0),tot=gs.reduce((x,g)=>x+goalSaved(g.id),0);
   return h("div",{class:"mshared","data-mctx":"shared"},h("div",{class:"mch"},h("span",{class:"mce"},emo("💞",20,false)),h("div",null,h("b",null,"Together"),h("small",null,gs.length?M(tot)+" put in by both of you":"For things you both chip in for: visits, trips, gifts")),
       h("button",{type:"button",class:"lnk",onclick:()=>goalEditSheet(null)},"+ New")),
@@ -5302,7 +5337,7 @@ setInterval(()=>{if(!S.viewAs)return;const a=document.activeElement;if(!el("shee
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.viewAs)softRender()});
 
 /* ---------- updates: reload when a newer version is published ---------- */
-const APP_VERSION="2026-11-23-a";
+const APP_VERSION="2026-11-23-b";
 async function checkUpdate(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==APP_VERSION){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update().catch(()=>{})}try{if(sessionStorage.getItem("odReload")===v)return;sessionStorage.setItem("odReload",v)}catch(e){}location.reload()}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
